@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkinQu</title>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #F4F7FC;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      padding: 15px 20px;
+      font-size: 18px;
+      color: #999;
+      font-weight: 500;
+    }
+
+    /* BANNER */
+    .banner {
+      margin: 0 15px;
+      background: #447DCE;
+      color: white;
+      border-radius: 20px;
+      padding: 20px;
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .banner img {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 65%;
+      border-bottom-right-radius: 20px;
+    }
+
+    .banner h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .banner p {
+      margin-top: 5px;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    /* CATEGORY SECTION */
+    .section-title {
+      padding: 20px 20px 10px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* CATEGORY TABS */
+    .category-tabs {
+      padding: 0 20px;
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .category-tabs div {
+      font-size: 14px;
+      padding-bottom: 5px;
+      cursor: pointer;
+      color: #777;
+    }
+
+    .category-tabs .active {
+      font-weight: bold;
+      color: #447DCE;
+      border-bottom: 2px solid #447DCE;
+    }
+
+    /* CATEGORY GRID */
+    .category-grid {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .category-card {
+      background: white;
+      border-radius: 16px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: .25s;
+    }
+
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(68, 125, 206, 0.25);
+    }
+
+    .category-card img {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .category-card p {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: white;
+      padding: 12px 0;
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+
+    .bottom-nav div {
+      text-align: center;
+      font-size: 22px;
+      color: #447DCE;
+      cursor: pointer;
+    }
+
+    .search-icon {
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(5px);
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 18px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white; /* biar ikon tetap putih */
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- BANNER -->
+<div class="banner">
+  <h2>Good Morning</h2>
+  <p>Your skincare is ready!</p>
+  <img src="https://images.unsplash.com/photo-1598514982141-1f655d29da7c?w=800">
+</div>
+
+<!-- CATEGORY TITLE -->
+<div class="section-title">Categories</div>
+
+<!-- CATEGORY TABS -->
+<div class="category-tabs">
+  <div class="active">All</div>
+  <div>Woman</div>
+  <div>Men</div>
+  <div>Kids</div>
+  <div>Parents</div>
+</div>
+
+<!-- CATEGORY GRID -->
+<div class="category-grid">
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/facial-cleanser.png"/>
+    <p>Facial Wash</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/moisturizer.png"/>
+    <p>Moisturizer</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/serum.png"/>
+    <p>Serum</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/micellar-water.png"/>
+    <p>Micellar Water</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/clay-mask.png"/>
+    <p>Clay Mask</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/sunblock.png"/>
+    <p>Sunscreen</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/cosmetics-jar.png"/>
+    <p>Package</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/acne.png"/>
+    <p>Acne Ointment</p>
+  </div>
+
+  <div class="category-card">
+    <img src="https://img.icons8.com/color/96/skin.png"/>
+    <p>Peeling</p>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div>🏠</div>
+  <div>
+    <a href="recom.html" class="search-icon">🔍</a>
+  </div>
+  <div>❤️</div>
+  <div>👤</div>
+</div>
+
+</body>
+</html>

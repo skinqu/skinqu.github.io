@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Kulit</title>
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #FAFAFA;
+  }
+
+  .back-btn {
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 25px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #E5E5E5;
+    font-size: 14px;
+  }
+
+  /* YA / TIDAK CHECKBOX */
+  .option-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    align-items: center;
+  }
+
+  .option-label {
+    font-size: 15px;
+  }
+
+  .yn-buttons {
+    display: flex;
+    gap: 20px;
+  }
+
+  .yn-buttons label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #447DCE;
+  }
+
+  /* TITLE OF SECTION */
+  .section-title {
+    margin-top: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 10px;
+  }
+
+  /* SEND BUTTON */
+  .btn-send {
+    margin-top: 30px;
+    width: 100%;
+    background: #093A73;
+    padding: 14px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="back-btn">←</div>
+
+<div class="title">
+  Beri tahu kami tentang kulit Anda <br>
+  Agar kami dapat merekomendasikan <br>
+  perawatan kulit terbaik untuk Anda
+</div>
+
+<!-- FORM -->
+<div class="form-group">
+  <label>Umur</label>
+  <input type="number" placeholder="Masukkan umur Anda">
+</div>
+
+<div class="form-group">
+  <label>Jenis Kelamin</label>
+  <select>
+    <option>Laki-laki</option>
+    <option>Perempuan</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>Hamil</label>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<!-- SECTION JENIS KULIT -->
+<div class="section-title">Jenis Kulit</div>
+
+<div class="option-row">
+  <div class="option-label">Berminyak</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Kering</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Kusam</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Berjerawat</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Kulit sensitif</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Beruntusan</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Flek hitam</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Kemerahan</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Pori-pori besar</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="option-row">
+  <div class="option-label">Berkomedo</div>
+  <div class="yn-buttons">
+    <label><input type="checkbox"> ya</label>
+    <label><input type="checkbox"> tidak</label>
+  </div>
+</div>
+
+<div class="btn-send">Send</div>
+
+</body>
+</html>
