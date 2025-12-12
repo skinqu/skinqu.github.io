@@ -85,51 +85,42 @@
 
 
 <script>
-/* ============================================
-   >>> CONTOH DATA DARI N8N (JSON)
-   Kamu nanti ganti ini dengan fetch() dari n8n
-   ============================================ */
-const rekomendasi = [
-    {
-        "nama": "Scarlett Acne Serum",
-        "image": "https://i.imgur.com/MBqV7vP.png",
-        "url": "https://shopee.co.id/scarlett-acne"
-    },
-    {
-        "nama": "Emina Sun Protection",
-        "image": "https://i.imgur.com/EEvoQzv.png",
-        "url": "https://shopee.co.id/emina-sun"
-    },
-    {
-        "nama": "Azarine Hydrasoothe",
-        "image": "https://i.imgur.com/HXahQ6u.png",
-        "url": "https://tokopedia.com/azarine"
-    },
-    {
-        "nama": "Somethinc Low pH Cleanser",
-        "image": "https://i.imgur.com/9anr5uM.png",
-        "url": "https://shopee.co.id/somethinc-cleanser"
+// Ambil data dari localStorage (dikirim lewat n8n)
+let rekomendasi = [];
+
+try {
+    const stored = localStorage.getItem("skinqu_products");
+
+    if (stored) {
+        rekomendasi = JSON.parse(stored);
+    } else {
+        alert("Data produk tidak ditemukan! Silakan isi form lagi.");
     }
-];
+} catch (e) {
+    console.error("Gagal parsing JSON:", e);
+    alert("Terjadi kesalahan memuat data produk.");
+}
 
-
-/* ============================================
-   >>> RENDER PRODUK KE UI
-   ============================================ */
+// Render otomatis
 const grid = document.getElementById("productGrid");
 
-rekomendasi.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.onclick = () => window.location.href = item.url;
+if (rekomendasi.length > 0) {
+    rekomendasi.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.onclick = () => window.location.href = item.url;
 
-    card.innerHTML = `
-        <img src="${item.image}" alt="${item.nama}">
-    `;
+        card.innerHTML = `
+            <img src="${item.image}" alt="${item.nama}">
+        `;
 
-    grid.appendChild(card);
-});
+        grid.appendChild(card);
+    });
+} else {
+    grid.innerHTML = `<p style="padding:20px;color:#555;">Tidak ada rekomendasi ditemukan.</p>`;
+}
 </script>
+
 
 </body>
 </html>
