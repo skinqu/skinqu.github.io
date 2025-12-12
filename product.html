@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rekomendasi Produk – SkinQu</title>
+<title>Produk Rekomendasi – SkinQu</title>
 
 <style>
     body {
@@ -14,121 +14,103 @@
 
     .topbar {
         padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        font-size: 18px;
-        font-weight: 500;
-    }
-
-    .topbar span {
-        font-size: 24px;
-        margin-right: 10px;
-        cursor: pointer;
-    }
-
-    .title {
-        padding: 20px;
         font-size: 20px;
-        font-weight: 700;
-        color: #0A2A43;
+        font-weight: 600;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    /* GRID PRODUK */
     .product-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-        padding: 0 20px 40px;
+        gap: 16px;
+        padding: 20px;
     }
 
     .product-card {
-        background: white;
-        padding: 18px;
-        border-radius: 18px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: 0.2s;
+        background: #fff;
+        border-radius: 14px;
+        padding: 12px;
+        text-align: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         cursor: pointer;
-        height: 180px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        transition: .2s;
     }
 
     .product-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
     .product-card img {
         width: 100%;
-        height: 100%;
+        height: 130px;
         object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #222;
+        height: 40px;
+        overflow: hidden;
+    }
+
+    .buy-btn {
+        background: #447DCE;
+        color: white;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
     }
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-    <span onclick="history.back()">←</span>
-    Produk Rekomendasi
-</div>
+<div class="topbar">Produk Rekomendasi 💙</div>
 
-<div class="title">Hasil analisa kulitmu 💙</div>
-
-<!-- GRID PRODUK -->
-<div class="product-grid" id="productGrid">
-    <!-- PRODUK NANTI DIISI DINAMIS DARI n8n -->
-</div>
-
+<div class="product-grid" id="productGrid"></div>
 
 <script>
-/* ============================================
-   >>> CONTOH DATA DARI N8N (JSON)
-   Kamu nanti ganti ini dengan fetch() dari n8n
-   ============================================ */
-const rekomendasi = [
-    {
-        "nama": "Scarlett Acne Serum",
-        "image": "https://i.imgur.com/MBqV7vP.png",
-        "url": "https://shopee.co.id/scarlett-acne"
-    },
-    {
-        "nama": "Emina Sun Protection",
-        "image": "https://i.imgur.com/EEvoQzv.png",
-        "url": "https://shopee.co.id/emina-sun"
-    },
-    {
-        "nama": "Azarine Hydrasoothe",
-        "image": "https://i.imgur.com/HXahQ6u.png",
-        "url": "https://tokopedia.com/azarine"
-    },
-    {
-        "nama": "Somethinc Low pH Cleanser",
-        "image": "https://i.imgur.com/9anr5uM.png",
-        "url": "https://shopee.co.id/somethinc-cleanser"
-    }
-];
+
+/* ==============================================
+   1️⃣ AMBIL DATA DARI n8n
+   ============================================== */
+
+fetch("https://hexafaton.app.n8n.cloud/webhook/skinqu-output")
+    .then(res => res.json())
+    .then(data => renderProducts(data))
+    .catch(err => {
+        console.error("Gagal ambil data:", err);
+    });
 
 
-/* ============================================
-   >>> RENDER PRODUK KE UI
-   ============================================ */
-const grid = document.getElementById("productGrid");
+/* ==============================================
+   2️⃣ RENDER KE UI
+   ============================================== */
+function renderProducts(list) {
+    const grid = document.getElementById("productGrid");
+    grid.innerHTML = ""; // reset grid
 
-rekomendasi.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.onclick = () => window.location.href = item.url;
+    list.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.onclick = () => window.open(p.url, "_blank");
 
-    card.innerHTML = `
-        <img src="${item.image}" alt="${item.nama}">
-    `;
+        card.innerHTML = `
+            <img src="${p.image}">
+            <div class="product-name">${p.nama}</div>
+            <div class="buy-btn">Beli Sekarang</div>
+        `;
 
-    grid.appendChild(card);
-});
+        grid.appendChild(card);
+    });
+}
+
 </script>
 
 </body>
