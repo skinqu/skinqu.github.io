@@ -6,11 +6,12 @@
 <title>Produk Rekomendasi – SkinQu</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #F4F8FA;
+    }
 
-<<<<<<< HEAD
     .topbar {
         padding: 15px 20px;
         font-size: 20px;
@@ -65,91 +66,11 @@
         font-weight: 600;
         text-align: center;
     }
-=======
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #f4f6f8;
-}
-
-/* HEADER */
-.header {
-  background: #ffffff;
-  padding: 15px;
-  font-size: 18px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-/* LIST */
-.product-list {
-  padding: 10px;
-}
-
-/* CARD */
-.card {
-  display: flex;
-  background: #fff;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  padding: 10px;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-/* IMAGE */
-.card img {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #eee;
-}
-
-/* CONTENT */
-.card-content {
-  flex: 1;
-}
-
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.card-price {
-  color: #ee4d2d;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.card-desc {
-  font-size: 12px;
-  color: #555;
-  line-height: 1.4;
-}
-
-/* BUTTON */
-.card a {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 6px 12px;
-  font-size: 12px;
-  background: #ee4d2d;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-}
->>>>>>> 3ca4e4c1e98aece8d519c9ce2e639c2de1115f79
 </style>
 </head>
 
 <body>
 
-<<<<<<< HEAD
 <div class="topbar">Produk Rekomendasi 💙</div>
 
 <div class="product-grid" id="productGrid"></div>
@@ -166,21 +87,8 @@ fetch("https://hexafaton.app.n8n.cloud/webhook/skinqu-output")
     .catch(err => {
         console.error("Gagal ambil data:", err);
     });
-=======
-<div class="header">Rekomendasi Skincare Untuk Kamu</div>
 
-<div class="product-list" id="productList"></div>
 
-<script>
-const products = JSON.parse(localStorage.getItem('skinqu_products')) || [];
-const container = document.getElementById('productList');
->>>>>>> 3ca4e4c1e98aece8d519c9ce2e639c2de1115f79
-
-if (products.length === 0) {
-  container.innerHTML = '<p style="padding:15px">Tidak ada produk.</p>';
-}
-
-<<<<<<< HEAD
 /* ==============================================
    2️⃣ RENDER KE UI
    ============================================== */
@@ -203,26 +111,6 @@ function renderProducts(list) {
     });
 }
 
-=======
-products.forEach(p => {
-  const img = p.image || 'https://via.placeholder.com/150';
-
-  const card = document.createElement('div');
-  card.className = 'card';
-
-  card.innerHTML = `
-    <img src="${img}">
-    <div class="card-content">
-      <div class="card-title">${p.nama}</div>
-      <div class="card-price">${p.harga}</div>
-      <div class="card-desc">${p.alasan}</div>
-      ${p.url ? `<a href="${p.url}" target="_blank">Lihat Produk</a>` : ''}
-    </div>
-  `;
-
-  container.appendChild(card);
-});
->>>>>>> 3ca4e4c1e98aece8d519c9ce2e639c2de1115f79
 </script>
 
 </body>
