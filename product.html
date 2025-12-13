@@ -76,39 +76,37 @@
 <div class="product-grid" id="productGrid"></div>
 
 <script>
-
 function renderProducts(list) {
-    const grid = document.getElementById("productGrid");
-    grid.innerHTML = "";
+  const grid = document.getElementById("productGrid");
+  grid.innerHTML = "";
 
-    list.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.onclick = () => window.open(p.url, "_blank");
+  list.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.onclick = () => window.open(p.url, "_blank");
 
-        card.innerHTML = `
-            <img src="${p.image}">
-            <div class="product-name">${p.nama}</div>
-            <div class="buy-btn">Beli Sekarang</div>
-        `;
-
-        grid.appendChild(card);
-    });
-}
-
-// === Ambil data dari sessionStorage ===
-let stored = sessionStorage.getItem("skinqu_products");
-
-if (!stored) {
-    document.getElementById("productGrid").innerHTML = `
-        <p style="padding:20px;color:#777">Tidak ada produk ditemukan. Silakan isi form dulu.</p>
+    card.innerHTML = `
+      <img src="${p.image}">
+      <div class="product-name">${p.nama}</div>
+      <div class="buy-btn">Beli Sekarang</div>
     `;
-} else {
-    const products = JSON.parse(stored);
-    renderProducts(products);
+
+    grid.appendChild(card);
+  });
 }
 
+// === AMBIL DATA DARI URL HASH ===
+const hash = window.location.hash;
+
+if (!hash.includes("data=")) {
+  document.getElementById("productGrid").innerHTML =
+    "<p style='padding:20px'>Tidak ada produk</p>";
+} else {
+  const json = decodeURIComponent(hash.split("data=")[1]);
+  renderProducts(JSON.parse(json));
+}
 </script>
+
 
 
 </body>
