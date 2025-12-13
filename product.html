@@ -66,10 +66,33 @@
         font-weight: 600;
         text-align: center;
     }
+
+    .back-btn {
+  float: right;
+  background: #447DCE;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  opacity: 0.9;
+}
+
 </style>
 </head>
 
 <body>
+<div class="topbar">
+  Produk Rekomendasi 💙
+  <button class="back-btn" onclick="window.location.href='recom.html'">
+    ⬅ Kembali
+  </button>
+</div>
 
 <div class="topbar">Produk Rekomendasi 💙</div>
 
@@ -116,10 +139,6 @@ if (raw) {
 }
 
 </script>
-
-
-
-
 
 </body>
 </html>
