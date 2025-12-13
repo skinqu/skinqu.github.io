@@ -104,38 +104,51 @@ function renderProducts(list) {
     const card = document.createElement("div");
     card.className = "product-card";
 
-    const imgSrc = p.image && p.image.trim() !== ""
+    const img = (p.image && p.image !== "")
       ? p.image
       : "https://via.placeholder.com/300x200?text=SkinQu";
 
-    card.innerHTML = `
-      <img src="${imgSrc}">
-      <div class="product-name">${p.nama || "Produk Skincare"}</div>
-      <div class="buy-btn">Rekomendasi</div>
-    `;
+    const harga = p.harga ? p.harga : "-";
 
-    if (p.url && p.url.trim() !== "") {
-      card.onclick = () => window.open(p.url, "_blank");
-    }
+    const link = p.url && p.url !== ""
+      ? p.url
+      : "#";
+
+    card.innerHTML = `
+      <img src="${img}">
+      <div class="product-name">${p.nama}</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">
+        ${harga}
+      </div>
+      <a href="${link}" target="_blank"
+         style="
+           display:block;
+           background:#447DCE;
+           color:#fff;
+           padding:8px;
+           border-radius:8px;
+           text-decoration:none;
+           font-size:13px;
+           font-weight:600;
+         ">
+         Pesan Produk
+      </a>
+    `;
 
     grid.appendChild(card);
   });
 }
 
-// === AMBIL DATA DARI QUERY STRING ===
+// AMBIL DATA
 const params = new URLSearchParams(window.location.search);
 const raw = params.get("data");
 
 if (raw) {
-  try {
-    const products = JSON.parse(decodeURIComponent(raw));
-    renderProducts(products);
-  } catch (e) {
-    console.log("Data rusak");
-  }
+  const products = JSON.parse(decodeURIComponent(raw));
+  renderProducts(products);
 }
-
 </script>
+
 
 </body>
 </html>
