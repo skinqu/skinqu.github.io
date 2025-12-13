@@ -131,7 +131,7 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
-/* 1️⃣ BUAT 6 KOTAK DULU (SKELETON) */
+/* skeleton */
 for (let i = 0; i < MAX; i++) {
   const card = document.createElement("div");
   card.className = "product-card";
@@ -145,13 +145,16 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* 2️⃣ AMBIL DATA DARI n8n (window.name) */
+/* 🔥 FIX UTAMA DI SINI */
 let products = [];
 try {
-  products = JSON.parse(window.name || "[]");
-} catch {}
+  const raw = JSON.parse(window.name || "[]");
+  products = Array.isArray(raw) ? raw : [raw];
+} catch (e) {
+  console.log("JSON error", e);
+}
 
-/* 3️⃣ ISI KOTAK DENGAN DATA n8n (MAX 6) */
+/* isi kotak */
 products.slice(0, MAX).forEach((p, i) => {
   const img = p.image && p.image !== ""
     ? p.image
@@ -169,6 +172,7 @@ products.slice(0, MAX).forEach((p, i) => {
   }
 });
 </script>
+
 
 </body>
 </html>
