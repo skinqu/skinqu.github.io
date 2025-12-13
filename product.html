@@ -20,8 +20,8 @@ body {
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .back-btn {
@@ -31,40 +31,24 @@ body {
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
 }
 
-.back-btn:hover {
-  opacity: 0.9;
-}
-
-/* ===== GRID RESPONSIF ===== */
+/* ===== GRID ===== */
 .product-grid {
   display: grid;
   gap: 16px;
   padding: 16px;
 }
 
-/* HP → 2 kolom */
 @media (max-width: 600px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
-/* Tablet */
 @media (min-width: 601px) and (max-width: 900px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .product-grid { grid-template-columns: repeat(3, 1fr); }
 }
-
-/* Desktop */
 @media (min-width: 901px) {
-  .product-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .product-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* ===== CARD ===== */
@@ -77,10 +61,7 @@ body {
   cursor: pointer;
   transition: .2s;
 }
-
-.product-card:hover {
-  transform: translateY(-4px);
-}
+.product-card:hover { transform: translateY(-4px); }
 
 .product-card img {
   width: 100%;
@@ -92,8 +73,8 @@ body {
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 6px;
   color: #222;
+  margin-bottom: 6px;
   height: 40px;
   overflow: hidden;
 }
@@ -119,68 +100,86 @@ body {
 
 <div class="topbar">
   <span>Produk Rekomendasi 💙</span>
-  <button class="back-btn" onclick="window.location.href='recom.html'">
-    ⬅ Kembali
-  </button>
+  <button class="back-btn" onclick="history.back()">⬅ Kembali</button>
 </div>
 
 <div class="product-grid" id="productGrid"></div>
 
 <script>
-const MAX = 6;
-const grid = document.getElementById("productGrid");
-const cards = [];
-
-/* ===== CONFIG SUPABASE ===== */
+/* ==========================
+   KONFIGURASI SUPABASE
+========================== */
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4"; // WAJIB
 
-/* skeleton */
-for (let i = 0; i < MAX; i++) {
-  const card = document.createElement("div");
-  card.className = "product-card";
-  card.innerHTML = `
-    <img src="https://via.placeholder.com/300x200?text=SkinQu">
-    <div class="product-name">Menyiapkan rekomendasi...</div>
-    <div class="product-price">Rp --</div>
-    <div class="buy-btn">Pesan Produk</div>
+const grid = document.getElementById("productGrid");
+
+/* ==========================
+   SKELETON LOADING
+========================== */
+grid.innerHTML = "";
+for (let i = 0; i < 6; i++) {
+  grid.innerHTML += `
+    <div class="product-card">
+      <img src="https://via.placeholder.com/300x200?text=SkinQu">
+      <div class="product-name">Menyiapkan rekomendasi...</div>
+      <div class="product-price">Rp --</div>
+      <div class="buy-btn">Pesan Produk</div>
+    </div>
   `;
-  grid.appendChild(card);
-  cards.push(card);
 }
 
-/* ===== FETCH DARI SUPABASE ===== */
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
+/* ==========================
+   FETCH DATA SUPABASE
+========================== */
+fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=nama,harga,image,url&order=id.desc&limit=6`, {
   headers: {
     apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`,
+    Authorization: `Bearer ${SUPABASE_KEY}`
   }
 })
 .then(res => res.json())
 .then(data => {
+
   console.log("DATA SUPABASE:", data);
 
-  data.forEach((p, i) => {
-    if (!cards[i]) return;
+  // HAPUS SKELETON
+  grid.innerHTML = "";
 
-    cards[i].innerHTML = `
-      <img src="${p.image || 'https://via.placeholder.com/300x200?text=SkinQu'}"
+  if (!data.length) {
+    grid.innerHTML = "<p style='padding:20px'>Belum ada rekomendasi</p>";
+    return;
+  }
+
+  data.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    const imgSrc = p.image && p.image.startsWith("http")
+      ? p.image
+      : "https://via.placeholder.com/300x200?text=SkinQu";
+
+    card.innerHTML = `
+      <img src="${imgSrc}"
+           loading="lazy"
            onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
       <div class="product-name">${p.nama}</div>
-      <div class="product-price">${p.harga || 'Estimasi harga'}</div>
+      <div class="product-price">${p.harga || "Estimasi harga"}</div>
       <div class="buy-btn">Pesan Produk</div>
     `;
 
     if (p.url) {
-      cards[i].onclick = () => window.open(p.url, "_blank");
+      card.onclick = () => window.open(p.url, "_blank");
     }
+
+    grid.appendChild(card);
   });
 })
 .catch(err => {
-  console.error("GAGAL LOAD SUPABASE:", err);
+  console.error("Gagal load Supabase:", err);
+  grid.innerHTML = "<p style='padding:20px'>Gagal memuat data</p>";
 });
 </script>
-
 
 </body>
 </html>
