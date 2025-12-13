@@ -1,38 +1,38 @@
 [
   {
-    "nama": "Somethinc Niacinamide 10% + Zinc 1%",
-    "image": "",
-    "url": "",
-    "harga": "Rp 139.000"
+    "nama": "Somethinc 2% Salicylic Acid Serum",
+    "image": "https://linkgambar.com/somethinc-salicylic-serum.jpg",
+    "url": "https://linkproduksomethinc.com/salicylic-acid-serum",
+    "harga": "Rp 119.000"
   },
   {
-    "nama": "Wardah Hydrating Glow Mist",
-    "image": "",
-    "url": "",
-    "harga": "Rp 65.000"
+    "nama": "Skintific 2% Niacinamide Serum",
+    "image": "https://linkgambar.com/skintific-niacinamide-serum.jpg",
+    "url": "https://linkprodukskintific.com/niacinamide-serum",
+    "harga": "Rp 145.000"
   },
   {
-    "nama": "Avoskin Your Skin Bae Serum",
-    "image": "",
-    "url": "",
-    "harga": "Rp 149.000"
+    "nama": "Wardah Hydrating Aloe Vera Gel",
+    "image": "https://linkgambar.com/wardah-aloe-vera-gel.jpg",
+    "url": "https://linkprodukwardah.com/aloe-vera-gel",
+    "harga": "Rp 45.000"
   },
   {
-    "nama": "Scarlett Whitening Face Serum",
-    "image": "",
-    "url": "",
+    "nama": "Scarlett Brightening Facial Wash",
+    "image": "https://linkgambar.com/scarlett-facial-wash.jpg",
+    "url": "https://linkprodukscarlett.com/brightening-facial-wash",
     "harga": "Rp 75.000"
   },
   {
-    "nama": "Emina Sun Protection SPF 30",
-    "image": "",
-    "url": "",
-    "harga": "Rp 55.000"
+    "nama": "Avoskin Even Glow Serum",
+    "image": "https://linkgambar.com/avoskin-even-glow-serum.jpg",
+    "url": "https://linkprodukavoskin.com/even-glow-serum",
+    "harga": "Rp 199.000"
   },
   {
-    "nama": "Hanasui Aloe Vera Gel",
-    "image": "",
-    "url": "",
-    "harga": "Rp 35.000"
+    "nama": "Emina Sun Protection Face Mist",
+    "image": "https://linkgambar.com/emina-sun-mist.jpg",
+    "url": "https://linkprodukemina.com/sun-protection-face-mist",
+    "harga": "Rp 55.000"
   }
 ]
