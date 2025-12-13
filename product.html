@@ -12,7 +12,7 @@ body {
   background: #F4F8FA;
 }
 
-/* ===== TOPBAR ===== */
+/* TOPBAR */
 .topbar {
   padding: 15px 20px;
   font-size: 20px;
@@ -31,10 +31,11 @@ body {
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-/* ===== GRID ===== */
+/* GRID */
 .product-grid {
   display: grid;
   gap: 16px;
@@ -51,21 +52,18 @@ body {
   .product-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* ===== CARD ===== */
+/* CARD */
 .product-card {
   background: #fff;
   border-radius: 14px;
   padding: 12px;
   text-align: center;
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: .2s;
 }
-.product-card:hover { transform: translateY(-4px); }
 
 .product-card img {
   width: 100%;
-  height: 130px;
+  height: 140px;
   object-fit: contain;
   margin-bottom: 10px;
 }
@@ -73,7 +71,6 @@ body {
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  color: #222;
   margin-bottom: 6px;
   height: 40px;
   overflow: hidden;
@@ -82,16 +79,19 @@ body {
 .product-price {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .buy-btn {
+  width: 100%;
   background: #447DCE;
-  color: white;
-  padding: 8px;
+  color: #fff;
+  border: none;
+  padding: 9px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -106,78 +106,65 @@ body {
 <div class="product-grid" id="productGrid"></div>
 
 <script>
-/* ==========================
-   KONFIGURASI SUPABASE
-========================== */
+// =======================
+// KONFIGURASI SUPABASE
+// =======================
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4"; // WAJIB
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4";
 
+// =======================
+const MAX = 6;
 const grid = document.getElementById("productGrid");
 
-/* ==========================
-   SKELETON LOADING
-========================== */
-grid.innerHTML = "";
-for (let i = 0; i < 6; i++) {
+// skeleton
+for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
       <img src="https://via.placeholder.com/300x200?text=SkinQu">
       <div class="product-name">Menyiapkan rekomendasi...</div>
       <div class="product-price">Rp --</div>
-      <div class="buy-btn">Pesan Produk</div>
+      <button class="buy-btn" disabled>Pesan Produk</button>
     </div>
   `;
 }
 
-/* ==========================
-   FETCH DATA SUPABASE
-========================== */
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=nama,harga,image,url&order=id.desc&limit=6`, {
+// =======================
+// FETCH DARI SUPABASE
+// =======================
+fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
   headers: {
-    apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`
+    "apikey": SUPABASE_ANON_KEY,
+    "Authorization": "Bearer " + SUPABASE_ANON_KEY
   }
 })
 .then(res => res.json())
 .then(data => {
-
-  console.log("DATA SUPABASE:", data);
-
-  // HAPUS SKELETON
   grid.innerHTML = "";
 
-  if (!data.length) {
-    grid.innerHTML = "<p style='padding:20px'>Belum ada rekomendasi</p>";
-    return;
-  }
-
   data.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-
-    const imgSrc = p.image && p.image.startsWith("http")
+    const img = p.image && p.image !== ""
       ? p.image
       : "https://via.placeholder.com/300x200?text=SkinQu";
 
-    card.innerHTML = `
-      <img src="${imgSrc}"
-           loading="lazy"
-           onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
-      <div class="product-name">${p.nama}</div>
-      <div class="product-price">${p.harga || "Estimasi harga"}</div>
-      <div class="buy-btn">Pesan Produk</div>
+    grid.innerHTML += `
+      <div class="product-card">
+        <img src="${img}"
+             loading="lazy"
+             onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
+
+        <div class="product-name">${p.nama}</div>
+        <div class="product-price">${p.harga}</div>
+
+        <button class="buy-btn"
+          onclick="window.open('${p.url}', '_blank')">
+          Pesan Produk
+        </button>
+      </div>
     `;
-
-    if (p.url) {
-      card.onclick = () => window.open(p.url, "_blank");
-    }
-
-    grid.appendChild(card);
   });
 })
 .catch(err => {
   console.error("Gagal load Supabase:", err);
-  grid.innerHTML = "<p style='padding:20px'>Gagal memuat data</p>";
 });
 </script>
 
