@@ -84,28 +84,39 @@ function renderProducts(list) {
     const card = document.createElement("div");
     card.className = "product-card";
 
+    const imgSrc = p.image && p.image.trim() !== ""
+      ? p.image
+      : "https://via.placeholder.com/300x200?text=SkinQu";
+
     card.innerHTML = `
-      <img src="${p.image}">
-      <div class="product-name">${p.nama}</div>
-      <div class="buy-btn">Beli Sekarang</div>
+      <img src="${imgSrc}">
+      <div class="product-name">${p.nama || "Produk Skincare"}</div>
+      <div class="buy-btn">Rekomendasi</div>
     `;
+
+    if (p.url && p.url.trim() !== "") {
+      card.onclick = () => window.open(p.url, "_blank");
+    }
 
     grid.appendChild(card);
   });
 }
 
-// === AMBIL DATA DARI URL QUERY ===
+// === AMBIL DATA DARI QUERY STRING ===
 const params = new URLSearchParams(window.location.search);
-const data = params.get("data");
+const raw = params.get("data");
 
-if (!data) {
-  document.getElementById("productGrid").innerHTML =
-    "<p style='padding:20px'>Tidak ada produk</p>";
-} else {
-  const products = JSON.parse(decodeURIComponent(data));
-  renderProducts(products);
+if (raw) {
+  try {
+    const products = JSON.parse(decodeURIComponent(raw));
+    renderProducts(products);
+  } catch (e) {
+    console.log("Data rusak");
+  }
 }
+
 </script>
+
 
 
 
