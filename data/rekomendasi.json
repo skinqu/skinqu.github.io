@@ -1,18 +1,24 @@
 [
   {
-    "nama": "Somethinc 2% Salicylic Acid Acne Treatment Gel",
+    "nama": "Somethinc 2% Niacinamide + 1% Zinc Serum",
     "image": "",
     "url": "",
-    "harga": "Rp 109.000"
+    "harga": "Rp 99.000"
+  },
+  {
+    "nama": "Skintific 7 Seconds Activated C Serum",
+    "image": "",
+    "url": "",
+    "harga": "Rp 139.000"
   },
   {
     "nama": "Wardah Hydrating Aloe Vera Gel",
     "image": "",
     "url": "",
-    "harga": "Rp 54.000"
+    "harga": "Rp 40.000"
   },
   {
-    "nama": "Scarlett Whitening Brightening Facial Wash",
+    "nama": "Scarlett Brightly Ever After Serum",
     "image": "",
     "url": "",
     "harga": "Rp 75.000"
@@ -24,15 +30,9 @@
     "harga": "Rp 150.000"
   },
   {
-    "nama": "Emina Sun Protection Gel",
+    "nama": "Emina Bright Stuff Face Wash",
     "image": "",
     "url": "",
-    "harga": "Rp 70.000"
-  },
-  {
-    "nama": "Whitelab Brightening Night Cream",
-    "image": "",
-    "url": "",
-    "harga": "Rp 99.000"
+    "harga": "Rp 45.000"
   }
 ]
