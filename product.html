@@ -113,7 +113,6 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 
 // skeleton
-grid.innerHTML = "";
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
@@ -125,37 +124,31 @@ for (let i = 0; i < MAX; i++) {
   `;
 }
 
-// fetch supabase
+// === FETCH DATA TERBARU ===
 fetch(
-  `${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}&order=created_at.desc`,
+  `${SUPABASE_URL}/rest/v1/rekomendasi_produk` +
+  `?select=nama,harga,image` +
+  `&order=created_at.desc` +
+  `&limit=${MAX}`,
   {
     headers: {
-      "apikey": SUPABASE_ANON_KEY,
-      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-      "Accept": "application/json"
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: "Bearer " + SUPABASE_ANON_KEY
     }
   }
 )
-.then(res => {
-  if (!res.ok) throw new Error("HTTP error " + res.status);
-  return res.json();
-})
+.then(res => res.json())
 .then(data => {
   grid.innerHTML = "";
-
-  if (!data.length) {
-    grid.innerHTML = "<p style='padding:20px'>Data kosong</p>";
-    return;
-  }
 
   data.forEach(p => {
     const img = p.image && p.image !== ""
       ? p.image
       : "https://via.placeholder.com/300x200?text=SkinQu";
 
-    const url = p.url && p.url !== ""
-      ? p.url
-      : "https://shopee.co.id/search?keyword=" + encodeURIComponent(p.nama);
+    const shopeeSearch =
+      "https://shopee.co.id/search?keyword=" +
+      encodeURIComponent(p.nama);
 
     grid.innerHTML += `
       <div class="product-card">
@@ -167,7 +160,7 @@ fetch(
         <div class="product-price">${p.harga}</div>
 
         <button class="buy-btn"
-          onclick="window.open('${url}', '_blank')">
+          onclick="window.open('${shopeeSearch}', '_blank')">
           Pesan Produk
         </button>
       </div>
@@ -176,9 +169,9 @@ fetch(
 })
 .catch(err => {
   console.error("Supabase error:", err);
-  grid.innerHTML = "<p style='padding:20px'>Gagal memuat data</p>";
 });
 </script>
+
 
 
 </body>
