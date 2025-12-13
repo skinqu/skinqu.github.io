@@ -12,7 +12,7 @@
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: #F4F8FA;
 }
 
@@ -22,10 +22,10 @@ body {
   font-size: 20px;
   font-weight: 600;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .back-btn {
@@ -39,16 +39,11 @@ body {
   cursor: pointer;
 }
 
-.back-btn:hover {
-  opacity: 0.9;
-}
-
 /* ===== GRID ===== */
 .product-grid {
   display: grid;
   gap: 16px;
   padding: 16px;
-  align-items: stretch;
 }
 
 @media (max-width: 600px) {
@@ -56,55 +51,54 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 @media (min-width: 601px) and (max-width: 900px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
 @media (min-width: 901px) {
   .product-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* ===== CARD (STABIL) ===== */
+/* ===== CARD (ANTI KEDUT) ===== */
 .product-card {
-  background: #fff;
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 14px;
   padding: 12px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 
-  height: 260px;               /* 🔒 KUNCI TINGGI */
+  /* 🔒 KUNCI TOTAL */
+  height: 260px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  transition: transform .2s ease, box-shadow .2s ease;
-  will-change: transform;
+  /* ❌ MATIKAN SEMUA ANIMASI */
+  transition: none !important;
+  transform: none !important;
 }
 
+/* ❌ NO HOVER EFFECT */
 .product-card:hover {
-  transform: scale(1.03);     /* ✅ TIDAK KEDUT */
-  box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+  transform: none !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-/* ===== IMAGE ===== */
+/* ===== IMAGE (FIXED SIZE) ===== */
 .product-card img {
   width: 100%;
   height: 130px;
   object-fit: contain;
-  background: #f2f2f2;
-  border-radius: 12px;
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
 /* ===== TEXT ===== */
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  color: #222;
-  margin: 8px 0 4px;
   height: 38px;
   overflow: hidden;
 }
@@ -112,7 +106,6 @@ body {
 .product-price {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 8px;
 }
 
 /* ===== BUTTON ===== */
@@ -121,14 +114,10 @@ body {
   color: #fff;
   border: none;
   padding: 10px;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.buy-btn:hover {
-  opacity: 0.9;
 }
 </style>
 </head>
@@ -136,26 +125,24 @@ body {
 <body>
 
 <div class="topbar">
-  <span>Produk Rekomendasi 💙</span>
-  <button class="back-btn" onclick="window.location.href='recom.html'">
-    ⬅ Kembali
-  </button>
+  <span>Produk Rekomendasi </span>
+  <button class="back-btn" onclick="history.back()">⬅ Kembali</button>
 </div>
 
 <div class="product-grid" id="productGrid"></div>
 
 <script>
 // =======================
-// KONFIGURASI SUPABASE
+// SUPABASE CONFIG
 // =======================
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+const SUPABASE_ANON_KEY = "ISI_ANON_KEY_KAMUeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
 // =======================
 const MAX = 6;
 const grid = document.getElementById("productGrid");
 
-// ===== SKELETON =====
+// SKELETON (FIXED HEIGHT)
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
@@ -167,7 +154,7 @@ for (let i = 0; i < MAX; i++) {
   `;
 }
 
-// ===== FETCH SUPABASE =====
+// FETCH SUPABASE
 fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
   headers: {
     apikey: SUPABASE_ANON_KEY,
@@ -179,35 +166,20 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
   grid.innerHTML = "";
 
   data.forEach(p => {
-    const img =
-      p.image && p.image !== ""
-        ? p.image
-        : "https://via.placeholder.com/300x200?text=SkinQu";
-
-    const searchQuery = encodeURIComponent(p.nama);
+    const q = encodeURIComponent(p.nama);
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="${img}"
-             loading="lazy"
-             onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
-
+        <img src="https://via.placeholder.com/300x200?text=SkinQu">
         <div class="product-name">${p.nama}</div>
         <div class="product-price">${p.harga}</div>
-
         <button class="buy-btn"
-          onclick="window.open(
-            'https://shopee.co.id/search?keyword=${searchQuery}',
-            '_blank'
-          )">
+          onclick="window.open('https://shopee.co.id/search?keyword=${q}','_blank')">
           Pesan Produk
         </button>
       </div>
     `;
   });
-})
-.catch(err => {
-  console.error("Gagal load Supabase:", err);
 });
 </script>
 
