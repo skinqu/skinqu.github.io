@@ -1,38 +1,38 @@
 [
   {
-    "nama": "Somethinc 2% Salicylic Acid Serum",
-    "image": "https://example.com/image1.jpg",
-    "url": "https://example.com/product1",
-    "harga": "Rp 110.000"
+    "nama": "Somethinc 2% Salicylic Acid Acne Treatment Gel",
+    "image": "",
+    "url": "",
+    "harga": "Rp 109.000"
   },
   {
     "nama": "Wardah Hydrating Aloe Vera Gel",
-    "image": "https://example.com/image2.jpg",
-    "url": "https://example.com/product2",
-    "harga": "Rp 50.000"
+    "image": "",
+    "url": "",
+    "harga": "Rp 54.000"
   },
   {
-    "nama": "Scarlett Whitening Facial Wash",
-    "image": "https://example.com/image3.jpg",
-    "url": "https://example.com/product3",
-    "harga": "Rp 85.000"
+    "nama": "Scarlett Whitening Brightening Facial Wash",
+    "image": "",
+    "url": "",
+    "harga": "Rp 75.000"
   },
   {
-    "nama": "Skintific 10% Niacinamide Serum",
-    "image": "https://example.com/image4.jpg",
-    "url": "https://example.com/product4",
+    "nama": "Avoskin Miraculous Refining Serum",
+    "image": "",
+    "url": "",
     "harga": "Rp 150.000"
   },
   {
-    "nama": "Avoskin Miraculous Refining Facial Wash",
-    "image": "https://example.com/image5.jpg",
-    "url": "https://example.com/product5",
-    "harga": "Rp 120.000"
+    "nama": "Emina Sun Protection Gel",
+    "image": "",
+    "url": "",
+    "harga": "Rp 70.000"
   },
   {
-    "nama": "Emina Creamatte Lip Cream",
-    "image": "https://example.com/image6.jpg",
-    "url": "https://example.com/product6",
-    "harga": "Rp 50.000"
+    "nama": "Whitelab Brightening Night Cream",
+    "image": "",
+    "url": "",
+    "harga": "Rp 99.000"
   }
 ]
