@@ -106,17 +106,14 @@ body {
 <div class="product-grid" id="productGrid"></div>
 
 <script>
-// =======================
-// KONFIGURASI SUPABASE
-// =======================
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
-// =======================
 const MAX = 6;
 const grid = document.getElementById("productGrid");
 
 // skeleton
+grid.innerHTML = "";
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
@@ -128,23 +125,37 @@ for (let i = 0; i < MAX; i++) {
   `;
 }
 
-// =======================
-// FETCH DARI SUPABASE
-// =======================
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
-  headers: {
-    "apikey": SUPABASE_ANON_KEY,
-    "Authorization": "Bearer " + SUPABASE_ANON_KEY
+// fetch supabase
+fetch(
+  `${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}&order=created_at.desc`,
+  {
+    headers: {
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+      "Accept": "application/json"
+    }
   }
+)
+.then(res => {
+  if (!res.ok) throw new Error("HTTP error " + res.status);
+  return res.json();
 })
-.then(res => res.json())
 .then(data => {
   grid.innerHTML = "";
+
+  if (!data.length) {
+    grid.innerHTML = "<p style='padding:20px'>Data kosong</p>";
+    return;
+  }
 
   data.forEach(p => {
     const img = p.image && p.image !== ""
       ? p.image
       : "https://via.placeholder.com/300x200?text=SkinQu";
+
+    const url = p.url && p.url !== ""
+      ? p.url
+      : "https://shopee.co.id/search?keyword=" + encodeURIComponent(p.nama);
 
     grid.innerHTML += `
       <div class="product-card">
@@ -156,7 +167,7 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
         <div class="product-price">${p.harga}</div>
 
         <button class="buy-btn"
-          onclick="window.open('${p.url}', '_blank')">
+          onclick="window.open('${url}', '_blank')">
           Pesan Produk
         </button>
       </div>
@@ -164,9 +175,11 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
   });
 })
 .catch(err => {
-  console.error("Gagal load Supabase:", err);
+  console.error("Supabase error:", err);
+  grid.innerHTML = "<p style='padding:20px'>Gagal memuat data</p>";
 });
 </script>
+
 
 </body>
 </html>
