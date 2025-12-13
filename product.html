@@ -3,133 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rekomendasi Produk – SkinQu</title>
+<title>Produk Rekomendasi – SkinQu</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background: #F4F8FA;
-    }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #F4F8FA;
+}
 
-    .topbar {
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        font-size: 18px;
-        font-weight: 500;
-    }
+/* ===== TOPBAR ===== */
+.topbar {
+  padding: 15px 20px;
+  font-size: 20px;
+  font-weight: 600;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    .topbar span {
-        font-size: 24px;
-        margin-right: 10px;
-        cursor: pointer;
-    }
+.back-btn {
+  background: #447DCE;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-    .title {
-        padding: 20px;
-        font-size: 20px;
-        font-weight: 700;
-        color: #0A2A43;
-    }
+.back-btn:hover {
+  opacity: 0.9;
+}
 
-    /* GRID PRODUK */
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-        padding: 0 20px 40px;
-    }
+/* ===== GRID RESPONSIF ===== */
+.product-grid {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
 
-    .product-card {
-        background: white;
-        padding: 18px;
-        border-radius: 18px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: 0.2s;
-        cursor: pointer;
-        height: 180px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+/* HP → 2 kolom */
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-    .product-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
+/* Tablet */
+@media (min-width: 601px) and (max-width: 900px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 
-    .product-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
+/* Desktop */
+@media (min-width: 901px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== CARD ===== */
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: .2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #222;
+  height: 40px;
+  overflow: hidden;
+}
+
+.product-price {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.buy-btn {
+  background: #447DCE;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-    <span onclick="history.back()">←</span>
-    Produk Rekomendasi
+  <span>Produk Rekomendasi 💙</span>
+  <button class="back-btn" onclick="window.location.href='recom.html'">
+    ⬅ Kembali
+  </button>
 </div>
 
-<div class="title">Hasil analisa kulitmu 💙</div>
-
-<!-- GRID PRODUK -->
-<div class="product-grid" id="productGrid">
-    <!-- PRODUK NANTI DIISI DINAMIS DARI n8n -->
-</div>
-
+<div class="product-grid" id="productGrid"></div>
 
 <script>
-/* ============================================
-   >>> CONTOH DATA DARI N8N (JSON)
-   Kamu nanti ganti ini dengan fetch() dari n8n
-   ============================================ */
-const rekomendasi = [
-    {
-        "nama": "Scarlett Acne Serum",
-        "image": "https://i.imgur.com/MBqV7vP.png",
-        "url": "https://shopee.co.id/scarlett-acne"
-    },
-    {
-        "nama": "Emina Sun Protection",
-        "image": "https://i.imgur.com/EEvoQzv.png",
-        "url": "https://shopee.co.id/emina-sun"
-    },
-    {
-        "nama": "Azarine Hydrasoothe",
-        "image": "https://i.imgur.com/HXahQ6u.png",
-        "url": "https://tokopedia.com/azarine"
-    },
-    {
-        "nama": "Somethinc Low pH Cleanser",
-        "image": "https://i.imgur.com/9anr5uM.png",
-        "url": "https://shopee.co.id/somethinc-cleanser"
-    }
-];
-
-
-/* ============================================
-   >>> RENDER PRODUK KE UI
-   ============================================ */
+const MAX = 6;
 const grid = document.getElementById("productGrid");
+const cards = [];
 
-rekomendasi.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.onclick = () => window.location.href = item.url;
+/* skeleton */
+for (let i = 0; i < MAX; i++) {
+  const card = document.createElement("div");
+  card.className = "product-card";
+  card.innerHTML = `
+    <img src="https://via.placeholder.com/300x200?text=SkinQu">
+    <div class="product-name">Menyiapkan rekomendasi...</div>
+    <div class="product-price">Rp --</div>
+    <div class="buy-btn">Pesan Produk</div>
+  `;
+  grid.appendChild(card);
+  cards.push(card);
+}
 
-    card.innerHTML = `
-        <img src="${item.image}" alt="${item.nama}">
-    `;
+/* 🔥 FIX UTAMA DI SINI */
+let products = [];
+try {
+  const raw = JSON.parse(window.name || "[]");
+  products = Array.isArray(raw) ? raw : [raw];
+} catch (e) {
+  console.log("JSON error", e);
+}
 
-    grid.appendChild(card);
+/* isi kotak */
+products.slice(0, MAX).forEach((p, i) => {
+  const img = p.image && p.image !== ""
+    ? p.image
+    : "https://via.placeholder.com/300x200?text=SkinQu";
+
+  cards[i].innerHTML = `
+    <img src="${img}">
+    <div class="product-name">${p.nama}</div>
+    <div class="product-price">${p.harga || ""}</div>
+    <div class="buy-btn">Pesan Produk</div>
+  `;
+
+  if (p.url && p.url !== "") {
+    cards[i].onclick = () => window.open(p.url, "_blank");
+  }
 });
 </script>
+
 
 </body>
 </html>

@@ -95,7 +95,7 @@
 
 <body>
 
-<form id="skinForm" method="POST" action="https://hexafaton.app.n8n.cloud/webhook/skinqu-input">
+<form id="skinForm">
 
 <div class="back-btn">←</div>
 
@@ -212,9 +212,34 @@
   </div>
 </div>
 
-<button class="btn-send" type="submit">Kirim</button>
+<button class="btn-send" type="button" onclick="kirim()">Kirim</button>
+
 
 </form>
+<script>
+function kirim() {
+  const form = document.getElementById("skinForm");
+  const data = Object.fromEntries(new FormData(form).entries());
+
+  fetch("https://hexafaton.app.n8n.cloud/webhook/skinqu-input", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(products => {
+    sessionStorage.setItem(
+      "skinqu_products",
+      JSON.stringify(products)
+    );
+    window.location.href = "product.html";
+  })
+  .catch(err => {
+    alert("Gagal memproses rekomendasi");
+    console.error(err);
+  });
+}
+</script>
 
 </body>
 </html>
