@@ -131,7 +131,7 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
-/* skeleton */
+/* skeleton loading */
 for (let i = 0; i < MAX; i++) {
   const card = document.createElement("div");
   card.className = "product-card";
@@ -145,31 +145,41 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* load json */
+/* load rekomendasi dari GitHub JSON */
 fetch("/data/rekomendasi.json?v=" + Date.now())
   .then(res => res.json())
   .then(products => {
     products.slice(0, MAX).forEach((p, i) => {
-      const img = p.image && p.image.startsWith("https://down-id.img.susercontent.com/")
-        ? p.image
+
+      // gambar berbasis browser (search-based, legal)
+      const imgSrc = p.image_query
+        ? "https://image.pollinations.ai/prompt/" +
+          encodeURIComponent(p.image_query + " product photo")
         : "https://via.placeholder.com/300x200?text=SkinQu";
 
       cards[i].innerHTML = `
-        <img src="${img}" onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
+        <img src="${imgSrc}"
+             onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
         <div class="product-name">${p.nama}</div>
-        <div class="product-price">${p.harga || ""}</div>
+        <div class="product-price">${p.harga || "Estimasi harga"}</div>
         <div class="buy-btn">Pesan Produk</div>
       `;
 
-      if (p.url && p.url.startsWith("https://shopee.co.id/")) {
-        cards[i].onclick = () => window.open(p.url, "_blank");
-      }
+      // Shopee SEARCH (AMAN & LEGAL)
+      cards[i].onclick = () => {
+        const q = encodeURIComponent(p.search_query || p.nama);
+        window.open(
+          "https://shopee.co.id/search?keyword=" + q,
+          "_blank"
+        );
+      };
     });
   })
   .catch(() => {
-    console.log("Gagal load rekomendasi");
+    console.log("Gagal memuat rekomendasi");
   });
 </script>
+
 
 </body>
 </html>
