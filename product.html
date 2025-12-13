@@ -6,69 +6,25 @@
 <title>Produk Rekomendasi – SkinQu</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background: #F4F8FA;
-    }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #F4F8FA;
+}
 
-    .topbar {
-        padding: 15px 20px;
-        font-size: 20px;
-        font-weight: 600;
-        background: #ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
+/* ===== TOPBAR ===== */
+.topbar {
+  padding: 15px 20px;
+  font-size: 20px;
+  font-weight: 600;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        padding: 20px;
-    }
-
-    .product-card {
-        background: #fff;
-        border-radius: 14px;
-        padding: 12px;
-        text-align: center;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    .product-card:hover {
-        transform: translateY(-4px);
-    }
-
-    .product-card img {
-        width: 100%;
-        height: 130px;
-        object-fit: contain;
-        margin-bottom: 10px;
-    }
-
-    .product-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #222;
-        height: 40px;
-        overflow: hidden;
-    }
-
-    .buy-btn {
-        background: #447DCE;
-        color: white;
-        padding: 8px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        text-align: center;
-    }
-
-    .back-btn {
-  float: right;
+.back-btn {
   background: #447DCE;
   color: #fff;
   border: none;
@@ -83,56 +39,135 @@
   opacity: 0.9;
 }
 
+/* ===== GRID RESPONSIF ===== */
+.product-grid {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* HP → 2 kolom */
+@media (max-width: 600px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet */
+@media (min-width: 601px) and (max-width: 900px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop */
+@media (min-width: 901px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== CARD ===== */
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: .2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #222;
+  height: 40px;
+  overflow: hidden;
+}
+
+.product-price {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.buy-btn {
+  background: #447DCE;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
 </style>
 </head>
 
 <body>
+
 <div class="topbar">
-  Produk Rekomendasi 💙
+  <span>Produk Rekomendasi 💙</span>
   <button class="back-btn" onclick="window.location.href='recom.html'">
     ⬅ Kembali
   </button>
 </div>
+
 <div class="product-grid" id="productGrid"></div>
 
 <script>
-function renderProducts(list) {
-  const grid = document.getElementById("productGrid");
-  grid.innerHTML = "";
+const MAX = 6;
+const grid = document.getElementById("productGrid");
+const cards = [];
 
-  list.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-
-    const img = p.image && p.image !== ""
-      ? p.image
-      : "https://via.placeholder.com/300x200?text=SkinQu";
-
-    card.innerHTML = `
-      <img src="${img}">
-      <div class="product-name">${p.nama}</div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:8px">
-        ${p.harga || ""}
-      </div>
-      <div class="buy-btn">Pesan Produk</div>
-    `;
-
-    if (p.url && p.url !== "") {
-      card.onclick = () => window.open(p.url, "_blank");
-    }
-
-    grid.appendChild(card);
-  });
+/* 1️⃣ BUAT 6 KOTAK DULU (SKELETON) */
+for (let i = 0; i < MAX; i++) {
+  const card = document.createElement("div");
+  card.className = "product-card";
+  card.innerHTML = `
+    <img src="https://via.placeholder.com/300x200?text=SkinQu">
+    <div class="product-name">Menyiapkan rekomendasi...</div>
+    <div class="product-price">Rp --</div>
+    <div class="buy-btn">Pesan Produk</div>
+  `;
+  grid.appendChild(card);
+  cards.push(card);
 }
 
+/* 2️⃣ AMBIL DATA DARI n8n (window.name) */
+let products = [];
 try {
-  const products = JSON.parse(window.name || "[]");
-  if (products.length) {
-    renderProducts(products);
+  products = JSON.parse(window.name || "[]");
+} catch {}
+
+/* 3️⃣ ISI KOTAK DENGAN DATA n8n (MAX 6) */
+products.slice(0, MAX).forEach((p, i) => {
+  const img = p.image && p.image !== ""
+    ? p.image
+    : "https://via.placeholder.com/300x200?text=SkinQu";
+
+  cards[i].innerHTML = `
+    <img src="${img}">
+    <div class="product-name">${p.nama}</div>
+    <div class="product-price">${p.harga || ""}</div>
+    <div class="buy-btn">Pesan Produk</div>
+  `;
+
+  if (p.url && p.url !== "") {
+    cards[i].onclick = () => window.open(p.url, "_blank");
   }
-} catch (e) {
-  console.log("Gagal parsing data");
-}
+});
 </script>
 
 </body>
