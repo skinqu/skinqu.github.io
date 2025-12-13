@@ -1,38 +1,38 @@
 [
   {
+    "nama": "Wardah Hydrating Aloe Vera Gel",
+    "harga": "Rp 35.000",
+    "image": "",
+    "url": ""
+  },
+  {
+    "nama": "Emina Bright Stuff Face Wash",
+    "harga": "Rp 39.000",
+    "image": "",
+    "url": ""
+  },
+  {
+    "nama": "Somethinc Niacinamide 10% + Moisture Super Serum",
+    "harga": "Rp 89.000",
+    "image": "",
+    "url": ""
+  },
+  {
+    "nama": "Scarlett Brightening Body Lotion",
+    "harga": "Rp 75.000",
+    "image": "",
+    "url": ""
+  },
+  {
     "nama": "Himalaya Purifying Neem Face Wash",
-    "harga": "Estimasi harga (Rp 40.000)",
-    "image": "https://example.com/image1.jpg",
-    "url": "https://shopee.co.id/search?keyword=himalaya%20purifying%20neem%20face%20wash"
+    "harga": "Rp 45.000",
+    "image": "",
+    "url": ""
   },
   {
-    "nama": "Wardah Hydrated Aloe Vera Gel",
-    "harga": "Estimasi harga (Rp 30.000)",
-    "image": "https://example.com/image2.jpg",
-    "url": "https://shopee.co.id/search?keyword=wardah%20aloe%20vera%20gel"
-  },
-  {
-    "nama": "Scarlett Whitening Body Lotion",
-    "harga": "Estimasi harga (Rp 75.000)",
-    "image": "https://example.com/image3.jpg",
-    "url": "https://shopee.co.id/search?keyword=scarlett%20whitening%20lotion"
-  },
-  {
-    "nama": "Emina Bright Stuff Moisturizer",
-    "harga": "Estimasi harga (Rp 45.000)",
-    "image": "https://example.com/image4.jpg",
-    "url": "https://shopee.co.id/search?keyword=emina%20bright%20stuff%20moisturizer"
-  },
-  {
-    "nama": "Somethinc Niacinamide 10% + Zinc 1%",
-    "harga": "Estimasi harga (Rp 150.000)",
-    "image": "https://example.com/image5.jpg",
-    "url": "https://shopee.co.id/search?keyword=somethinc%20niacinamide%20zinc"
-  },
-  {
-    "nama": "Pixy Make It Glow Moisturizer",
-    "harga": "Estimasi harga (Rp 60.000)",
-    "image": "https://example.com/image6.jpg",
-    "url": "https://shopee.co.id/search?keyword=pixy%20make%20it%20glow%20moisturizer"
+    "nama": "COSRX Acne Pimple Master Patch",
+    "harga": "Rp 35.000",
+    "image": "",
+    "url": ""
   }
 ]
