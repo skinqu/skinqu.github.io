@@ -104,51 +104,31 @@ function renderProducts(list) {
     const card = document.createElement("div");
     card.className = "product-card";
 
-    const img = (p.image && p.image !== "")
+    const img = p.image && p.image !== ""
       ? p.image
       : "https://via.placeholder.com/300x200?text=SkinQu";
-
-    const harga = p.harga ? p.harga : "-";
-
-    const link = p.url && p.url !== ""
-      ? p.url
-      : "#";
 
     card.innerHTML = `
       <img src="${img}">
       <div class="product-name">${p.nama}</div>
       <div style="font-size:13px;font-weight:600;margin-bottom:8px">
-        ${harga}
+        ${p.harga || ""}
       </div>
-      <a href="${link}" target="_blank"
-         style="
-           display:block;
-           background:#447DCE;
-           color:#fff;
-           padding:8px;
-           border-radius:8px;
-           text-decoration:none;
-           font-size:13px;
-           font-weight:600;
-         ">
-         Pesan Produk
-      </a>
+      <div class="buy-btn">Pesan Produk</div>
     `;
+
+    if (p.url && p.url !== "") {
+      card.onclick = () => window.open(p.url, "_blank");
+    }
 
     grid.appendChild(card);
   });
 }
 
-// AMBIL DATA
-const params = new URLSearchParams(window.location.search);
-const raw = params.get("data");
-
+const raw = localStorage.getItem("skinqu_products");
 if (raw) {
-  const products = JSON.parse(decodeURIComponent(raw));
-  renderProducts(products);
+  renderProducts(JSON.parse(raw));
 }
 </script>
-
-
 </body>
 </html>
