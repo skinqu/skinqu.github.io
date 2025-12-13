@@ -1,38 +1,38 @@
 [
   {
-    "nama": "Somethinc Glow Maker Serum",
-    "image": "https://somethinc.com/images/products/glow-maker-serum.jpg",
-    "url": "https://somethinc.com/products/glow-maker-serum",
-    "harga": "Rp 199.000"
+    "nama": "Somethinc 2% Salicylic Acid Serum",
+    "image": "https://linkgambar.com/somethinc-salicylic-serum.jpg",
+    "url": "https://linkproduksomethinc.com/salicylic-acid-serum",
+    "harga": "Rp 119.000"
   },
   {
-    "nama": "Skintific 5X Ceramide Barrier Repair Moisturizer",
-    "image": "https://skintific.com/images/products/ceramide-moisturizer.jpg",
-    "url": "https://skintific.com/products/ceramide-moisturizer",
-    "harga": "Rp 120.000"
+    "nama": "Skintific 2% Niacinamide Serum",
+    "image": "https://linkgambar.com/skintific-niacinamide-serum.jpg",
+    "url": "https://linkprodukskintific.com/niacinamide-serum",
+    "harga": "Rp 145.000"
   },
   {
     "nama": "Wardah Hydrating Aloe Vera Gel",
-    "image": "https://wardah.com/images/products/aloe-vera-gel.jpg",
-    "url": "https://wardah.com/products/hydrating-aloe-vera-gel",
+    "image": "https://linkgambar.com/wardah-aloe-vera-gel.jpg",
+    "url": "https://linkprodukwardah.com/aloe-vera-gel",
     "harga": "Rp 45.000"
   },
   {
-    "nama": "Scarlett Whitening Body Lotion",
-    "image": "https://scarlettwhitening.com/images/products/body-lotion.jpg",
-    "url": "https://scarlettwhitening.com/products/body-lotion",
+    "nama": "Scarlett Brightening Facial Wash",
+    "image": "https://linkgambar.com/scarlett-facial-wash.jpg",
+    "url": "https://linkprodukscarlett.com/brightening-facial-wash",
     "harga": "Rp 75.000"
   },
   {
-    "nama": "Avoskin Miraculous Refining Serum",
-    "image": "https://avoskin.com/images/products/refining-serum.jpg",
-    "url": "https://avoskin.com/products/refining-serum",
-    "harga": "Rp 150.000"
+    "nama": "Avoskin Even Glow Serum",
+    "image": "https://linkgambar.com/avoskin-even-glow-serum.jpg",
+    "url": "https://linkprodukavoskin.com/even-glow-serum",
+    "harga": "Rp 199.000"
   },
   {
-    "nama": "Whitelab Brightening Night Cream",
-    "image": "https://whitelab.com/images/products/night-cream.jpg",
-    "url": "https://whitelab.com/products/brightening-night-cream",
-    "harga": "Rp 138.000"
+    "nama": "Emina Sun Protection Face Mist",
+    "image": "https://linkgambar.com/emina-sun-mist.jpg",
+    "url": "https://linkprodukemina.com/sun-protection-face-mist",
+    "harga": "Rp 55.000"
   }
 ]
