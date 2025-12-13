@@ -1,38 +1,38 @@
 [
   {
-    "nama": "Wardah Purifying Facial Wash",
-    "harga": "Rp 25.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Himalaya Purifying Neem Face Wash",
+    "harga": "Estimasi harga (Rp 65.000)",
+    "image": "https://example.com/himalaya_face_wash.jpg",
+    "url": "https://shopee.co.id/search?keyword=Himalaya%20Purifying%20Neem%20Face%20Wash"
   },
   {
-    "nama": "Garnier Men Oil Control Facial Wash",
-    "harga": "Rp 30.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Wardah Hydrating Aloe Vera Gel",
+    "harga": "Estimasi harga (Rp 30.000)",
+    "image": "https://example.com/wardah_aloe_vera.jpg",
+    "url": "https://shopee.co.id/search?keyword=Wardah%20Hydrating%20Aloe%20Vera%20Gel"
   },
   {
-    "nama": "Hada Labo Air Aqua Facial Wash",
-    "harga": "Rp 80.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Scarlett Whitening Body Lotion",
+    "harga": "Estimasi harga (Rp 75.000)",
+    "image": "https://example.com/scarlett_body_lotion.jpg",
+    "url": "https://shopee.co.id/search?keyword=Scarlett%20Whitening%20Body%20Lotion"
   },
   {
-    "nama": "Senka Perfect Whip Foam",
-    "harga": "Rp 75.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Somethinc Niacinamide 10% + Zinc 1%",
+    "harga": "Estimasi harga (Rp 120.000)",
+    "image": "https://example.com/somethinc_niacinamide.jpg",
+    "url": "https://shopee.co.id/search?keyword=Somethinc%20Niacinamide%2010%25%20%2B%20Zinc%201%25"
   },
   {
-    "nama": "Cetaphil Oily Skin Cleanser",
-    "harga": "Rp 200.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Emina Bright Stuff Moisturizer",
+    "harga": "Estimasi harga (Rp 50.000)",
+    "image": "https://example.com/emina_moisturizer.jpg",
+    "url": "https://shopee.co.id/search?keyword=Emina%20Bright%20Stuff%20Moisturizer"
   },
   {
-    "nama": "Himalaya Neem Face Wash",
-    "harga": "Rp 45.000",
-    "image": "https://cf.shopee.co.id/file/your_image_link",
-    "url": ""
+    "nama": "Pixy White-Aqua Gel",
+    "harga": "Estimasi harga (Rp 45.000)",
+    "image": "https://example.com/pixy_aqua_gel.jpg",
+    "url": "https://shopee.co.id/search?keyword=Pixy%20White-Aqua%20Gel"
   }
 ]
