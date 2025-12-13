@@ -125,10 +125,15 @@ function renderProducts(list) {
   });
 }
 
-const raw = localStorage.getItem("skinqu_products");
-if (raw) {
-  renderProducts(JSON.parse(raw));
+try {
+  const products = JSON.parse(window.name || "[]");
+  if (products.length) {
+    renderProducts(products);
+  }
+} catch (e) {
+  console.log("Gagal parsing data");
 }
 </script>
+
 </body>
 </html>
