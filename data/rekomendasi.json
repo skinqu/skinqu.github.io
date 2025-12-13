@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "nama": "Somethinc Niacinamide 10% + Zinc 1%",
+    "image": "",
+    "url": "",
+    "harga": "Rp 139.000"
+  },
+  {
+    "nama": "Wardah Hydrating Glow Mist",
+    "image": "",
+    "url": "",
+    "harga": "Rp 65.000"
+  },
+  {
+    "nama": "Avoskin Your Skin Bae Serum",
+    "image": "",
+    "url": "",
+    "harga": "Rp 149.000"
+  },
+  {
+    "nama": "Scarlett Whitening Face Serum",
+    "image": "",
+    "url": "",
+    "harga": "Rp 75.000"
+  },
+  {
+    "nama": "Emina Sun Protection SPF 30",
+    "image": "",
+    "url": "",
+    "harga": "Rp 55.000"
+  },
+  {
+    "nama": "Hanasui Aloe Vera Gel",
+    "image": "",
+    "url": "",
+    "harga": "Rp 35.000"
+  }
+]
