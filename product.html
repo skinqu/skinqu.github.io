@@ -131,7 +131,7 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
-/* 1️⃣ BUAT 6 KOTAK SKELETON */
+/* skeleton */
 for (let i = 0; i < MAX; i++) {
   const card = document.createElement("div");
   card.className = "product-card";
@@ -145,33 +145,31 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* 2️⃣ FETCH JSON DARI GITHUB */
+/* load json */
 fetch("/data/rekomendasi.json?v=" + Date.now())
   .then(res => res.json())
   .then(products => {
     products.slice(0, MAX).forEach((p, i) => {
-      const img = p.image && p.image !== ""
+      const img = p.image && p.image.startsWith("https://down-id.img.susercontent.com/")
         ? p.image
         : "https://via.placeholder.com/300x200?text=SkinQu";
 
       cards[i].innerHTML = `
-        <img src="${img}">
+        <img src="${img}" onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
         <div class="product-name">${p.nama}</div>
         <div class="product-price">${p.harga || ""}</div>
         <div class="buy-btn">Pesan Produk</div>
       `;
 
-      if (p.url && p.url !== "") {
+      if (p.url && p.url.startsWith("https://shopee.co.id/")) {
         cards[i].onclick = () => window.open(p.url, "_blank");
       }
     });
   })
-  .catch(err => {
-    console.error("Gagal load rekomendasi:", err);
+  .catch(() => {
+    console.log("Gagal load rekomendasi");
   });
 </script>
-
-
 
 </body>
 </html>
