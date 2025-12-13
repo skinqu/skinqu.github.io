@@ -131,7 +131,7 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
-/* skeleton */
+/* 1️⃣ BUAT 6 KOTAK SKELETON */
 for (let i = 0; i < MAX; i++) {
   const card = document.createElement("div");
   card.className = "product-card";
@@ -145,33 +145,32 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* 🔥 FIX UTAMA DI SINI */
-let products = [];
-try {
-  const raw = JSON.parse(window.name || "[]");
-  products = Array.isArray(raw) ? raw : [raw];
-} catch (e) {
-  console.log("JSON error", e);
-}
+/* 2️⃣ FETCH JSON DARI GITHUB */
+fetch("/data/rekomendasi.json?v=" + Date.now())
+  .then(res => res.json())
+  .then(products => {
+    products.slice(0, MAX).forEach((p, i) => {
+      const img = p.image && p.image !== ""
+        ? p.image
+        : "https://via.placeholder.com/300x200?text=SkinQu";
 
-/* isi kotak */
-products.slice(0, MAX).forEach((p, i) => {
-  const img = p.image && p.image !== ""
-    ? p.image
-    : "https://via.placeholder.com/300x200?text=SkinQu";
+      cards[i].innerHTML = `
+        <img src="${img}">
+        <div class="product-name">${p.nama}</div>
+        <div class="product-price">${p.harga || ""}</div>
+        <div class="buy-btn">Pesan Produk</div>
+      `;
 
-  cards[i].innerHTML = `
-    <img src="${img}">
-    <div class="product-name">${p.nama}</div>
-    <div class="product-price">${p.harga || ""}</div>
-    <div class="buy-btn">Pesan Produk</div>
-  `;
-
-  if (p.url && p.url !== "") {
-    cards[i].onclick = () => window.open(p.url, "_blank");
-  }
-});
+      if (p.url && p.url !== "") {
+        cards[i].onclick = () => window.open(p.url, "_blank");
+      }
+    });
+  })
+  .catch(err => {
+    console.error("Gagal load rekomendasi:", err);
+  });
 </script>
+
 
 
 </body>
