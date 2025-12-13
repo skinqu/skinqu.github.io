@@ -1,38 +1,38 @@
 [
   {
-    "nama": "Somethinc Niacinamide 10% + Zinc 1%",
-    "image": "",
-    "url": "",
-    "harga": "Rp 139.000"
+    "nama": "Somethinc 2% Salicylic Acid Serum",
+    "image": "https://example.com/image1.jpg",
+    "url": "https://example.com/product1",
+    "harga": "Rp 110.000"
   },
   {
-    "nama": "Wardah Hydrating Glow Mist",
-    "image": "",
-    "url": "",
-    "harga": "Rp 65.000"
+    "nama": "Wardah Hydrating Aloe Vera Gel",
+    "image": "https://example.com/image2.jpg",
+    "url": "https://example.com/product2",
+    "harga": "Rp 50.000"
   },
   {
-    "nama": "Avoskin Your Skin Bae Serum",
-    "image": "",
-    "url": "",
-    "harga": "Rp 149.000"
+    "nama": "Scarlett Whitening Facial Wash",
+    "image": "https://example.com/image3.jpg",
+    "url": "https://example.com/product3",
+    "harga": "Rp 85.000"
   },
   {
-    "nama": "Scarlett Whitening Face Serum",
-    "image": "",
-    "url": "",
-    "harga": "Rp 75.000"
+    "nama": "Skintific 10% Niacinamide Serum",
+    "image": "https://example.com/image4.jpg",
+    "url": "https://example.com/product4",
+    "harga": "Rp 150.000"
   },
   {
-    "nama": "Emina Sun Protection SPF 30",
-    "image": "",
-    "url": "",
-    "harga": "Rp 55.000"
+    "nama": "Avoskin Miraculous Refining Facial Wash",
+    "image": "https://example.com/image5.jpg",
+    "url": "https://example.com/product5",
+    "harga": "Rp 120.000"
   },
   {
-    "nama": "Hanasui Aloe Vera Gel",
-    "image": "",
-    "url": "",
-    "harga": "Rp 35.000"
+    "nama": "Emina Creamatte Lip Cream",
+    "image": "https://example.com/image6.jpg",
+    "url": "https://example.com/product6",
+    "harga": "Rp 50.000"
   }
 ]
