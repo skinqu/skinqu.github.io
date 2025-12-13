@@ -131,6 +131,10 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
+/* ====== CONFIG SUPABASE ====== */
+const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+const SUPABASE_KEY = "ISI_DENGAN_ANON_PUBLIC_KEY_KAMU";
+
 /* skeleton loading */
 for (let i = 0; i < MAX; i++) {
   const card = document.createElement("div");
@@ -145,41 +149,42 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* load rekomendasi dari GitHub JSON */
-fetch("/data/rekomendasi.json?v=" + Date.now())
-  .then(res => res.json())
-  .then(products => {
-    products.slice(0, MAX).forEach((p, i) => {
+/* ====== FETCH DARI SUPABASE ====== */
+fetch(
+  `${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`,
+  {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY,
+    }
+  }
+)
+.then(res => res.json())
+.then(products => {
+  products.forEach((p, i) => {
+    if (!cards[i]) return;
 
-      // gambar berbasis browser (search-based, legal)
-      const imgSrc = p.image_query
-        ? "https://image.pollinations.ai/prompt/" +
-          encodeURIComponent(p.image_query + " product photo")
-        : "https://via.placeholder.com/300x200?text=SkinQu";
+    const img = p.image && p.image !== ""
+      ? p.image
+      : "https://via.placeholder.com/300x200?text=SkinQu";
 
-      cards[i].innerHTML = `
-        <img src="${imgSrc}"
-             onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
-        <div class="product-name">${p.nama}</div>
-        <div class="product-price">${p.harga || "Estimasi harga"}</div>
-        <div class="buy-btn">Pesan Produk</div>
-      `;
+    cards[i].innerHTML = `
+      <img src="${img}"
+           onerror="this.src='https://via.placeholder.com/300x200?text=SkinQu'">
+      <div class="product-name">${p.nama}</div>
+      <div class="product-price">${p.harga || "Estimasi harga"}</div>
+      <div class="buy-btn">Pesan Produk</div>
+    `;
 
-      // Shopee SEARCH (AMAN & LEGAL)
-      cards[i].onclick = () => {
-        const q = encodeURIComponent(p.search_query || p.nama);
-        window.open(
-          "https://shopee.co.id/search?keyword=" + q,
-          "_blank"
-        );
-      };
-    });
-  })
-  .catch(() => {
-    console.log("Gagal memuat rekomendasi");
+    if (p.url) {
+      cards[i].onclick = () => window.open(p.url, "_blank");
+    }
   });
+})
+.catch(err => {
+  console.error("Gagal load Supabase:", err);
+});
 </script>
-
 
 </body>
 </html>
