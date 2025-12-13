@@ -83,7 +83,6 @@ function renderProducts(list) {
   list.forEach(p => {
     const card = document.createElement("div");
     card.className = "product-card";
-    card.onclick = () => window.open(p.url, "_blank");
 
     card.innerHTML = `
       <img src="${p.image}">
@@ -95,17 +94,19 @@ function renderProducts(list) {
   });
 }
 
-// === AMBIL DATA DARI URL HASH ===
-const hash = window.location.hash;
+// === AMBIL DATA DARI URL QUERY ===
+const params = new URLSearchParams(window.location.search);
+const data = params.get("data");
 
-if (!hash.includes("data=")) {
+if (!data) {
   document.getElementById("productGrid").innerHTML =
     "<p style='padding:20px'>Tidak ada produk</p>";
 } else {
-  const json = decodeURIComponent(hash.split("data=")[1]);
-  renderProducts(JSON.parse(json));
+  const products = JSON.parse(decodeURIComponent(data));
+  renderProducts(products);
 }
 </script>
+
 
 
 
