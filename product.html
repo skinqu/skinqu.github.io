@@ -131,8 +131,9 @@ const MAX = 6;
 const grid = document.getElementById("productGrid");
 const cards = [];
 
+/* ===== CONFIG SUPABASE ===== */
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "PASTE_ANON_PUBLIC_KEY_DI_SINI";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTY0MDYwNSwiZXhwIjoyMDgxMjE2NjA1fQ.gDP4pTG5Qnoac8baXbpZ0gSRbO0HZ2E1CHXWv9faAA4";
 
 /* skeleton */
 for (let i = 0; i < MAX; i++) {
@@ -148,20 +149,14 @@ for (let i = 0; i < MAX; i++) {
   cards.push(card);
 }
 
-/* fetch supabase */
+/* ===== FETCH DARI SUPABASE ===== */
 fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
-  method: "GET",
   headers: {
-    "apikey": SUPABASE_KEY,
-    "Authorization": `Bearer ${SUPABASE_KEY}`,
-    "Content-Type": "application/json",
-    "Accept": "application/json"
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
   }
 })
-.then(res => {
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return res.json();
-})
+.then(res => res.json())
 .then(data => {
   console.log("DATA SUPABASE:", data);
 
@@ -182,9 +177,10 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
   });
 })
 .catch(err => {
-  console.error("SUPABASE ERROR:", err);
+  console.error("GAGAL LOAD SUPABASE:", err);
 });
 </script>
+
 
 </body>
 </html>
