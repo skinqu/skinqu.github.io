@@ -26,9 +26,19 @@ body {
 .banner-track {
   display: flex;
   gap: 18px;
-  padding: 0 20px;
-  overflow: hidden;
+
+  /* KUNCI CENTER PREVIEW */
+  padding: 0 15vw;
+
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
 }
+
+.banner-track::-webkit-scrollbar {
+  display: none;
+}
+
 
 /* =========================
    BANNER CARD
