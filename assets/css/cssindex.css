@@ -125,50 +125,120 @@ body {
   color: #333;
 }
 
-/* ===== BOTTOM NAV ICON ===== */
+/* =========================
+   BOTTOM NAVIGATION
+========================= */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-around;
+  align-items: center;
+
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+
+  z-index: 9999;
+}
+
+/* JAGA BODY BIAR CONTENT TIDAK KETUTUP */
+body {
+  padding-bottom: 90px;
+}
+
+/* =========================
+   NAV ITEM
+========================= */
+
 .bottom-nav .nav-item {
+  width: 46px;
+  height: 46px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+
   cursor: pointer;
 }
 
-.bottom-nav img {
+/* ICON IMAGE */
+.bottom-nav .nav-item img {
   width: 24px;
   height: 24px;
   object-fit: contain;
-  opacity: 0.85;
-  transition: 0.25s ease;
+
+  opacity: 0.75;
+  transition: all 0.25s ease;
 }
 
+/* HOVER */
 .bottom-nav .nav-item:hover img {
   opacity: 1;
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
-/* ACTIVE STATE */
-.bottom-nav .active img {
+/* ACTIVE */
+.bottom-nav .nav-item.active img {
   opacity: 1;
-  filter: drop-shadow(0 4px 8px rgba(68,125,206,.4));
+  filter: drop-shadow(0 4px 8px rgba(68,125,206,0.45));
 }
 
-/* SEARCH BUTTON */
+/* =========================
+   SEARCH (CENTER FLOAT)
+========================= */
+
+.search-wrapper {
+  position: relative;
+  top: -18px;
+}
+
 .search-icon {
-  background: #447DCE;
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
+  width: 58px;
+  height: 58px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 22px rgba(68,125,206,.45);
+
+  background: #447DCE;
+  border-radius: 18px;
+
+  box-shadow: 0 14px 30px rgba(68,125,206,0.45);
+  transition: all 0.25s ease;
 }
 
+/* ICON SEARCH */
 .search-icon img {
   width: 26px;
   height: 26px;
   filter: brightness(0) invert(1);
 }
+
+/* HOVER SEARCH */
+.search-icon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(68,125,206,0.6);
+}
+
+/* =========================
+   SAFETY OVERRIDE
+   (ANTI SIDEBAR BUG)
+========================= */
+
+.bottom-nav div {
+  float: none !important;
+  position: relative;
+}
+
+.bottom-nav * {
+  flex-direction: row !important;
+}
+
 
