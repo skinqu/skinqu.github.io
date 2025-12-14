@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile | SkinQu</title>
+
+  <!-- CSS utama -->
+  <link rel="stylesheet" href="assets/css/cssindex.css">
+
+  <!-- CSS khusus profile -->
+  <style>
+    .profile-container {
+      padding: 24px 20px 120px;
+    }
+
+    .profile-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: #447DCE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: #fff;
+      font-size: 36px;
+      font-weight: 600;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .profile-email {
+      font-size: 13px;
+      color: #777;
+    }
+
+    .profile-section {
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .profile-section h4 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    .profile-item span {
+      color: #666;
+    }
+
+    .logout-btn {
+      margin-top: 28px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: #447DCE;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- CONTENT -->
+  <div class="profile-container">
+
+    <div class="profile-card">
+      <div class="profile-avatar">F</div>
+      <div class="profile-name">Fatoni</div>
+      <div class="profile-email">fatoni@skinqu.dev</div>
+    </div>
+
+    <div class="profile-section">
+      <h4>Personal Info</h4>
+
+      <div class="profile-item">
+        <div>Gender</div>
+        <span>Laki-laki</span>
+      </div>
+
+      <div class="profile-item">
+        <div>Age</div>
+        <span>23 Tahun</span>
+      </div>
+
+      <div class="profile-item">
+        <div>Skin Type</div>
+        <span>Berminyak & Berjerawat</span>
+      </div>
+    </div>
+
+    <button class="logout-btn">Logout</button>
+
+  </div>
+
+  <!-- BOTTOM NAVBAR -->
+  <div class="bottom-nav">
+
+    <div class="nav-item" data-page="index.html">
+      <img src="assets/img/home.png" alt="Home">
+    </div>
+
+    <div class="nav-item search-wrapper" data-page="recom.html">
+      <a href="recom.html" class="search-icon">
+        <img src="assets/img/search.png" alt="Search">
+      </a>
+    </div>
+
+    <div class="nav-item" data-page="favorite.html">
+      <img src="assets/img/heart.png" alt="Favorite">
+    </div>
+
+    <div class="nav-item active" data-page="profile.html">
+      <img src="assets/img/user.png" alt="Profile">
+    </div>
+
+  </div>
+
+  <!-- JS NAV ACTIVE -->
+  <script src="assets/js/nav-active.js"></script>
+
+</body>
+</html>
