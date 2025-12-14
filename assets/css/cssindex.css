@@ -11,81 +11,101 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== BANNER CARD ===== */
+/* =========================
+   BACKGROUND STRIP
+========================= */
+.banner-bg {
+  background: linear-gradient(135deg, #447DCE, #5E8FE0);
+  padding: 22px 0;
+  overflow: hidden;
+}
+
+/* =========================
+   SCROLL TRACK
+========================= */
+.banner-track {
+  display: flex;
+  gap: 18px;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+/* =========================
+   BANNER CARD
+========================= */
 .banner {
   min-width: 300px;
-  flex-shrink: 0;
-
-  background: linear-gradient(135deg, #447DCE, #5E8FE0);
-  color: #fff;
-  border-radius: 18px;
-  padding: 26px;
   height: 190px;
+  flex-shrink: 0;
 
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 28px rgba(68, 125, 206, 0.35);
-}
+  border-radius: 18px;
 
-.banner img {
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  width: 42%;
-  max-width: 180px;
-
-  opacity: 0.9;
-  pointer-events: none;
-}
-
-
-.banner h2 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.banner p {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: .92;
-}
-
-/* ===== BANNER SCALE EFFECT ===== */
-.banner {
-  transition: transform 0.45s ease, opacity 0.45s ease;
   transform: scale(0.88);
   opacity: 0.6;
+  transition: transform 0.45s ease, opacity 0.45s ease;
+
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
 }
 
+/* ACTIVE */
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
 }
 
-/* ===== BANNER BACKGROUND (FULL WIDTH) ===== */
-.banner-bg {
-  background: linear-gradient(135deg, #447DCE, #5E8FE0);
-  padding: 20px 0;
-  overflow-x: hidden;
+/* =========================
+   IMAGE FULL COVER
+========================= */
+.banner img {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  z-index: 1;
 }
 
-/* ===== SCROLL TRACK ===== */
-.banner-track {
-  display: flex;
-  gap: 18px;
-  padding: 0 20px;
-
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none; /* firefox */
+/* =========================
+   OVERLAY (BIAR TEKS JELAS)
+========================= */
+.banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.55),
+    rgba(0,0,0,0.15)
+  );
+  z-index: 2;
 }
 
-.banner-track::-webkit-scrollbar {
-  display: none; /* chrome */
+/* =========================
+   TEXT CONTENT
+========================= */
+.banner-content {
+  position: relative;
+  z-index: 3;
+  padding: 26px;
+  color: #fff;
 }
+
+.banner-content h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.banner-content p {
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.92;
+}
+
 
 /* ===== DOT INDICATOR ===== */
 .banner-dots {
