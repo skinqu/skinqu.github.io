@@ -23,7 +23,7 @@ body {
   height: 64px;
   padding: 0 20px;
 
-  background: #ffffff;
+  background: #093A73;
   position: relative;
   z-index: 20;
 
@@ -39,7 +39,7 @@ body {
 .welcome-text {
   font-size: 15px;
   font-weight: 600;
-  color: #222;
+  color: #ffffff;
 }
 
 /* RIGHT HEADER */
@@ -55,7 +55,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
 
-  background: #f0f2f6;
+  background: #ffffff;
   padding: 6px;
 
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
