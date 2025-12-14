@@ -94,29 +94,49 @@ body {
   gap: 20px;
 }
 
-/* ===== CATEGORY CARD ===== */
+/* =========================
+   CATEGORY CARD
+========================= */
+
 .category-card {
-  background: #fff;
+  background: #ffffff;
   border-radius: 16px;
   padding: 18px 12px;
   text-align: center;
   cursor: pointer;
-  transition: all .25s ease;
+
   box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  border: 1px solid rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
 }
 
 .category-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(68, 125, 206, 0.22);
-  border-color: rgba(68,125,206,.3);
+  box-shadow: 0 14px 30px rgba(68,125,206,0.22);
 }
 
+/* =========================
+   ICON WRAPPER (KUNCI)
+========================= */
+
 .category-card img {
-  width: 52px;
-  height: 52px;
-  margin-bottom: 10px;
+  width: 56px;        /* 🔥 ukuran SERAGAM */
+  height: 56px;       /* 🔥 ukuran SERAGAM */
+
+  object-fit: contain; /* 🔥 biar utuh */
+  display: block;
+  margin: 0 auto 10px;
+
+  transition: transform 0.25s ease;
 }
+
+/* HOVER ICON */
+.category-card:hover img {
+  transform: scale(1.1);
+}
+
+/* =========================
+   TEXT
+========================= */
 
 .category-card p {
   margin: 0;
@@ -125,60 +145,6 @@ body {
   color: #333;
 }
 
-/* =========================
-   BOTTOM NAVBAR
-========================= */
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 70px;
-
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-
-  background: #ffffff;
-  border-top: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
-
-  z-index: 9999;
-}
-
-/* JAGA KONTEN */
-body {
-  padding-bottom: 90px;
-}
-
-/* =========================
-   NAV ITEM (SEMUA SAMA)
-========================= */
-
-.bottom-nav .nav-item {
-  width: 46px;
-  height: 46px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-  border-radius: 14px;
-
-  transition: all 0.25s ease;
-}
-
-/* ICON */
-.bottom-nav .nav-item img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-
-  opacity: 0.75;
-  transition: all 0.25s ease;
-}
 
 /* =========================
    BOTTOM NAVBAR
@@ -202,34 +168,7 @@ body {
   z-index: 9999;
 }
 
-/* Supaya konten tidak ketutup navbar */
-body {
-  padding-bottom: 90px;
-}
-
-/* =========================
-   BOTTOM NAVBAR
-========================= */
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 70px;
-
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-
-  background: #ffffff;
-  border-top: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
-
-  z-index: 9999;
-}
-
-/* supaya konten tidak ketutup */
+/* supaya konten tidak ketutup navbar */
 body {
   padding-bottom: 90px;
 }
@@ -284,15 +223,15 @@ body {
 }
 
 /* =========================
-   SEARCH (TENGAH, TIDAK ISTIMEWA)
+   SEARCH (TENGAH, SAMA)
 ========================= */
 
 .search-wrapper {
   position: relative;
-  top: -6px; /* sedikit menonjol tapi aman */
+  top: -6px;
 }
 
-/* HAPUS SEMUA STYLE KHUSUS */
+/* search tidak punya style sendiri */
 .search-icon {
   width: 46px;
   height: 46px;
@@ -301,8 +240,8 @@ body {
   align-items: center;
   justify-content: center;
 
-  background: transparent;   /* 🔥 PENTING */
-  box-shadow: none;          /* 🔥 PENTING */
+  background: transparent;
+  box-shadow: none;
   border-radius: 14px;
 
   transition: all 0.25s ease;
@@ -316,10 +255,7 @@ body {
   transition: all 0.25s ease;
 }
 
-/* =========================
-   SEARCH IKUT NAV ITEM
-========================= */
-
+/* search ikut hover nav-item */
 .bottom-nav .nav-item:hover .search-icon {
   background: rgba(68,125,206,0.08);
 }
@@ -335,7 +271,7 @@ body {
 }
 
 /* =========================
-   ACTIVE (JS OPTIONAL)
+   ACTIVE (DARI JS)
 ========================= */
 
 .bottom-nav .nav-item.active {
@@ -346,6 +282,7 @@ body {
   opacity: 1;
   transform: scale(1.1);
 }
+
 
 
 
