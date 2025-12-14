@@ -126,7 +126,7 @@ body {
 }
 
 /* =========================
-   BOTTOM NAVIGATION
+   BOTTOM NAVBAR
 ========================= */
 
 .bottom-nav {
@@ -136,25 +136,24 @@ body {
   width: 100%;
   height: 70px;
 
-  display: flex !important;
-  flex-direction: row !important;
+  display: flex;
   justify-content: space-around;
   align-items: center;
 
   background: #ffffff;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
 
   z-index: 9999;
 }
 
-/* JAGA BODY BIAR CONTENT TIDAK KETUTUP */
+/* JAGA KONTEN */
 body {
   padding-bottom: 90px;
 }
 
 /* =========================
-   NAV ITEM
+   NAV ITEM (SEMUA SAMA)
 ========================= */
 
 .bottom-nav .nav-item {
@@ -166,9 +165,12 @@ body {
   justify-content: center;
 
   cursor: pointer;
+  border-radius: 14px;
+
+  transition: all 0.25s ease;
 }
 
-/* ICON IMAGE */
+/* ICON */
 .bottom-nav .nav-item img {
   width: 24px;
   height: 24px;
@@ -178,20 +180,30 @@ body {
   transition: all 0.25s ease;
 }
 
-/* HOVER */
+/* =========================
+   HOVER (SEMUA BUTTON)
+========================= */
+
+.bottom-nav .nav-item:hover {
+  background: rgba(68,125,206,0.08);
+}
+
 .bottom-nav .nav-item:hover img {
   opacity: 1;
   transform: scale(1.1);
 }
 
-/* ACTIVE */
-.bottom-nav .nav-item.active img {
-  opacity: 1;
-  filter: drop-shadow(0 4px 8px rgba(68,125,206,0.45));
+/* =========================
+   CLICK / TAP
+========================= */
+
+.bottom-nav .nav-item:active {
+  transform: scale(0.92);
+  background: rgba(68,125,206,0.15);
 }
 
 /* =========================
-   SEARCH (CENTER FLOAT)
+   SEARCH (TENGAH, SAMA)
 ========================= */
 
 .search-wrapper {
@@ -207,10 +219,10 @@ body {
   align-items: center;
   justify-content: center;
 
-  background: #447DCE;
+  background: #ffffff;
   border-radius: 18px;
 
-  box-shadow: 0 14px 30px rgba(68,125,206,0.45);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.12);
   transition: all 0.25s ease;
 }
 
@@ -218,22 +230,50 @@ body {
 .search-icon img {
   width: 26px;
   height: 26px;
-  filter: brightness(0) invert(1);
+  opacity: 0.75;
+  transition: all 0.25s ease;
 }
 
-/* HOVER SEARCH */
-.search-icon:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 40px rgba(68,125,206,0.6);
+/* HOVER SEARCH = SAMA */
+.bottom-nav .nav-item:hover .search-icon {
+  background: rgba(68,125,206,0.08);
 }
 
-.bottom-nav div {
-  float: none !important;
-  position: relative;
+.bottom-nav .nav-item:hover .search-icon img {
+  opacity: 1;
+  transform: scale(1.1);
 }
+
+/* CLICK SEARCH */
+.bottom-nav .nav-item:active .search-icon {
+  transform: scale(0.92);
+  background: rgba(68,125,206,0.15);
+}
+
+/* =========================
+   ACTIVE (JS OPTIONAL)
+========================= */
+
+.bottom-nav .nav-item.active {
+  background: rgba(68,125,206,0.12);
+}
+
+.bottom-nav .nav-item.active img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* =========================
+   SAFETY (ANTI BUG)
+========================= */
 
 .bottom-nav * {
   flex-direction: row !important;
 }
+
+.bottom-nav div {
+  float: none !important;
+}
+
 
 
