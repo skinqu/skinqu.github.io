@@ -1,14 +1,15 @@
-/* ===== RESET & BASE ===== */
+/* =========================
+   RESET & BASE
+========================= */
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  padding: 0;
+  background: #f6f8fc;
   font-family: 'Poppins', sans-serif;
-  background: #F5F7FB;
-  color: #2B2B2B;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* =========================
@@ -19,68 +20,65 @@ body {
   align-items: center;
   justify-content: space-between;
 
-  padding: 18px 20px 12px;
-  background: #ffffff;
+  height: 64px;
+  padding: 0 20px;
 
+  background: #ffffff;
   position: relative;
-  z-index: 10;
+  z-index: 20;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* LEFT TEXT */
+/* LEFT HEADER */
 .header-left {
   display: flex;
   flex-direction: column;
 }
 
 .welcome-text {
-  font-size: 13px;
-  color: #888;
-}
-
-.username {
-  font-size: 18px;
-  color: #222;
+  font-size: 15px;
   font-weight: 600;
+  color: #222;
 }
 
-/* RIGHT PROFILE */
+/* RIGHT HEADER */
 .header-right {
   display: flex;
   align-items: center;
 }
 
 .profile-avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
 
   border-radius: 50%;
   object-fit: cover;
 
-  background: #f2f4f8;
+  background: #f0f2f6;
   padding: 6px;
 
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
   cursor: pointer;
 }
 
-
 /* =========================
-   BACKGROUND STRIP
+   BANNER BACKGROUND STRIP
 ========================= */
 .banner-bg {
   background: linear-gradient(135deg, #447DCE, #5E8FE0);
-  padding: 22px 0;
+  padding: 22px 0 26px;
   overflow: hidden;
 }
 
 /* =========================
-   SCROLL TRACK
+   BANNER SCROLL TRACK
 ========================= */
 .banner-track {
   display: flex;
   gap: 18px;
 
-  /* KUNCI CENTER PREVIEW */
+  /* Banner aktif di tengah + preview kiri kanan */
   padding: 0 15vw;
 
   overflow-x: scroll;
@@ -91,7 +89,6 @@ body {
 .banner-track::-webkit-scrollbar {
   display: none;
 }
-
 
 /* =========================
    BANNER CARD
@@ -105,21 +102,22 @@ body {
   overflow: hidden;
   border-radius: 18px;
 
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+
+  /* Default (non-active) */
   transform: scale(0.88);
   opacity: 0.6;
   transition: transform 0.45s ease, opacity 0.45s ease;
-
-  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
 }
 
-/* ACTIVE */
+/* Banner aktif (tengah) */
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
 }
 
 /* =========================
-   IMAGE FULL COVER
+   BANNER IMAGE (FULL COVER)
 ========================= */
 .banner img {
   position: absolute;
@@ -133,34 +131,38 @@ body {
 }
 
 /* =========================
-   OVERLAY (BIAR TEKS JELAS)
+   IMAGE OVERLAY
 ========================= */
 .banner::after {
   content: "";
   position: absolute;
   inset: 0;
+
   background: linear-gradient(
     to right,
     rgba(0,0,0,0.55),
     rgba(0,0,0,0.15)
   );
+
   z-index: 2;
 }
 
 /* =========================
-   TEXT CONTENT
+   BANNER TEXT CONTENT
 ========================= */
 .banner-content {
   position: relative;
   z-index: 3;
+
   padding: 26px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .banner-content h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .banner-content p {
@@ -169,8 +171,9 @@ body {
   opacity: 0.92;
 }
 
-
-/* ===== DOT INDICATOR ===== */
+/* =========================
+   DOT INDICATOR
+========================= */
 .banner-dots {
   display: flex;
   justify-content: center;
@@ -181,6 +184,7 @@ body {
 .banner-dots span {
   width: 8px;
   height: 8px;
+
   border-radius: 50%;
   background: rgba(255,255,255,0.45);
   transition: all 0.3s ease;
@@ -191,7 +195,6 @@ body {
   border-radius: 6px;
   background: #ffffff;
 }
-
 
 /* ===== SECTION TITLE ===== */
 .section-title {
