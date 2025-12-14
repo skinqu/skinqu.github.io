@@ -11,14 +11,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== BANNER ===== */
+/* ===== BANNER CARD ===== */
 .banner {
-  margin: 20px;
+  min-width: 300px;
+  flex-shrink: 0;
+
   background: linear-gradient(135deg, #447DCE, #5E8FE0);
   color: #fff;
   border-radius: 18px;
   padding: 26px;
   height: 190px;
+
   position: relative;
   overflow: hidden;
   box-shadow: 0 12px 28px rgba(68, 125, 206, 0.35);
@@ -36,7 +39,6 @@ body {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
-  letter-spacing: .2px;
 }
 
 .banner p {
@@ -44,6 +46,29 @@ body {
   font-size: 14px;
   opacity: .92;
 }
+
+/* ===== BANNER BACKGROUND (FULL WIDTH) ===== */
+.banner-bg {
+  background: linear-gradient(135deg, #447DCE, #5E8FE0);
+  padding: 20px 0;
+  overflow-x: hidden;
+}
+
+/* ===== SCROLL TRACK ===== */
+.banner-track {
+  display: flex;
+  gap: 18px;
+  padding: 0 20px;
+
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* firefox */
+}
+
+.banner-track::-webkit-scrollbar {
+  display: none; /* chrome */
+}
+
 
 /* ===== SECTION TITLE ===== */
 .section-title {
