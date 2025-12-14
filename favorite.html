@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favorite Produk – SkinQu</title>
+
+  <!-- CSS utama -->
+  <link rel="stylesheet" href="assets/css/cssproduct.css">
+  <link rel="stylesheet" href="assets/css/cssindex.css">
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>Produk Favorit</span>
+  <button class="back-btn" onclick="history.back()">Kembali</button>
+</div>
+
+<!-- FAVORITE GRID -->
+<div class="product-grid" id="favoriteGrid">
+
+  <!-- DUMMY CARD -->
+  <div class="product-card">
+    <img src="https://via.placeholder.com/300x200?text=SkinQu">
+    <div class="product-name">Somethinc Low pH Gentle Cleanser</div>
+    <div class="product-price">Rp 89.000</div>
+    <button class="buy-btn">Lihat Produk</button>
+  </div>
+
+  <div class="product-card">
+    <img src="https://via.placeholder.com/300x200?text=SkinQu">
+    <div class="product-name">Skintific 5X Ceramide Barrier Repair</div>
+    <div class="product-price">Rp 139.000</div>
+    <button class="buy-btn">Lihat Produk</button>
+  </div>
+
+  <div class="product-card">
+    <img src="https://via.placeholder.com/300x200?text=SkinQu">
+    <div class="product-name">Azarine Hydrasoothe Sunscreen Gel</div>
+    <div class="product-price">Rp 69.000</div>
+    <button class="buy-btn">Lihat Produk</button>
+  </div>
+
+</div>
+
+<!-- EMPTY STATE (OPSIONAL, NANTI) -->
+<!--
+<div class="empty-state">
+  <p>Belum ada produk favorit ❤️</p>
+</div>
+-->
+
+<!-- BOTTOM NAVBAR -->
+<div class="bottom-nav">
+
+  <div class="nav-item" data-page="index.html">
+    <a href="index.html">
+      <img src="assets/img/home.png" alt="Home">
+    </a>
+  </div>
+
+  <div class="nav-item search-wrapper" data-page="recom.html">
+    <a href="recom.html" class="search-icon">
+      <img src="assets/img/search.png" alt="Search">
+    </a>
+  </div>
+
+  <div class="nav-item" data-page="favorite.html">
+    <a href="favorite.html">
+      <img src="assets/img/heart.png" alt="Favorite">
+    </a>
+  </div>
+
+  <div class="nav-item" data-page="profile.html">
+    <a href="profile.html">
+      <img src="assets/img/user.png" alt="Profile">
+    </a>
+  </div>
+
+</div>
+
+<!-- ACTIVE NAV -->
+<script src="assets/js/nav-active.js"></script>
+
+</body>
+</html>

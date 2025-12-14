@@ -154,14 +154,23 @@
 
 </div>
 
-
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>AI sedang menganalisis kulit Anda…<br>Mohon tunggu sebentar</p>
+  </div>
 </div>
 
 </form>
+
 <script>
 function kirim() {
   const form = document.getElementById("skinForm");
   const data = Object.fromEntries(new FormData(form).entries());
+
+  // TAMPILKAN LOADING
+  document.getElementById("loadingOverlay").style.display = "flex";
 
   fetch("https://hexafaton.app.n8n.cloud/webhook/skinqu-input", {
     method: "POST",
@@ -174,9 +183,12 @@ function kirim() {
       "skinqu_products",
       JSON.stringify(products)
     );
+
+    // PINDAH HALAMAN → LOADING AUTO HILANG
     window.location.href = "product.html";
   })
   .catch(err => {
+    document.getElementById("loadingOverlay").style.display = "none";
     alert("Gagal memproses rekomendasi");
     console.error(err);
   });
