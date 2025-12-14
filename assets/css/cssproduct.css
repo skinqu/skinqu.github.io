@@ -132,12 +132,15 @@ body {
   border-top: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
 
+  /* 🔥 INI KUNCI (ANTI GARIS DI HP) */
+  padding-bottom: env(safe-area-inset-bottom);
+
   z-index: 9999;
 }
 
 /* supaya konten tidak ketutup navbar */
 body {
-  padding-bottom: 90px;
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
 }
 
 /* =========================
@@ -195,7 +198,7 @@ body {
 
 .search-wrapper {
   position: relative;
-  top: -6px;
+  top: -6px; /* masih aman, tidak keluar layar */
 }
 
 /* search tidak punya style sendiri */
