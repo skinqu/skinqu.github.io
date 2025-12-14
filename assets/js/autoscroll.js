@@ -3,59 +3,80 @@ document.addEventListener("DOMContentLoaded", () => {
   const dotsContainer = document.getElementById("bannerDots");
   if (!track || !dotsContainer) return;
 
-  const banners = Array.from(track.children);
+  let banners = Array.from(track.children);
   const bannerCount = banners.length;
 
   /* ===== CREATE DOTS ===== */
-  for (let i = 0; i < bannerCount; i++) {
+  banners.forEach((_, i) => {
     const dot = document.createElement("span");
     if (i === 0) dot.classList.add("active");
     dotsContainer.appendChild(dot);
-  }
+  });
   const dots = dotsContainer.querySelectorAll("span");
 
   /* ===== CLONE BANNERS (INFINITE) ===== */
-  banners.forEach(banner => {
-    const clone = banner.cloneNode(true);
-    track.appendChild(clone);
-  });
+  banners.forEach(b => track.appendChild(b.cloneNode(true)));
 
-  let scrollSpeed = 0.35;
+  banners = Array.from(track.children); // update list after clone
+
+  let index = 0;
   let interval;
 
-  function updateDots() {
-    const bannerWidth = banners[0].offsetWidth + 18; // gap
-    const index = Math.floor(track.scrollLeft / bannerWidth) % bannerCount;
+  function bannerWidth() {
+    return banners[0].offsetWidth + 18; // gap
+  }
+
+  function updateActive() {
+    banners.forEach(b => b.classList.remove("is-active"));
+    const activeIndex = index % bannerCount;
+    banners[activeIndex].classList.add("is-active");
 
     dots.forEach(d => d.classList.remove("active"));
-    dots[index].classList.add("active");
+    dots[activeIndex].classList.add("active");
   }
 
-  function autoScroll() {
-    track.scrollLeft += scrollSpeed;
-
-    if (track.scrollLeft >= track.scrollWidth / 2) {
-      track.scrollLeft = 0;
-    }
-
-    updateDots();
+  function goToBanner(i) {
+    track.scrollTo({
+      left: i * bannerWidth(),
+      behavior: "smooth"
+    });
+    index = i;
+    updateActive();
   }
 
-  interval = setInterval(autoScroll, 20);
+  /* ===== AUTO STEP SCROLL ===== */
+  function startAuto() {
+    interval = setInterval(() => {
+      index++;
+
+      if (index >= bannerCount * 2) {
+        track.scrollLeft = 0;
+        index = 1;
+      }
+
+      goToBanner(index);
+    }, 3000); // ⏱️ langsung lompat per 3 detik
+  }
 
   /* ===== PAUSE ON INTERACTION ===== */
-  ["touchstart", "mouseenter"].forEach(evt =>
+  ["mouseenter", "touchstart"].forEach(evt =>
     track.addEventListener(evt, () => clearInterval(interval))
   );
 
-  ["touchend", "mouseleave"].forEach(evt =>
-    track.addEventListener(evt, () => {
-      interval = setInterval(autoScroll, 20);
-    })
+  ["mouseleave", "touchend"].forEach(evt =>
+    track.addEventListener(evt, startAuto)
   );
 
-  /* ===== MANUAL SCROLL UPDATE DOT ===== */
-  track.addEventListener("scroll", () => {
-    updateDots();
+  /* ===== DOT CLICK (OPSIONAL TAPI KEREN) ===== */
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => {
+      clearInterval(interval);
+      goToBanner(i);
+      startAuto();
+    });
   });
+
+  /* INIT */
+  updateActive();
+  startAuto();
 });
