@@ -181,6 +181,60 @@ body {
 }
 
 /* =========================
+   BOTTOM NAVBAR
+========================= */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background: #ffffff;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+
+  z-index: 9999;
+}
+
+/* Supaya konten tidak ketutup navbar */
+body {
+  padding-bottom: 90px;
+}
+
+/* =========================
+   NAV ITEM (SEMUA SAMA)
+========================= */
+
+.bottom-nav .nav-item {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+/* ICON */
+.bottom-nav .nav-item img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+
+  opacity: 0.75;
+  transition: all 0.25s ease;
+}
+
+/* =========================
    HOVER (SEMUA BUTTON)
 ========================= */
 
@@ -203,24 +257,24 @@ body {
 }
 
 /* =========================
-   SEARCH (TENGAH, SAMA)
+   SEARCH (TENGAH – AMAN)
 ========================= */
 
 .search-wrapper {
   position: relative;
-  top: -18px;
+  top: -6px; /* 🔥 AMAN, tidak keluar navbar */
 }
 
 .search-icon {
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 16px;
 
   box-shadow: 0 10px 22px rgba(0,0,0,0.12);
   transition: all 0.25s ease;
@@ -234,7 +288,10 @@ body {
   transition: all 0.25s ease;
 }
 
-/* HOVER SEARCH = SAMA */
+/* =========================
+   SEARCH = SAMA PERILAKU
+========================= */
+
 .bottom-nav .nav-item:hover .search-icon {
   background: rgba(68,125,206,0.08);
 }
@@ -244,14 +301,13 @@ body {
   transform: scale(1.1);
 }
 
-/* CLICK SEARCH */
 .bottom-nav .nav-item:active .search-icon {
   transform: scale(0.92);
   background: rgba(68,125,206,0.15);
 }
 
 /* =========================
-   ACTIVE (JS OPTIONAL)
+   ACTIVE (OPTIONAL VIA JS)
 ========================= */
 
 .bottom-nav .nav-item.active {
@@ -264,7 +320,7 @@ body {
 }
 
 /* =========================
-   SAFETY (ANTI BUG)
+   SAFETY OVERRIDE
 ========================= */
 
 .bottom-nav * {
@@ -274,6 +330,7 @@ body {
 .bottom-nav div {
   float: none !important;
 }
+
 
 
 
