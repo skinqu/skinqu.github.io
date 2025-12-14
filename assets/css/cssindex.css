@@ -29,11 +29,17 @@ body {
 
 .banner img {
   position: absolute;
-  right: -40px;
-  bottom: -30px;
-  width: 55%;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 42%;
+  max-width: 180px;
+
   opacity: 0.9;
+  pointer-events: none;
 }
+
 
 .banner h2 {
   margin: 0;
