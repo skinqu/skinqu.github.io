@@ -227,11 +227,6 @@ body {
   box-shadow: 0 18px 40px rgba(68,125,206,0.6);
 }
 
-/* =========================
-   SAFETY OVERRIDE
-   (ANTI SIDEBAR BUG)
-========================= */
-
 .bottom-nav div {
   float: none !important;
   position: relative;
