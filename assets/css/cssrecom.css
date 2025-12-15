@@ -95,50 +95,78 @@
 }
 
 /* =========================
-   BOTTOM NAVBAR
+   ROOT VARIABLES (MOBILE)
 ========================= */
+:root {
+  --nav-height: 70px;
+  --safe-bottom: env(safe-area-inset-bottom);
+  --nav-bg: #ffffff;
+  --nav-border: rgba(0,0,0,0.08);
+  --nav-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+  --accent: rgba(68,125,206,1);
+}
 
+/* =========================
+   BODY (MOBILE SAFE)
+========================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  background: #ffffff;
+}
+
+/* offset agar konten tidak ketutup navbar */
+body {
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
+}
+
+/* =========================
+   BOTTOM NAVBAR (STABIL)
+========================= */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 70px;
+  right: 0;
+  bottom: 0;
 
+  height: var(--nav-height); /* 🔒 FIX */
   display: flex;
   justify-content: space-around;
   align-items: center;
 
-  background: #ffffff;
-  border-top: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+  background: var(--nav-bg);
+  border-top: 1px solid var(--nav-border);
+  box-shadow: var(--nav-shadow);
 
-  /* 🔥 INI KUNCI (ANTI GARIS DI HP) */
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--safe-bottom); /* dipisah dari height */
+  box-sizing: content-box;
 
   z-index: 9999;
-}
 
-/* supaya konten tidak ketutup navbar */
-body {
-  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  /* 🔥 ANTI JITTER ANDROID */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* =========================
-   NAV ITEM (SEMUA SAMA)
+   NAV ITEM (TOUCH FRIENDLY)
 ========================= */
-
 .bottom-nav .nav-item {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  cursor: pointer;
   border-radius: 14px;
-  transition: all 0.25s ease;
+  cursor: pointer;
+
+  /* animasi ringan, tidak memicu reflow */
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
 /* ICON */
@@ -147,84 +175,35 @@ body {
   height: 24px;
   object-fit: contain;
 
-  opacity: 0.75;
-  transition: all 0.25s ease;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 /* =========================
-   HOVER (SEMUA)
+   INTERACTION (MOBILE)
 ========================= */
 
-.bottom-nav .nav-item:hover {
-  background: rgba(68,125,206,0.08);
+/* hover hanya efektif di desktop */
+@media (hover: hover) {
+  .bottom-nav .nav-item:hover {
+    background: rgba(68,125,206,0.08);
+  }
+
+  .bottom-nav .nav-item:hover img {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
-.bottom-nav .nav-item:hover img {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* =========================
-   CLICK / TAP
-========================= */
-
+/* tap (mobile) */
 .bottom-nav .nav-item:active {
   transform: scale(0.92);
   background: rgba(68,125,206,0.15);
 }
 
 /* =========================
-   SEARCH (TENGAH, SAMA)
+   ACTIVE STATE (JS)
 ========================= */
-
-.search-wrapper {
-  position: relative;
-  top: -6px; /* masih aman, tidak keluar layar */
-}
-
-/* search tidak punya style sendiri */
-.search-icon {
-  width: 46px;
-  height: 46px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent;
-  box-shadow: none;
-  border-radius: 14px;
-
-  transition: all 0.25s ease;
-}
-
-/* ICON SEARCH */
-.search-icon img {
-  width: 24px;
-  height: 24px;
-  opacity: 0.75;
-  transition: all 0.25s ease;
-}
-
-/* search ikut hover nav-item */
-.bottom-nav .nav-item:hover .search-icon {
-  background: rgba(68,125,206,0.08);
-}
-
-.bottom-nav .nav-item:hover .search-icon img {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.bottom-nav .nav-item:active .search-icon {
-  transform: scale(0.92);
-  background: rgba(68,125,206,0.15);
-}
-
-/* =========================
-   ACTIVE (DARI JS)
-========================= */
-
 .bottom-nav .nav-item.active {
   background: rgba(68,125,206,0.12);
 }
@@ -232,6 +211,57 @@ body {
 .bottom-nav .nav-item.active img {
   opacity: 1;
   transform: scale(1.1);
+}
+
+/* =========================
+   SEARCH (TENGAH)
+========================= */
+.search-wrapper {
+  position: relative;
+  top: -6px; /* visual only */
+}
+
+.search-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+}
+
+.search-icon img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* =========================
+   SMALL SCREEN SAFETY
+========================= */
+@media (max-width: 360px) {
+  .bottom-nav {
+    height: 64px;
+  }
+
+  body {
+    padding-bottom: calc(64px + var(--safe-bottom));
+  }
+
+  .bottom-nav .nav-item,
+  .search-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .bottom-nav .nav-item img,
+  .search-icon img {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 /* =========================
