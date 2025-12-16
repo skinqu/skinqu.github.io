@@ -177,6 +177,29 @@
 <script>
 function kirim() {
   const form = document.getElementById("skinForm");
+
+  // ambil field wajib
+  const umur = form.querySelector('input[name="umur"]');
+  const gender = form.querySelector('select[name="gender"]');
+
+  // =========================
+  // VALIDASI WAJIB
+  // =========================
+  if (!umur.value || Number(umur.value) <= 0) {
+    alert("Umur wajib diisi");
+    umur.focus();
+    return; // ❌ STOP
+  }
+
+  if (!gender.value) {
+    alert("Jenis kelamin wajib dipilih");
+    gender.focus();
+    return; // ❌ STOP
+  }
+
+  // =========================
+  // JIKA LOLOS → KIRIM
+  // =========================
   const data = Object.fromEntries(new FormData(form).entries());
 
   // TAMPILKAN LOADING
@@ -194,7 +217,6 @@ function kirim() {
       JSON.stringify(products)
     );
 
-    // PINDAH HALAMAN → LOADING AUTO HILANG
     window.location.href = "product.html";
   })
   .catch(err => {
@@ -204,6 +226,7 @@ function kirim() {
   });
 }
 </script>
+
 
 </body>
 </html>
