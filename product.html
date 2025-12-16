@@ -44,20 +44,26 @@
 </div>
 
 <script>
-// =======================
-// SUPABASE CONFIG
-// =======================
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
-// =======================
 const MAX = 6;
 const grid = document.getElementById("productGrid");
 
-// SKELETON (FIXED HEIGHT)
+// =======================
+// HELPER ANTI NULL
+// =======================
+function isValid(value) {
+  return value && value !== "null" && value !== "";
+}
+
+// =======================
+// SKELETON
+// =======================
+grid.innerHTML = "";
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
-    <div class="product-card">
+    <div class="product-card skeleton">
       <img src="https://via.placeholder.com/300x200?text=SkinQu">
       <div class="product-name">Menyiapkan rekomendasi...</div>
       <div class="product-price">Rp --</div>
@@ -66,24 +72,43 @@ for (let i = 0; i < MAX; i++) {
   `;
 }
 
-// FETCH SUPABASE
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
+// =======================
+// FETCH DATA
+// =======================
+fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=12`, {
   headers: {
     apikey: SUPABASE_ANON_KEY,
     Authorization: "Bearer " + SUPABASE_ANON_KEY
   }
 })
-
 .then(res => res.json())
 .then(data => {
+
+  // 🔒 FILTER DATA VALID SAJA
+  const cleanData = data.filter(p =>
+    isValid(p.nama) &&
+    isValid(p.harga)
+  ).slice(0, MAX);
+
   grid.innerHTML = "";
 
-  data.forEach(p => {
+  // 🔴 JIKA TIDAK ADA DATA VALID
+  if (cleanData.length === 0) {
+    grid.innerHTML = `<p style="text-align:center;color:#777">
+      Produk tidak tersedia saat ini
+    </p>`;
+    return;
+  }
+
+  // =======================
+  // RENDER PRODUK
+  // =======================
+  cleanData.forEach(p => {
     const q = encodeURIComponent(p.nama);
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="https://via.placeholder.com/300x200?text=SkinQu">
+        <img src="https://via.placeholder.com/300x200?text=SkinQu" alt="${p.nama}">
         <div class="product-name">${p.nama}</div>
         <div class="product-price">${p.harga}</div>
         <button class="buy-btn"
@@ -93,6 +118,12 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
       </div>
     `;
   });
+})
+.catch(err => {
+  console.error(err);
+  grid.innerHTML = `<p style="text-align:center;color:red">
+    Gagal memuat produk
+  </p>`;
 });
 </script>
 
