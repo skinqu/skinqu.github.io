@@ -17,17 +17,27 @@
 </div>
 
 <!-- FORM BEGIN -->
-<div class="form-group">
-  <label>Umur</label>
-  <input type="number" name="umur" placeholder="Masukkan umur Anda" required>
-</div>
+<div class="form-wrapper">
 
-<div class="form-group">
-  <label>Jenis Kelamin</label>
-  <select name="gender">
-    <option value="laki-laki">Laki-laki</option>
-    <option value="perempuan">Perempuan</option>
-  </select>
+  <div class="form-group">
+      <label>Umur</label>
+      <input 
+        type="number" 
+        name="umur" 
+        placeholder="Masukkan umur Anda"
+        required
+        min="1"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>Jenis Kelamin</label>
+      <select name="gender" required>
+        <option value="">-- Pilih Jenis Kelamin --</option>
+        <option value="laki-laki">Laki-laki</option>
+        <option value="perempuan">Perempuan</option>
+      </select>
+    </div>
 </div>
 
 <div class="section-title">Hamil?</div>
