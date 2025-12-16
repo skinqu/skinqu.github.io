@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkinQu Search</title>
+<link rel="stylesheet" href="assets/css/search.css">
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="greeting">
+      <h2>Hi Niken 🤍</h2>
+      <p>Explore and find your favorites</p>
+    </div>
+    <div class="header-icon">🔔</div>
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="search-box">
+    <input type="text" placeholder="Search Product" oninput="searchProduct(this.value)">
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="section-title">Popular Products</div>
+  <div class="category">
+    <button class="chip active" onclick="filterCategory('all')">All</button>
+    <button class="chip" onclick="filterCategory('sunscreen')">Sunscreen</button>
+    <button class="chip" onclick="filterCategory('moisturizer')">Moisturizer</button>
+    <button class="chip" onclick="filterCategory('serum')">Serum</button>
+  </div>
+
+  <!-- PRODUCT GRID -->
+  <div class="product-grid" id="productGrid"></div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item"><img src="assets/img/home.png"></div>
+  <div class="nav-item active"><img src="assets/img/search.png"></div>
+  <div class="nav-item"><img src="assets/img/heart.png"></div>
+  <div class="nav-item"><img src="assets/img/user.png"></div>
+</div>
+
+<script src="assets/js/search.js"></script>
+</body>
+</html>
