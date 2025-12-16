@@ -67,12 +67,13 @@ for (let i = 0; i < MAX; i++) {
 }
 
 // FETCH SUPABASE
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&limit=${MAX}`, {
+fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
   headers: {
     apikey: SUPABASE_ANON_KEY,
     Authorization: "Bearer " + SUPABASE_ANON_KEY
   }
 })
+
 .then(res => res.json())
 .then(data => {
   grid.innerHTML = "";
