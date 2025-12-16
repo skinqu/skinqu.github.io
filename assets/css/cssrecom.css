@@ -49,6 +49,38 @@ body {
   margin-bottom: 22px;
 }
 
+/* =========================
+   PAGE WRAPPER (KUNCI)
+========================= */
+.page-wrapper {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px 16px 12px; /* JARAK KIRI-KANAN */
+  box-sizing: border-box;
+}
+
+/* =========================
+   TITLE (BIAR TIDAK MEPET)
+========================= */
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.4;
+  margin-bottom: 22px;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+.section-title {
+  margin: 26px 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #093A73;
+}
+
+
 /* =====================================================
    FORM WRAPPER (CARD STYLE)
 ===================================================== */
