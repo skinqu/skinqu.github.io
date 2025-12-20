@@ -206,7 +206,7 @@ function kirim() {
   .then(res => res.json())
   .then(products => {
     sessionStorage.setItem("skinqu_products", JSON.stringify(products));
-    window.location.href = "product.html";
+    window.location.href = "/product.html";
   })
   .catch(err => {
     document.getElementById("loadingOverlay").style.display = "none";

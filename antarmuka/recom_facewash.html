@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Form Kulit – Moisturizer</title>
+<title>Form Kulit – facewash</title>
 <link rel="stylesheet" href="/assets/css/cssrecom.css">
 </head>
 
@@ -13,7 +13,7 @@
 
 <div class="title">
   Beri tahu kami tentang kulit Anda <br>
-  Agar rekomendasi moisturizer lebih akurat
+  Agar rekomendasi face wash lebih akurat
 </div>
 
 <div class="form-wrapper">
@@ -206,7 +206,7 @@ function kirim() {
   .then(res => res.json())
   .then(products => {
     sessionStorage.setItem("skinqu_products", JSON.stringify(products));
-    window.location.href = "product.html";
+    window.location.href = "/product.html";
   })
   .catch(err => {
     document.getElementById("loadingOverlay").style.display = "none";
