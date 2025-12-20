@@ -100,22 +100,21 @@ button {
 </div>
 
 <script>
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const loading = document.getElementById("loading");
-
-// 🔴 GANTI DENGAN URL WEBHOOK n8n KAMU
-const N8N_WEBHOOK = "https://hexafaton.app.n8n.cloud/webhook/scan-wajah";
-
-// AKSES KAMERA
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then(stream => video.srcObject = stream)
-  .catch(() => alert("❌ Kamera tidak bisa diakses"));
-
 async function scanWajah() {
   loading.style.display = "block";
 
-  // resize + compress biar Vision stabil
+  // 🔥 WAJIB: pastikan video READY
+  if (video.videoWidth === 0 || video.videoHeight === 0) {
+    await new Promise(r => setTimeout(r, 700));
+  }
+
+  if (video.videoWidth === 0) {
+    alert("❌ Kamera belum siap, coba ulangi");
+    loading.style.display = "none";
+    return;
+  }
+
+  // resize + compress
   const maxWidth = 640;
   const scale = maxWidth / video.videoWidth;
 
@@ -125,30 +124,26 @@ async function scanWajah() {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  const imageBase64 = canvas.toDataURL("image/jpeg", 0.7);
+  // 🔥 compress lebih kecil (HP friendly)
+  const imageBase64 = canvas.toDataURL("image/jpeg", 0.6);
 
-  try {
-    // ❗ KIRIM SAJA, TIDAK NUNGGU RESPONSE
-    fetch(N8N_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        image: imageBase64,
-        umur: 23,
-        gender: "laki-laki",
-        category: "facewash"
-      })
-    });
+  // 🔥 JANGAN AWAIT, JANGAN NUNGGU RESPONSE
+  fetch(N8N_WEBHOOK, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      image: imageBase64,
+      umur: 23,
+      gender: "laki-laki",
+      category: "facewash"
+    })
+  }).catch(err => console.error("Fetch error:", err));
 
-    // langsung pindah halaman
-    window.location.href = "product.html";
-
-  } catch (err) {
-    alert("❌ Gagal memproses scan");
-    console.error(err);
-  }
+  // pindah halaman (workflow jalan di background)
+  window.location.href = "product.html";
 }
 </script>
+
 
 </body>
 </html>
