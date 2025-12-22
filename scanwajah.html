@@ -316,137 +316,175 @@
   <canvas id="canvas" hidden></canvas>
 
   <script>
-    const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
+  const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
 
-    const video = document.getElementById('video');
-    const scanBtn = document.getElementById('scanBtn');
-    const loading = document.getElementById('loading');
-    const permissionMsg = document.getElementById('permission-msg');
-    const scanLine = document.getElementById('scanLine');
-    const flashEl = document.getElementById('flash');
-    const particlesContainer = document.getElementById('particles');
+  const video = document.getElementById('video');
+  const scanBtn = document.getElementById('scanBtn');
+  const loading = document.getElementById('loading');
+  const permissionMsg = document.getElementById('permission-msg');
+  const scanLine = document.getElementById('scanLine');
+  const flashEl = document.getElementById('flash');
+  const particlesContainer = document.getElementById('particles');
 
-    // ✨ Generate floating particles
-    function createParticles() {
-      for (let i = 0; i < 12; i++) {
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        p.style.left = `${Math.random() * 100}%`;
-        p.style.top = `${100 + Math.random() * 20}%`;
-        p.style.animationDuration = `${10 + Math.random() * 20}s`;
-        p.style.opacity = Math.random() * 0.5 + 0.2;
-        p.style.width = `${2 + Math.random() * 3}px`;
-        p.style.height = p.style.width;
-        particlesContainer.appendChild(p);
-      }
+  // ✨ Generate floating particles
+  function createParticles() {
+    for (let i = 0; i < 12; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.top = `${100 + Math.random() * 20}%`;
+      p.style.animationDuration = `${10 + Math.random() * 20}s`;
+      p.style.opacity = Math.random() * 0.5 + 0.2;
+      p.style.width = `${2 + Math.random() * 3}px`;
+      p.style.height = p.style.width;
+      particlesContainer.appendChild(p);
     }
+  }
 
-    // 📸 Init camera
-    async function initCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'user',
-            width: { ideal: 720 },
-            height: { ideal: 960 }
-          },
-          audio: false
-        });
-
-        video.srcObject = stream;
-        video.style.display = 'block';
-        permissionMsg.style.display = 'none';
-
-        video.onloadedmetadata = () => video.play();
-        scanBtn.disabled = false;
-
-        createParticles();
-
-      } catch (err) {
-        console.error("Camera error:", err);
-        permissionMsg.innerHTML = `⚠️ Akses kamera dibutuhkan.<br><small>Buka pengaturan → izinkan kamera → refresh.</small>`;
-      }
-    }
-
-    // 🌀 Efek scan (garis + flash)
-    function runScanAnimation() {
-      return new Promise(resolve => {
-        // Reset
-        scanLine.style.opacity = '0';
-        scanLine.style.top = '-10px';
-
-        // Trigger scan line
-        setTimeout(() => {
-          scanLine.style.transition = 'top 1.8s ease-out, opacity 0.3s';
-          scanLine.style.opacity = '1';
-          scanLine.style.top = '100%';
-        }, 100);
-
-        // Flash effect di akhir
-        setTimeout(() => {
-          flashEl.style.transition = 'opacity 0.4s';
-          flashEl.style.opacity = '0.8';
-          setTimeout(() => {
-            flashEl.style.opacity = '0';
-            resolve();
-          }, 200);
-        }, 1700);
+  // 📸 Init camera
+  async function initCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 720 },
+          height: { ideal: 960 }
+        },
+        audio: false
       });
+
+      video.srcObject = stream;
+      video.style.display = 'block';
+      permissionMsg.style.display = 'none';
+
+      video.onloadedmetadata = () => video.play();
+      scanBtn.disabled = false;
+
+      createParticles();
+    } catch (err) {
+      console.error("Camera error:", err);
+      permissionMsg.innerHTML = `⚠️ Akses kamera dibutuhkan.<br><small>Buka pengaturan → izinkan kamera → refresh.</small>`;
     }
+  }
 
-    // 📤 Scan & kirim
-    async function scanWajah() {
-      if (!video.srcObject) return;
+  // 🌀 Efek scan (garis + flash)
+  function runScanAnimation() {
+    return new Promise(resolve => {
+      scanLine.style.opacity = '0';
+      scanLine.style.top = '-10px';
 
-      scanBtn.disabled = true;
-      loading.style.display = 'block';
+      setTimeout(() => {
+        scanLine.style.transition = 'top 1.8s ease-out, opacity 0.3s';
+        scanLine.style.opacity = '1';
+        scanLine.style.top = '100%';
+      }, 100);
 
-      try {
-        await runScanAnimation();
-        await new Promise(r => setTimeout(r, 200)); // jeda halus
+      setTimeout(() => {
+        flashEl.style.transition = 'opacity 0.4s';
+        flashEl.style.opacity = '0.8';
+        setTimeout(() => {
+          flashEl.style.opacity = '0';
+          resolve();
+        }, 200);
+      }, 1700);
+    });
+  }
 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+  // 🔁 Helper: encode object ke URL query (aman)
+  function encodeQueryData(data) {
+    return Object.keys(data)
+      .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+      .join('&');
+  }
 
-        const size = Math.min(video.videoWidth, video.videoHeight);
-        const x = (video.videoWidth - size) / 2;
-        const y = (video.videoHeight - size) / 2;
+  // 📤 Scan & kirim — TUNGGU SAMPAI AI SELESAI
+  async function scanWajah() {
+    if (!video.srcObject) return;
 
-        canvas.width = 512;
-        canvas.height = 512;
-        ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
+    scanBtn.disabled = true;
+    loading.style.display = 'block';
+    loading.textContent = "Memindai wajah…";
 
-        const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
+    try {
+      await runScanAnimation();
+      await new Promise(r => setTimeout(r, 200));
 
-        // Kirim ke n8n
-        const res = await fetch(N8N_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: imageBase64,
-            umur: 25,
-            gender: "netral",
-            category: "facewash"
-          })
-        });
+      // Ambil gambar
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const size = Math.min(video.videoWidth, video.videoHeight);
+      const x = (video.videoWidth - size) / 2;
+      const y = (video.videoHeight - size) / 2;
 
-        if (res.ok) {
-          window.location.href = "product.html";
-        } else {
-          throw new Error('Webhook failed');
-        }
+      canvas.width = 512;
+      canvas.height = 512;
+      ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
+      const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
 
-      } catch (err) {
-        console.error("Scan error:", err);
-        alert("❌ Gagal memproses scan. Coba lagi.");
-        scanBtn.disabled = false;
-        loading.style.display = 'none';
+      loading.textContent = "Mengirim ke AI…";
+
+      // ⏳ Kirim & TUNGGU hasil AI (bukan hanya respons HTTP)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // timeout 30 detik
+
+      const res = await fetch(N8N_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: imageBase64,
+          umur: 25,
+          gender: "netral",
+          category: "facewash"
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        throw new Error(`AI server error: ${res.status} ${res.statusText}`);
       }
-    }
 
-    // 🎯 Events
-    scanBtn.addEventListener('click', scanWajah);
-    document.addEventListener('DOMContentLoaded', initCamera);
-  </script>
+      loading.textContent = "Menganalisis hasil…";
+
+      // ✅ Baca body sebagai JSON — ini hasil AI yang sesungguhnya
+      const aiResult = await res.json();
+
+      // 🔍 Validasi hasil
+      if (!aiResult.success) {
+        throw new Error(aiResult.message || "AI analysis failed");
+      }
+
+      // ✅ Semua aman — redirect ke product.html + kirim data via query
+      const queryParams = encodeQueryData({
+        skin_type: aiResult.skin_type || 'normal',
+        concerns: (aiResult.concerns || []).join(','),
+        confidence: aiResult.confidence || 0.8,
+        products: (aiResult.recommended_products || []).join('|')
+      });
+
+      // Redirect dengan data
+      window.location.href = `product.html?${queryParams}`;
+
+    } catch (err) {
+      console.error("Scan error:", err);
+
+      let msg = "❌ Gagal memproses scan.";
+      if (err.name === 'AbortError') {
+        msg = "⏰ Proses AI melebihi waktu (30 detik). Coba lagi.";
+      } else if (err.message.includes('JSON')) {
+        msg = "🤖 AI gagal memberikan hasil valid. Coba lagi nanti.";
+      }
+
+      alert(msg);
+      scanBtn.disabled = false;
+      loading.style.display = 'none';
+    }
+  }
+
+  // 🎯 Events
+  scanBtn.addEventListener('click', scanWajah);
+  document.addEventListener('DOMContentLoaded', initCamera);
+</script>
 </body>
 </html>
