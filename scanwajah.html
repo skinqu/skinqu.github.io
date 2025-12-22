@@ -2,135 +2,353 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>SkinQu – Scan Wajah</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>SkinQu • AI Facial Scan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
+    :root {
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.4);
+      --scan-line: #3b82f6;
+      --glass-bg: rgba(15, 23, 42, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text: #f1f5f9;
+      --text-sub: #94a3b8;
+    }
+
+    * {
       margin: 0;
-      font-family: 'Poppins', Arial, sans-serif;
-      background: #fafafa;
-      color: #222;
-      text-align: center;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .container {
-      max-width: 420px;
-      margin: auto;
-      padding: 16px;
-    }
-    h1 {
-      font-size: 20px;
-      margin: 12px 0;
-    }
-    .desc {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 12px;
-    }
-    .camera-box {
+
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: linear-gradient(160deg, #0b0e1a, #111827, #0d1117);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 28px 16px 32px;
+      overflow-x: hidden;
       position: relative;
-      border-radius: 16px;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, transparent 40%, rgba(11, 14, 26, 0.9) 90%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      max-width: 360px;
+    }
+
+    .header h1 {
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(100deg, #e2e8f0, #cbd5e1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .camera-frame {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 4/5;
+      margin: 0 auto 28px;
+      border-radius: 28px;
       overflow: hidden;
-      background: #111;
-      height: 320px;
-      margin: 16px 0;
+      background: #000;
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px var(--glass-border);
+      isolation: isolate;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    /* Glass overlay */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .face-outline {
+      width: 65%;
+      max-width: 220px;
+      filter: drop-shadow(0 0 8px var(--primary-glow));
+    }
+
+    .face-outline path {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 1.5;
+      stroke-dasharray: 6, 4;
+      stroke-linecap: round;
+      opacity: 0.9;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { stroke-dashoffset: 0; opacity: 0.7; }
+      50% { stroke-dashoffset: -10; opacity: 0.95; }
+    }
+
+    .guide-text {
+      position: absolute;
+      top: 24%;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      margin-top: -40px;
+    }
+
+    /* Scan line animation */
+    .scan-line {
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--scan-line), transparent);
+      box-shadow: 0 0 12px var(--primary-glow);
+      opacity: 0;
+      transform: scaleX(0.95);
+      z-index: 3;
+    }
+
+    /* Flash effect */
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    #permission-msg {
+      color: #94a3b8;
+      font-size: 16px;
+      text-align: center;
+      padding: 32px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 380px;
+      padding: 18px;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #1e40af, #1d4ed8);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow:
+        0 4px 16px rgba(30, 64, 175, 0.3),
+        0 0 0 2px rgba(59, 130, 246, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
     }
-    #video {
-      width: 100%;
-      max-height: 100%;
-      object-fit: cover;
-      display: none; /* Sembunyikan dulu sampai ready */
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow:
+        0 6px 20px rgba(30, 64, 175, 0.45),
+        0 0 0 3px rgba(59, 130, 246, 0.3);
     }
-    .overlay {
-      position: absolute;
-      top: 12%; left: 12%; right: 12%; bottom: 12%;
-      border: 2px dashed rgba(255,255,255,0.8);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    #permission-msg {
-      color: #fff;
-      font-size: 14px;
-      padding: 20px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border-radius: 12px;
-      border: none;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .scan-btn {
-      background: #4CAF50;
-      color: white;
-    }
-    .scan-btn:disabled {
-      background: #ccc;
+
+    .btn:disabled {
+      opacity: 0.6;
+      transform: none;
       cursor: not-allowed;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    .loading {
-      text-align: center;
-      font-size: 13px;
-      margin-top: 10px;
+
+    .loading-state {
       display: none;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 15px;
+      color: var(--text-sub);
     }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      animation: float 15s infinite linear;
+    }
+
+    @keyframes float {
+      to { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+    }
+
     .note {
       font-size: 11px;
-      color: #888;
-      margin-top: 14px;
+      color: #64748b;
+      margin-top: 24px;
+      max-width: 380px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 375px) {
+      .header h1 { font-size: 26px; }
+      .camera-frame { border-radius: 24px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Scan Wajah</h1>
-    <div class="desc">
-      Arahkan wajah ke kamera<br>
-      Pastikan cahaya cukup & tanpa filter
-    </div>
-
-    <div class="camera-box">
-      <div id="permission-msg">⏳ Memuat kamera...</div>
-      <video id="video" playsinline muted></video>
-      <div class="overlay"></div>
-    </div>
-
-    <button id="scanBtn" class="scan-btn" disabled>Scan Sekarang</button>
-
-    <div class="loading" id="loading">
-      ⏳ Menganalisis wajah dengan AI...
-    </div>
-
-    <canvas id="canvas" hidden></canvas>
-
-    <div class="note">
-      Analisis ini bersifat estimasi visual dan bukan diagnosis medis.
-    </div>
+  <div class="header">
+    <h1>SkinQu AI Scanner</h1>
+    <p>Lakukan pemindaian wajah real-time untuk rekomendasi perawatan kulit personal.</p>
   </div>
 
+  <div class="camera-frame">
+    <div id="permission-msg">🔍 Mengaktifkan kamera…</div>
+    <video id="video" playsinline muted></video>
+    
+    <div class="overlay">
+      <div class="guide-text">Letakkan wajah di dalam garis</div>
+      <svg class="face-outline" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50,15 
+                 C30,15 18,28 18,46 
+                 C18,58 24,70 34,82 
+                 C30,88 28,96 28,104 
+                 C28,112 32,118 38,122 
+                 C44,126 56,126 62,122 
+                 C68,118 72,112 72,104 
+                 C72,96 70,88 66,82 
+                 C76,70 82,58 82,46 
+                 C82,28 70,15 50,15 Z
+                 
+                 M38,48 
+                 C38,48 42,44 50,44 
+                 C58,44 62,48 62,48 
+                 
+                 M44,90 
+                 Q50,96 56,90" />
+      </svg>
+    </div>
+
+    <div class="scan-line" id="scanLine"></div>
+    <div class="flash" id="flash"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <button id="scanBtn" class="btn" disabled>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M12 3v2"></path>
+      <path d="M12 19v2"></path>
+      <path d="M5 12h2"></path>
+      <path d="M17 12h2"></path>
+      <path d="M7 7l1.5 1.5"></path>
+      <path d="M15.5 15.5L17 17"></path>
+      <path d="M17 7l-1.5 1.5"></path>
+      <path d="M8.5 15.5L7 17"></path>
+    </svg>
+    Mulai Pemindaian
+  </button>
+
+  <div class="loading-state" id="loading">
+    Memproses hasil scan AI…
+  </div>
+
+  <div class="note">
+    🔒 Data tidak disimpan. Analisis dilakukan lokal & cloud aman. Bukan diagnosis medis.
+  </div>
+
+  <canvas id="canvas" hidden></canvas>
+
   <script>
-    // 🔥 GANTI DENGAN WEBOOK n8n KAMU DI SINI!H
-    const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah"; 
+    const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
 
     const video = document.getElementById('video');
     const scanBtn = document.getElementById('scanBtn');
     const loading = document.getElementById('loading');
     const permissionMsg = document.getElementById('permission-msg');
+    const scanLine = document.getElementById('scanLine');
+    const flashEl = document.getElementById('flash');
+    const particlesContainer = document.getElementById('particles');
 
-    // ✅ 1. Minta akses kamera & tampilkan preview
+    // ✨ Generate floating particles
+    function createParticles() {
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.classList.add('particle');
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.top = `${100 + Math.random() * 20}%`;
+        p.style.animationDuration = `${10 + Math.random() * 20}s`;
+        p.style.opacity = Math.random() * 0.5 + 0.2;
+        p.style.width = `${2 + Math.random() * 3}px`;
+        p.style.height = p.style.width;
+        particlesContainer.appendChild(p);
+      }
+    }
+
+    // 📸 Init camera
     async function initCamera() {
       try {
-        // ✅ Prefer front camera (HP biasanya pakai 'user')
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: "user", // kamera depan
-            width: { ideal: 640 },
-            height: { ideal: 480 }
+            facingMode: 'user',
+            width: { ideal: 720 },
+            height: { ideal: 960 }
           },
           audio: false
         });
@@ -139,85 +357,95 @@
         video.style.display = 'block';
         permissionMsg.style.display = 'none';
 
-        // Tunggu video siap (metadata loaded)
-        await new Promise((resolve) => {
-          video.onloadedmetadata = resolve;
-        });
-        video.play(); // Pastikan autoplay jalan setelah stream aktif
+        video.onloadedmetadata = () => video.play();
         scanBtn.disabled = false;
 
+        createParticles();
+
       } catch (err) {
-        console.error("❌ Gagal mengakses kamera:", err);
-        permissionMsg.innerHTML = `
-          ❌ Izin kamera ditolak.<br>
-          <small>Buka pengaturan browser → izinkan kamera → refresh halaman</small>
-        `;
+        console.error("Camera error:", err);
+        permissionMsg.innerHTML = `⚠️ Akses kamera dibutuhkan.<br><small>Buka pengaturan → izinkan kamera → refresh.</small>`;
       }
     }
 
-    // ✅ 2. Ambil & kirim gambar
-    async function scanWajah() {
-      if (!video.srcObject) {
-        alert("Kamera belum aktif. Tunggu sebentar...");
-        return;
-      }
+    // 🌀 Efek scan (garis + flash)
+    function runScanAnimation() {
+      return new Promise(resolve => {
+        // Reset
+        scanLine.style.opacity = '0';
+        scanLine.style.top = '-10px';
 
-      loading.style.display = "block";
+        // Trigger scan line
+        setTimeout(() => {
+          scanLine.style.transition = 'top 1.8s ease-out, opacity 0.3s';
+          scanLine.style.opacity = '1';
+          scanLine.style.top = '100%';
+        }, 100);
+
+        // Flash effect di akhir
+        setTimeout(() => {
+          flashEl.style.transition = 'opacity 0.4s';
+          flashEl.style.opacity = '0.8';
+          setTimeout(() => {
+            flashEl.style.opacity = '0';
+            resolve();
+          }, 200);
+        }, 1700);
+      });
+    }
+
+    // 📤 Scan & kirim
+    async function scanWajah() {
+      if (!video.srcObject) return;
+
       scanBtn.disabled = true;
+      loading.style.display = 'block';
 
       try {
-        // Tunggu 300ms biar kamera stabil (opsional, tapi membantu)
-        await new Promise(r => setTimeout(r, 300));
-
-        // Ukuran maks output: 640px lebar
-        const maxWidth = 640;
-        const scale = maxWidth / video.videoWidth;
-        const height = video.videoHeight * scale;
+        await runScanAnimation();
+        await new Promise(r => setTimeout(r, 200)); // jeda halus
 
         const canvas = document.getElementById('canvas');
-        canvas.width = maxWidth;
-        canvas.height = height;
-
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, maxWidth, height);
 
-        // Compress ke JPEG 60% → ukuran kecil, cepat upload
-        const imageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        const size = Math.min(video.videoWidth, video.videoHeight);
+        const x = (video.videoWidth - size) / 2;
+        const y = (video.videoHeight - size) / 2;
 
-        // 🔥 Kirim ke n8n (tanpa await — biar tidak nunggu response)
-        fetch(N8N_WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        canvas.width = 512;
+        canvas.height = 512;
+        ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
+
+        const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
+
+        // Kirim ke n8n
+        const res = await fetch(N8N_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             image: imageBase64,
-            umur: 23,          // ⚠️ HARUS diambil dari form/user input nanti
-            gender: "laki-laki", // ⚠️ HARUS dinamis
+            umur: 25,
+            gender: "netral",
             category: "facewash"
           })
-        })
-        .then(() => {
-          // ✅ Sukses kirim → alihkan
-          window.location.href = "product.html";
-        })
-        .catch((err) => {
-          console.error("❌ Gagal kirim ke n8n:", err);
-          alert("Gagal mengirim data. Periksa koneksi internet.");
-          loading.style.display = "none";
-          scanBtn.disabled = false;
         });
 
+        if (res.ok) {
+          window.location.href = "product.html";
+        } else {
+          throw new Error('Webhook failed');
+        }
+
       } catch (err) {
-        console.error("❌ Error saat scan:", err);
-        alert("Terjadi kesalahan saat memproses gambar.");
-        loading.style.display = "none";
+        console.error("Scan error:", err);
+        alert("❌ Gagal memproses scan. Coba lagi.");
         scanBtn.disabled = false;
+        loading.style.display = 'none';
       }
     }
 
-    // 🔗 Event listener
+    // 🎯 Events
     scanBtn.addEventListener('click', scanWajah);
-
-    // 🚀 Jalankan saat halaman siap
     document.addEventListener('DOMContentLoaded', initCamera);
   </script>
 </body>
