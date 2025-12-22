@@ -1,149 +1,224 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkinQu – Scan Wajah</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Poppins, Arial, sans-serif;
-  background: #fafafa;
-  color: #222;
-}
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 16px;
-}
-h1 {
-  text-align: center;
-  font-size: 20px;
-}
-.desc {
-  text-align: center;
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 12px;
-}
-.camera-box {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #000;
-}
-video {
-  width: 100%;
-}
-.overlay {
-  position: absolute;
-  inset: 12%;
-  border: 2px dashed rgba(255,255,255,0.8);
-  border-radius: 50%;
-}
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 12px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.scan-btn {
-  background: #4CAF50;
-  color: white;
-}
-.loading {
-  text-align: center;
-  font-size: 13px;
-  margin-top: 10px;
-  display: none;
-}
-.note {
-  font-size: 11px;
-  text-align: center;
-  color: #888;
-  margin-top: 14px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>SkinQu – Scan Wajah</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #fafafa;
+      color: #222;
+      text-align: center;
+    }
+    .container {
+      max-width: 420px;
+      margin: auto;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 12px 0;
+    }
+    .desc {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    .camera-box {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #111;
+      height: 320px;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #video {
+      width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      display: none; /* Sembunyikan dulu sampai ready */
+    }
+    .overlay {
+      position: absolute;
+      top: 12%; left: 12%; right: 12%; bottom: 12%;
+      border: 2px dashed rgba(255,255,255,0.8);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    #permission-msg {
+      color: #fff;
+      font-size: 14px;
+      padding: 20px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .scan-btn {
+      background: #4CAF50;
+      color: white;
+    }
+    .scan-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .loading {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+    .note {
+      font-size: 11px;
+      color: #888;
+      margin-top: 14px;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
+  <div class="container">
+    <h1>Scan Wajah</h1>
+    <div class="desc">
+      Arahkan wajah ke kamera<br>
+      Pastikan cahaya cukup & tanpa filter
+    </div>
 
-  <h1>Scan Wajah</h1>
-  <div class="desc">
-    Arahkan wajah ke kamera<br>
-    Pastikan cahaya cukup & tanpa filter
+    <div class="camera-box">
+      <div id="permission-msg">⏳ Memuat kamera...</div>
+      <video id="video" playsinline muted></video>
+      <div class="overlay"></div>
+    </div>
+
+    <button id="scanBtn" class="scan-btn" disabled>Scan Sekarang</button>
+
+    <div class="loading" id="loading">
+      ⏳ Menganalisis wajah dengan AI...
+    </div>
+
+    <canvas id="canvas" hidden></canvas>
+
+    <div class="note">
+      Analisis ini bersifat estimasi visual dan bukan diagnosis medis.
+    </div>
   </div>
 
-  <div class="camera-box">
-    <video id="video" autoplay playsinline></video>
-    <div class="overlay"></div>
-  </div>
+  <script>
+    // 🔥 GANTI DENGAN WEBOOK n8n KAMU DI SINI!H
+    const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah"; 
 
-  <button class="scan-btn" onclick="scanWajah()">Scan Sekarang</button>
+    const video = document.getElementById('video');
+    const scanBtn = document.getElementById('scanBtn');
+    const loading = document.getElementById('loading');
+    const permissionMsg = document.getElementById('permission-msg');
 
-  <div class="loading" id="loading">
-    ⏳ Menganalisis wajah dengan AI...
-  </div>
+    // ✅ 1. Minta akses kamera & tampilkan preview
+    async function initCamera() {
+      try {
+        // ✅ Prefer front camera (HP biasanya pakai 'user')
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user", // kamera depan
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
 
-  <canvas id="canvas" hidden></canvas>
+        video.srcObject = stream;
+        video.style.display = 'block';
+        permissionMsg.style.display = 'none';
 
-  <div class="note">
-    Analisis ini bersifat estimasi visual dan bukan diagnosis medis.
-  </div>
+        // Tunggu video siap (metadata loaded)
+        await new Promise((resolve) => {
+          video.onloadedmetadata = resolve;
+        });
+        video.play(); // Pastikan autoplay jalan setelah stream aktif
+        scanBtn.disabled = false;
 
-</div>
+      } catch (err) {
+        console.error("❌ Gagal mengakses kamera:", err);
+        permissionMsg.innerHTML = `
+          ❌ Izin kamera ditolak.<br>
+          <small>Buka pengaturan browser → izinkan kamera → refresh halaman</small>
+        `;
+      }
+    }
 
-<script>
-async function scanWajah() {
-  loading.style.display = "block";
+    // ✅ 2. Ambil & kirim gambar
+    async function scanWajah() {
+      if (!video.srcObject) {
+        alert("Kamera belum aktif. Tunggu sebentar...");
+        return;
+      }
 
-  // 🔥 WAJIB: pastikan video READY
-  if (video.videoWidth === 0 || video.videoHeight === 0) {
-    await new Promise(r => setTimeout(r, 700));
-  }
+      loading.style.display = "block";
+      scanBtn.disabled = true;
 
-  if (video.videoWidth === 0) {
-    alert("❌ Kamera belum siap, coba ulangi");
-    loading.style.display = "none";
-    return;
-  }
+      try {
+        // Tunggu 300ms biar kamera stabil (opsional, tapi membantu)
+        await new Promise(r => setTimeout(r, 300));
 
-  // resize + compress
-  const maxWidth = 640;
-  const scale = maxWidth / video.videoWidth;
+        // Ukuran maks output: 640px lebar
+        const maxWidth = 640;
+        const scale = maxWidth / video.videoWidth;
+        const height = video.videoHeight * scale;
 
-  canvas.width = maxWidth;
-  canvas.height = video.videoHeight * scale;
+        const canvas = document.getElementById('canvas');
+        canvas.width = maxWidth;
+        canvas.height = height;
 
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, maxWidth, height);
 
-  // 🔥 compress lebih kecil (HP friendly)
-  const imageBase64 = canvas.toDataURL("image/jpeg", 0.6);
+        // Compress ke JPEG 60% → ukuran kecil, cepat upload
+        const imageBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
-  // 🔥 JANGAN AWAIT, JANGAN NUNGGU RESPONSE
-  fetch(N8N_WEBHOOK, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      image: imageBase64,
-      umur: 23,
-      gender: "laki-laki",
-      category: "facewash"
-    })
-  }).catch(err => console.error("Fetch error:", err));
+        // 🔥 Kirim ke n8n (tanpa await — biar tidak nunggu response)
+        fetch(N8N_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image: imageBase64,
+            umur: 23,          // ⚠️ HARUS diambil dari form/user input nanti
+            gender: "laki-laki", // ⚠️ HARUS dinamis
+            category: "facewash"
+          })
+        })
+        .then(() => {
+          // ✅ Sukses kirim → alihkan
+          window.location.href = "product.html";
+        })
+        .catch((err) => {
+          console.error("❌ Gagal kirim ke n8n:", err);
+          alert("Gagal mengirim data. Periksa koneksi internet.");
+          loading.style.display = "none";
+          scanBtn.disabled = false;
+        });
 
-  // pindah halaman (workflow jalan di background)
-  window.location.href = "product.html";
-}
-</script>
+      } catch (err) {
+        console.error("❌ Error saat scan:", err);
+        alert("Terjadi kesalahan saat memproses gambar.");
+        loading.style.display = "none";
+        scanBtn.disabled = false;
+      }
+    }
 
+    // 🔗 Event listener
+    scanBtn.addEventListener('click', scanWajah);
 
+    // 🚀 Jalankan saat halaman siap
+    document.addEventListener('DOMContentLoaded', initCamera);
+  </script>
 </body>
 </html>
