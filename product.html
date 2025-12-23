@@ -5,51 +5,258 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Produk Rekomendasi – SkinQu</title>
 <link rel="stylesheet" href="assets/css/cssproduct.css">
+<style>
+/* ============================
+   STYLE TAMBAHAN UNTUK HASIL AI SCAN
+   ============================ */
+
+/* Container untuk hasil AI */
+.ai-results-section {
+  margin: 20px 0 30px 0;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
+  border-radius: 15px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.ai-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.ai-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-title::before {
+  content: "🤖";
+  font-size: 20px;
+}
+
+.badge {
+  background: #10b981;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ai-info {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Grid untuk produk AI */
+.ai-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.ai-product-card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+}
+
+.ai-product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+}
+
+.ai-product-card .product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 10px 0 8px 0;
+  line-height: 1.4;
+  height: 40px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ai-product-card .product-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+
+.ai-buy-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ai-buy-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  transform: translateY(-2px);
+}
+
+/* Skeleton loading untuk AI results */
+.ai-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 15px;
+}
+
+.ai-skeleton-card {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 15px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Toggle untuk show/hide */
+.toggle-ai-results {
+  width: 100%;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.toggle-ai-results:hover {
+  background: #f1f5f9;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ai-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  
+  .ai-product-card .product-name {
+    font-size: 13px;
+    height: 36px;
+  }
+  
+  .ai-buy-btn {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .ai-title {
+    font-size: 16px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <span>Produk Rekomendasi </span>
+  <span>Produk Rekomendasi</span>
 </div>
 
+<!-- TAMBAHAN: Container untuk hasil AI Scan -->
+<div id="aiResultsContainer" class="ai-results-section hidden">
+  <div class="ai-results-header">
+    <div class="ai-title">Rekomendasi AI SkinQu</div>
+    <div class="badge">Personal</div>
+  </div>
+  <div class="ai-info">
+    Berdasarkan analisis AI terhadap kulit Anda, berikut rekomendasi produk terbaik:
+  </div>
+  <div id="aiProductsGrid" class="ai-products-grid">
+    <!-- AI products akan dimuat di sini -->
+  </div>
+  <button id="toggleAIResults" class="toggle-ai-results" onclick="toggleAIResults()">
+    <span>Sembunyikan Rekomendasi AI</span>
+    <span>▲</span>
+  </button>
+</div>
+
+<!-- TAMBAHAN: Skeleton loading untuk AI results -->
+<div id="aiSkeleton" class="ai-skeleton hidden">
+  <div class="ai-skeleton-card"></div>
+  <div class="ai-skeleton-card"></div>
+  <div class="ai-skeleton-card"></div>
+</div>
+
+<!-- Container produk dari Supabase (ORIGINAL) -->
 <div class="product-grid" id="productGrid"></div>
 
 <div class="bottom-nav">
-
   <div class="nav-item" data-page="index.html">
     <a href="index.html">
       <img src="assets/img/home.png" alt="Home">
     </a>
   </div>
-
   <div class="nav-item search-wrapper" data-page="scanwajah.html">
     <a href="scanwajah.html" class="search-icon">
       <img src="assets/img/scanwajah.png" alt="Search">
     </a>
   </div>
-
   <div class="nav-item" data-page="favorite.html">
     <a href="favorite.html">
       <img src="assets/img/heart.png" alt="Favorite">
     </a>
   </div>
-
   <div class="nav-item" data-page="profile.html">
     <a href="profile.html">
       <img src="assets/img/user.png" alt="Profile">
     </a>
   </div>
-
 </div>
 
 <script>
 // =======================
-// SUPABASE CONFIG
+// SUPABASE CONFIG (ORIGINAL - TIDAK DIUBAH)
 // =======================
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
+// =======================
+// KODE ASLI UNTUK PRODUK SUPABASE (TIDAK DIUBAH)
 // =======================
 const MAX = 6;
 const grid = document.getElementById("productGrid");
@@ -73,7 +280,6 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
     Authorization: "Bearer " + SUPABASE_ANON_KEY
   }
 })
-
 .then(res => res.json())
 .then(data => {
   grid.innerHTML = "";
@@ -94,7 +300,185 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
     `;
   });
 });
-</script>
 
+// =======================
+// FUNGSI BARU: TAMPILKAN REKOMENDASI AI DARI SCAN
+// =======================
+
+// Fungsi untuk toggle tampilan AI results
+function toggleAIResults() {
+  const container = document.getElementById('aiResultsContainer');
+  const toggleBtn = document.getElementById('toggleAIResults');
+  const arrow = toggleBtn.querySelector('span:last-child');
+  
+  if (container.classList.contains('hidden')) {
+    container.classList.remove('hidden');
+    toggleBtn.querySelector('span:first-child').textContent = 'Sembunyikan Rekomendasi AI';
+    arrow.textContent = '▲';
+  } else {
+    container.classList.add('hidden');
+    toggleBtn.querySelector('span:first-child').textContent = 'Tampilkan Rekomendasi AI';
+    arrow.textContent = '▼';
+  }
+}
+
+// Fungsi untuk memuat produk dari AI scan
+function loadAIResults() {
+  // Cek apakah ada data dari scan wajah
+  const skinquProducts = sessionStorage.getItem("skinqu_products");
+  const scanTime = sessionStorage.getItem("skinqu_scan_time");
+  const sessionId = sessionStorage.getItem("skinqu_session_id");
+  
+  // Jika tidak ada data scan, sembunyikan section AI
+  if (!skinquProducts) {
+    document.getElementById('aiResultsContainer').classList.add('hidden');
+    return;
+  }
+  
+  try {
+    const products = JSON.parse(skinquProducts);
+    
+    // Tampilkan skeleton loading
+    document.getElementById('aiSkeleton').classList.remove('hidden');
+    
+    // Delay untuk efek visual
+    setTimeout(() => {
+      // Sembunyikan skeleton
+      document.getElementById('aiSkeleton').classList.add('hidden');
+      
+      // Tampilkan container AI results
+      const aiContainer = document.getElementById('aiResultsContainer');
+      aiContainer.classList.remove('hidden');
+      
+      // Update info waktu scan
+      if (scanTime) {
+        const scanDate = new Date(scanTime);
+        const timeStr = scanDate.toLocaleTimeString('id-ID', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        const dateStr = scanDate.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+        
+        document.querySelector('.ai-info').innerHTML = 
+          `Berdasarkan analisis AI scan pada <strong>${dateStr} pukul ${timeStr}</strong>, berikut rekomendasi produk terbaik untuk kulit Anda:`;
+      }
+      
+      // Render produk AI
+      const aiGrid = document.getElementById('aiProductsGrid');
+      aiGrid.innerHTML = '';
+      
+      // Validasi format data produk
+      if (Array.isArray(products)) {
+        // Format array biasa
+        products.slice(0, 4).forEach((product, index) => {
+          const productName = product.nama || product.name || product.product_name || `Produk ${index + 1}`;
+          const productPrice = product.harga || product.price || product.harga_rupiah || "Rp --";
+          
+          // Encode untuk pencarian Shopee
+          const searchQuery = encodeURIComponent(productName);
+          
+          aiGrid.innerHTML += `
+            <div class="ai-product-card">
+              <img src="${product.image || product.gambar || 'https://via.placeholder.com/300x200?text=SkinQu+AI'}" 
+                   alt="${productName}"
+                   style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+              <div class="product-name">${productName}</div>
+              <div class="product-price">${productPrice}</div>
+              <button class="ai-buy-btn"
+                onclick="window.open('https://shopee.co.id/search?keyword=${searchQuery}','_blank')">
+                Lihat di Shopee
+              </button>
+            </div>
+          `;
+        });
+      } else if (typeof products === 'object') {
+        // Format object dengan properti produk
+        let productCount = 0;
+        for (const key in products) {
+          if (productCount >= 4) break;
+          
+          if (products[key] && typeof products[key] === 'object') {
+            const product = products[key];
+            const productName = product.nama || product.name || key;
+            const productPrice = product.harga || product.price || "Rp --";
+            const searchQuery = encodeURIComponent(productName);
+            
+            aiGrid.innerHTML += `
+              <div class="ai-product-card">
+                <img src="${product.image || product.gambar || 'https://via.placeholder.com/300x200?text=SkinQu+AI'}" 
+                     alt="${productName}"
+                     style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+                <div class="product-name">${productName}</div>
+                <div class="product-price">${productPrice}</div>
+                <button class="ai-buy-btn"
+                  onclick="window.open('https://shopee.co.id/search?keyword=${searchQuery}','_blank')">
+                  Lihat di Shopee
+                </button>
+              </div>
+            `;
+            
+            productCount++;
+          }
+        }
+      }
+      
+      // Jika tidak ada produk yang valid
+      if (aiGrid.innerHTML === '') {
+        aiGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #64748b;">
+            <p>Belum ada rekomendasi AI. Lakukan scan wajah terlebih dahulu.</p>
+            <a href="scanwajah.html" style="color: #2563eb; text-decoration: none; font-weight: 500;">
+              → Scan Wajah Sekarang
+            </a>
+          </div>
+        `;
+      }
+      
+    }, 1000); // Delay 1 detik untuk efek loading
+    
+  } catch (error) {
+    console.error("Error loading AI results:", error);
+    document.getElementById('aiResultsContainer').classList.add('hidden');
+  }
+}
+
+// Fungsi untuk membersihkan data scan setelah ditampilkan
+function clearScanDataAfterDisplay() {
+  // Tunggu 5 detik setelah halaman dimuat, lalu hapus data
+  setTimeout(() => {
+    // Anda bisa memilih untuk menghapus atau tidak
+    // sessionStorage.removeItem("skinqu_products");
+    // sessionStorage.removeItem("skinqu_scan_time");
+    // sessionStorage.removeItem("skinqu_session_id");
+  }, 5000);
+}
+
+// =======================
+// INISIALISASI SAAT HALAMAN DIMUAT
+// =======================
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Load AI results dari sessionStorage
+  loadAIResults();
+  
+  // 2. Clear data setelah ditampilkan (opsional)
+  clearScanDataAfterDisplay();
+  
+  // 3. Cek jika ada parameter URL untuk menunjukkan hasil scan
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('fromScan') === 'true') {
+    // Scroll ke hasil AI
+    setTimeout(() => {
+      document.getElementById('aiResultsContainer')?.scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    }, 500);
+  }
+});
+
+</script>
 </body>
 </html>
