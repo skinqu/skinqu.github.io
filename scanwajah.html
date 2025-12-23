@@ -433,7 +433,15 @@
 
   <script>
   const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
-  const SUPABASE_STORAGE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+  
+  // ====================== CONFIGURASI WAKTU PROSES ======================
+  const PROCESSING_CONFIG = {
+    INITIAL_WAIT: 3000,      // Tunggu 3 detik setelah scan sebelum mulai polling
+    POLLING_INTERVAL: 2000,  // Poll setiap 2 detik
+    MAX_POLLING_TIME: 45000,  // Maksimal 45 detik polling
+    PROGRESS_UPDATE: 500     // Update progress setiap 500ms
+  };
+  // =====================================================================
 
   const video = document.getElementById('video');
   const scanBtn = document.getElementById('scanBtn');
@@ -445,6 +453,8 @@
 
   // Variabel untuk mengelola status loading
   let isProcessing = false;
+  let progressInterval;
+  let elapsedSeconds = 0;
 
   // ✨ Generate floating particles
   function createParticles() {
@@ -510,8 +520,8 @@
     });
   }
 
-  // 🔄 Update status loading steps
-  function updateLoadingStep(stepNumber) {
+  // 🔄 Update status loading steps dengan timer
+  function updateLoadingStep(stepNumber, description = '') {
     // Reset semua step
     for (let i = 1; i <= 4; i++) {
       const step = document.getElementById(`step${i}`);
@@ -523,39 +533,85 @@
       const step = document.getElementById(`step${i}`);
       step.classList.add('active');
     }
-  }
-
-  // 💾 Fungsi untuk upload gambar ke Supabase (opsional)
-  async function uploadToSupabase(imageBase64, fileName) {
-    try {
-      // Konversi base64 ke blob
-      const base64Response = await fetch(imageBase64);
-      const blob = await base64Response.blob();
-      
-      // Format: multipart/form-data untuk upload
-      const formData = new FormData();
-      formData.append('file', blob, fileName);
-      
-      // TAMBAHKAN header authorization jika diperlukan
-      // formData.append('Authorization', 'Bearer YOUR_SUPABASE_ANON_KEY');
-      
-      const response = await fetch(SUPABASE_STORAGE_URL, {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        return data.url; // URL gambar di Supabase
+    
+    // Update description jika ada
+    if (description && stepNumber <= 4) {
+      const stepText = document.querySelector(`#step${stepNumber} .step-text`);
+      if (stepText) {
+        stepText.innerHTML = description;
       }
-      return null;
-    } catch (error) {
-      console.error('Supabase upload error:', error);
-      return null;
     }
   }
 
-  // 📤 Scan & kirim — FUNGSI UTAMA YANG DIPERBAIKI
+  // ⏱️ Update progress timer di UI
+  function updateProgressTimer() {
+    elapsedSeconds++;
+    const timerText = document.querySelector('.loading-subtext');
+    if (timerText) {
+      timerText.textContent = `Proses AI membutuhkan waktu 9-15 detik. Sedang diproses: ${elapsedSeconds} detik...`;
+    }
+    
+    // Update progress bar jika ada
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+      const progressPercent = Math.min((elapsedSeconds / 15) * 100, 100);
+      progressBar.style.width = `${progressPercent}%`;
+    }
+  }
+
+  // 🔍 Polling untuk mengecek status proses AI di n8n
+  async function pollProcessingStatus(sessionId) {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < PROCESSING_CONFIG.MAX_POLLING_TIME) {
+      try {
+        console.log(`Polling status untuk session: ${sessionId}`);
+        
+        // Kirim request ke endpoint status n8n (anda perlu buat endpoint ini di n8n)
+        const statusRes = await fetch(`${N8N_WEBHOOK}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+        
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          
+          // ====================== LOGIKA STATUS N8N ======================
+          // Anda perlu sesuaikan dengan respons n8n:
+          // status: "processing", "completed", "failed"
+          // products: (array jika completed)
+          // ==============================================================
+          
+          if (statusData.status === 'completed') {
+            return {
+              success: true,
+              products: statusData.products,
+              message: 'Proses AI selesai'
+            };
+          } else if (statusData.status === 'failed') {
+            return {
+              success: false,
+              error: statusData.error || 'Proses AI gagal'
+            };
+          }
+          // Jika masih processing, lanjut polling
+        }
+      } catch (error) {
+        console.warn('Polling error:', error);
+      }
+      
+      // Tunggu sebelum polling berikutnya
+      await new Promise(resolve => setTimeout(resolve, PROCESSING_CONFIG.POLLING_INTERVAL));
+    }
+    
+    return {
+      success: false,
+      error: 'Waktu proses AI terlalu lama (timeout)'
+    };
+  }
+
+  // 📤 Scan & kirim - VERSI POLLING UNTUK PROSES AI 9-15 DETIK
   async function scanWajah() {
     if (isProcessing) return;
     
@@ -567,14 +623,44 @@
     // Nonaktifkan tombol scan
     scanBtn.disabled = true;
     isProcessing = true;
+    elapsedSeconds = 0;
     
     // Tampilkan loading overlay
     loadingOverlay.style.display = "flex";
-    updateLoadingStep(1);
+    updateLoadingStep(1, "Mengambil gambar wajah...");
 
     try {
-      // Ambil data (sesuai dengan memori user)
-      const data = {
+      // 1. Jalankan animasi scan
+      await runScanAnimation();
+      
+      // Tunggu sebentar untuk efek visual
+      await new Promise(r => setTimeout(r, 300));
+
+      // 2. Ambil gambar dari video
+      updateLoadingStep(2, "Menyimpan gambar untuk analisis...");
+      
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const size = Math.min(video.videoWidth, video.videoHeight);
+      const x = (video.videoWidth - size) / 2;
+      const y = (video.videoHeight - size) / 2;
+
+      canvas.width = 512;
+      canvas.height = 512;
+      ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
+      const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
+
+      // 3. Mulai progress timer
+      progressInterval = setInterval(updateProgressTimer, PROCESSING_CONFIG.PROGRESS_UPDATE);
+
+      // 4. Buat session ID unik untuk tracking
+      const sessionId = `scan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // 5. Kirim ke n8n UNTUK MEMULAI PROSES
+      updateLoadingStep(3, "Mengirim ke server AI...");
+      
+      const requestData = {
+        session_id: sessionId,  // ID unik untuk tracking
         umur: "25",
         gender: "netral",
         hamil: "tidak",
@@ -588,109 +674,112 @@
         flek: "tidak",
         kemerahan: "tidak",
         pori: "tidak",
-        komedo: "tidak"
+        komedo: "tidak",
+        image: imageBase64
       };
 
-      // 1. Jalankan animasi scan
-      await runScanAnimation();
-      updateLoadingStep(1);
-      
-      // Tunggu sebentar untuk efek visual
-      await new Promise(r => setTimeout(r, 300));
-
-      // 2. Ambil gambar dari video
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-      const size = Math.min(video.videoWidth, video.videoHeight);
-      const x = (video.videoWidth - size) / 2;
-      const y = (video.videoHeight - size) / 2;
-
-      canvas.width = 512;
-      canvas.height = 512;
-      ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
-      const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
-      
-      // OPSIONAL: Upload ke Supabase
-      updateLoadingStep(2);
-      try {
-        // Jika ingin menyimpan gambar, aktifkan kode berikut:
-        // const timestamp = new Date().getTime();
-        // const fileName = `scan_${timestamp}.jpg`;
-        // const supabaseUrl = await uploadToSupabase(imageBase64, fileName);
-        // if (supabaseUrl) {
-        //   data.supabase_image_url = supabaseUrl;
-        // }
-      } catch (uploadError) {
-        console.warn('Gagal upload ke Supabase:', uploadError);
-        // Lanjutkan meskipun upload gagal
-      }
-
-      // Sisipkan gambar ke data
-      data.image = imageBase64;
-
-      // 3. Kirim ke n8n webhook
-      updateLoadingStep(3);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // Timeout 30 detik
-      
-      const res = await fetch(N8N_WEBHOOK, {
+      // Kirim request pertama untuk memulai proses
+      const initiateRes = await fetch(N8N_WEBHOOK, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(data),
-        signal: controller.signal
+        body: JSON.stringify(requestData)
       });
 
-      clearTimeout(timeoutId);
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      if (!initiateRes.ok) {
+        throw new Error(`Gagal memulai proses AI: HTTP ${initiateRes.status}`);
       }
 
-      // 4. Proses respons
-      updateLoadingStep(4);
-      const products = await res.json();
+      const initiateData = await initiateRes.json();
       
-      // Validasi respons
+      // 6. TUNGGU PROCESSING_TIME_INITIAL untuk memberi waktu AI bekerja
+      updateLoadingStep(3, `AI sedang menganalisis kulit... (0 detik)`);
+      await new Promise(r => setTimeout(r, PROCESSING_CONFIG.INITIAL_WAIT));
+
+      // 7. Update ke step 4 dan mulai polling
+      updateLoadingStep(4, "Menunggu hasil analisis AI...");
+      
+      // ====================== PILIH SALAH SATU STRATEGI ======================
+      
+      // STRATEGI A: Polling dengan endpoint status terpisah (REKOMENDASI)
+      // const pollResult = await pollProcessingStatus(sessionId);
+      
+      // STRATEGI B: Delay langsung 12 detik (FALLBACK jika polling tidak ada)
+      await new Promise(r => setTimeout(r, 12000)); // Tunggu 12 detik
+      
+      updateLoadingStep(4, "Menyiapkan rekomendasi produk...");
+      
+      // 8. Ambil hasil akhir (request kedua untuk mendapatkan produk)
+      // Ganti URL ini dengan endpoint n8n untuk mengambil hasil
+      const resultRes = await fetch(`${N8N_WEBHOOK}/results`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId })
+      });
+
+      if (!resultRes.ok) {
+        throw new Error(`Gagal mengambil hasil: HTTP ${resultRes.status}`);
+      }
+
+      const products = await resultRes.json();
+      
+      // 9. Validasi respons
       if (!products || (Array.isArray(products) && products.length === 0)) {
         throw new Error('Tidak ada produk yang ditemukan');
       }
 
-      // Simpan ke session storage
+      // 10. Hentikan timer dan simpan data
+      clearInterval(progressInterval);
       sessionStorage.setItem("skinqu_products", JSON.stringify(products));
       sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
+      sessionStorage.setItem("skinqu_session_id", sessionId);
 
-      // Tunggu 1 detik untuk efek UX
+      // 11. Update UI bahwa proses selesai
+      updateLoadingStep(4, "✅ Analisis selesai! Mengarahkan...");
       await new Promise(r => setTimeout(r, 1000));
 
-      // Redirect ke halaman produk
+      // 12. Redirect ke halaman produk
       window.location.href = "product.html";
 
     } catch (err) {
       console.error("Scan error:", err);
       
-      // Tentukan pesan error yang sesuai
+      // Hentikan timer
+      if (progressInterval) clearInterval(progressInterval);
+      
+      // Tentukan pesan error
       let errorMessage = "❌ Gagal memproses rekomendasi. Coba lagi.";
       
-      if (err.name === 'AbortError') {
-        errorMessage = "⏱️ Waktu pemrosesan habis. Coba lagi.";
-      } else if (err.message.includes('HTTP')) {
-        errorMessage = `❌ Server error (${err.message}). Coba beberapa saat lagi.`;
-      } else if (err.message.includes('produk')) {
-        errorMessage = "⚠️ Tidak ditemukan produk yang sesuai. Coba dengan kondisi kulit yang berbeda.";
+      if (err.message.includes('Waktu proses')) {
+        errorMessage = "⏱️ Proses AI memakan waktu terlalu lama. Coba scan ulang.";
+      } else if (err.message.includes('tidak ada produk')) {
+        errorMessage = "⚠️ Tidak ditemukan produk yang sesuai. Coba dengan kondisi berbeda.";
       }
       
-      alert(errorMessage);
-
-      // Sembunyikan loading
-      loadingOverlay.style.display = "none";
+      // Tampilkan error di UI
+      const loadingText = document.querySelector('.loading-text');
+      const loadingSubtext = document.querySelector('.loading-subtext');
       
-      // Reset state
+      if (loadingText) loadingText.textContent = "Proses Gagal";
+      if (loadingSubtext) loadingSubtext.textContent = errorMessage;
+      
+      // Tunggu 3 detik sebelum reset
+      await new Promise(r => setTimeout(r, 3000));
+      
+      // Reset UI
+      loadingOverlay.style.display = "none";
       scanBtn.disabled = false;
       isProcessing = false;
+      
+      // Reset step descriptions
+      updateLoadingStep(1, "Mengambil gambar wajah");
+      document.querySelectorAll('.step-text').forEach((el, idx) => {
+        const texts = ["Mengambil gambar wajah", "Mengirim ke server AI", 
+                      "Analisis karakteristik kulit", "Menyiapkan rekomendasi"];
+        if (idx < texts.length) el.textContent = texts[idx];
+      });
     }
   }
 
@@ -701,12 +790,12 @@
   // Handle halaman kembali
   window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
-      // Jika halaman di-load dari cache, reset state
       scanBtn.disabled = false;
       isProcessing = false;
       loadingOverlay.style.display = "none";
+      if (progressInterval) clearInterval(progressInterval);
     }
   });
-  </script>
+</script>
 </body>
 </html>
