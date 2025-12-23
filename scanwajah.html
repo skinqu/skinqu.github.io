@@ -93,6 +93,7 @@
       height: 100%;
       object-fit: cover;
       display: none;
+      transform: scaleX(-1);
     }
 
     /* Glass overlay */
@@ -207,6 +208,95 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
+    /* Loading overlay baru */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 14, 26, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .loading-subtext {
+      color: var(--text-sub);
+      font-size: 14px;
+      max-width: 280px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .status-steps {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+
+    .step.active {
+      opacity: 1;
+    }
+
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 12px;
+    }
+
+    .step.active .step-icon {
+      background: var(--primary);
+    }
+
+    .step-text {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .step.active .step-text {
+      color: var(--text);
+      font-weight: 500;
+    }
+
     .loading-state {
       display: none;
       text-align: center;
@@ -305,6 +395,32 @@
     Mulai Pemindaian
   </button>
 
+  <!-- Loading overlay baru -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Memproses analisis wajah</div>
+    <div class="loading-subtext">AI kami sedang menganalisis kulit dan mencari produk terbaik untuk Anda</div>
+    
+    <div class="status-steps">
+      <div class="step active" id="step1">
+        <div class="step-icon">1</div>
+        <div class="step-text">Mengambil gambar wajah</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-icon">2</div>
+        <div class="step-text">Mengirim ke server AI</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-icon">3</div>
+        <div class="step-text">Analisis karakteristik kulit</div>
+      </div>
+      <div class="step" id="step4">
+        <div class="step-icon">4</div>
+        <div class="step-text">Menyiapkan rekomendasi</div>
+      </div>
+    </div>
+  </div>
+
   <div class="loading-state" id="loading">
     Memproses hasil scan AI…
   </div>
@@ -317,6 +433,7 @@
 
   <script>
   const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
+  const SUPABASE_STORAGE_URL = "https://your-supabase-url.supabase.co/storage/v1/object/scan-images"; // GANTI dengan URL Supabase Anda
 
   const video = document.getElementById('video');
   const scanBtn = document.getElementById('scanBtn');
@@ -325,6 +442,9 @@
   const scanLine = document.getElementById('scanLine');
   const flashEl = document.getElementById('flash');
   const particlesContainer = document.getElementById('particles');
+
+  // Variabel untuk mengelola status loading
+  let isProcessing = false;
 
   // ✨ Generate floating particles
   function createParticles() {
@@ -390,36 +510,95 @@
     });
   }
 
-  // 📤 Scan & kirim — SAMA PERSIS FUNGSI KIRIM() DI RECOM.HTML
+  // 🔄 Update status loading steps
+  function updateLoadingStep(stepNumber) {
+    // Reset semua step
+    for (let i = 1; i <= 4; i++) {
+      const step = document.getElementById(`step${i}`);
+      step.classList.remove('active');
+    }
+    
+    // Aktifkan step yang diminta
+    for (let i = 1; i <= stepNumber; i++) {
+      const step = document.getElementById(`step${i}`);
+      step.classList.add('active');
+    }
+  }
+
+  // 💾 Fungsi untuk upload gambar ke Supabase (opsional)
+  async function uploadToSupabase(imageBase64, fileName) {
+    try {
+      // Konversi base64 ke blob
+      const base64Response = await fetch(imageBase64);
+      const blob = await base64Response.blob();
+      
+      // Format: multipart/form-data untuk upload
+      const formData = new FormData();
+      formData.append('file', blob, fileName);
+      
+      // TAMBAHKAN header authorization jika diperlukan
+      // formData.append('Authorization', 'Bearer YOUR_SUPABASE_ANON_KEY');
+      
+      const response = await fetch(SUPABASE_STORAGE_URL, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.url; // URL gambar di Supabase
+      }
+      return null;
+    } catch (error) {
+      console.error('Supabase upload error:', error);
+      return null;
+    }
+  }
+
+  // 📤 Scan & kirim — FUNGSI UTAMA YANG DIPERBAIKI
   async function scanWajah() {
+    if (isProcessing) return;
+    
     if (!video.srcObject) {
       alert("Kamera belum siap. Tunggu sebentar...");
       return;
     }
 
-    // ✅ Ambil data seperti di form (tapi hardcoded seperti kirim())
-    const data = {
-      umur: "25",           // sesuai memori user
-      gender: "netral",      // sesuai memori user
-      hamil: "tidak",
-      category: "toner",     // ⚠️ SESUAI FUNGSI KIRIM() — AUTO "toner"
-      berminyak: "tidak",
-      kering: "tidak",
-      kusam: "tidak",
-      berjerawat: "tidak",
-      sensitif: "tidak",
-      beruntusan: "tidak",
-      flek: "tidak",
-      kemerahan: "tidak",
-      pori: "tidak",
-      komedo: "tidak"
-    };
+    // Nonaktifkan tombol scan
+    scanBtn.disabled = true;
+    isProcessing = true;
+    
+    // Tampilkan loading overlay
+    loadingOverlay.style.display = "flex";
+    updateLoadingStep(1);
 
-    // ✅ Ambil gambar
     try {
-      await runScanAnimation();
-      await new Promise(r => setTimeout(r, 200));
+      // Ambil data (sesuai dengan memori user)
+      const data = {
+        umur: "25",
+        gender: "netral",
+        hamil: "tidak",
+        category: "toner",
+        berminyak: "tidak",
+        kering: "tidak",
+        kusam: "tidak",
+        berjerawat: "tidak",
+        sensitif: "tidak",
+        beruntusan: "tidak",
+        flek: "tidak",
+        kemerahan: "tidak",
+        pori: "tidak",
+        komedo: "tidak"
+      };
 
+      // 1. Jalankan animasi scan
+      await runScanAnimation();
+      updateLoadingStep(1);
+      
+      // Tunggu sebentar untuk efek visual
+      await new Promise(r => setTimeout(r, 300));
+
+      // 2. Ambil gambar dari video
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
       const size = Math.min(video.videoWidth, video.videoHeight);
@@ -430,58 +609,104 @@
       canvas.height = 512;
       ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
       const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
-
-      // ✅ Sisipkan gambar ke data
-      data.image = imageBase64;
-
-      // ✅ TAMPILKAN LOADING OVERLAY — SAMA PERSIS RECOM.HTML
-      if (loadingOverlay) {
-        loadingOverlay.style.display = "flex";
-      } else {
-        // Fallback jika tidak ada loadingOverlay
-        const loading = document.getElementById('loading');
-        if (loading) {
-          loading.style.display = 'block';
-          loading.textContent = "Memproses rekomendasi...";
-        }
+      
+      // OPSIONAL: Upload ke Supabase
+      updateLoadingStep(2);
+      try {
+        // Jika ingin menyimpan gambar, aktifkan kode berikut:
+        // const timestamp = new Date().getTime();
+        // const fileName = `scan_${timestamp}.jpg`;
+        // const supabaseUrl = await uploadToSupabase(imageBase64, fileName);
+        // if (supabaseUrl) {
+        //   data.supabase_image_url = supabaseUrl;
+        // }
+      } catch (uploadError) {
+        console.warn('Gagal upload ke Supabase:', uploadError);
+        // Lanjutkan meskipun upload gagal
       }
 
-      // ⏳ Kirim ke n8n dan TUNGGU hasil produk
+      // Sisipkan gambar ke data
+      data.image = imageBase64;
+
+      // 3. Kirim ke n8n webhook
+      updateLoadingStep(3);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // Timeout 30 detik
+      
       const res = await fetch(N8N_WEBHOOK, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data),
+        signal: controller.signal
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      clearTimeout(timeoutId);
 
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      // 4. Proses respons
+      updateLoadingStep(4);
       const products = await res.json();
+      
+      // Validasi respons
+      if (!products || (Array.isArray(products) && products.length === 0)) {
+        throw new Error('Tidak ada produk yang ditemukan');
+      }
 
-      // ✅ SIMPAN KE SESSION STORAGE — SAMA PERSIS RECOM.HTML
+      // Simpan ke session storage
       sessionStorage.setItem("skinqu_products", JSON.stringify(products));
+      sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
 
-      // ✅ REDIRECT BERSIH — SAMA PERSIS RECOM.HTML
-      window.location.href = "/product.html";
+      // Tunggu 1 detik untuk efek UX
+      await new Promise(r => setTimeout(r, 1000));
+
+      // Redirect ke halaman produk
+      window.location.href = "product.html";
 
     } catch (err) {
       console.error("Scan error:", err);
-      alert("❌ Gagal memproses rekomendasi. Coba lagi.");
-
-      // ✅ SEMBUNYIKAN LOADING — SAMA PERSIS RECOM.HTML
-      if (loadingOverlay) {
-        loadingOverlay.style.display = "none";
-      } else {
-        const loading = document.getElementById('loading');
-        if (loading) loading.style.display = 'none';
+      
+      // Tentukan pesan error yang sesuai
+      let errorMessage = "❌ Gagal memproses rekomendasi. Coba lagi.";
+      
+      if (err.name === 'AbortError') {
+        errorMessage = "⏱️ Waktu pemrosesan habis. Coba lagi.";
+      } else if (err.message.includes('HTTP')) {
+        errorMessage = `❌ Server error (${err.message}). Coba beberapa saat lagi.`;
+      } else if (err.message.includes('produk')) {
+        errorMessage = "⚠️ Tidak ditemukan produk yang sesuai. Coba dengan kondisi kulit yang berbeda.";
       }
+      
+      alert(errorMessage);
 
+      // Sembunyikan loading
+      loadingOverlay.style.display = "none";
+      
+      // Reset state
       scanBtn.disabled = false;
+      isProcessing = false;
     }
   }
 
   // 🎯 Events
   scanBtn.addEventListener('click', scanWajah);
   document.addEventListener('DOMContentLoaded', initCamera);
-</script>
+  
+  // Handle halaman kembali
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      // Jika halaman di-load dari cache, reset state
+      scanBtn.disabled = false;
+      isProcessing = false;
+      loadingOverlay.style.display = "none";
+    }
+  });
+  </script>
 </body>
 </html>
