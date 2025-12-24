@@ -1,220 +1,234 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Form Kulit – facewash</title>
-<link rel="stylesheet" href="/assets/css/cssrecom.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#447DCE">
+  <title>Form Kulit – Rekomendasi Face Wash</title>
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- CSS utama -->
+  <link rel="stylesheet" href="/assets/css/cssrecom.css">
+  <style>
+    /* Fallback jika CSS belum load */
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
 </head>
-
 <body>
-<div class="page-wrapper">
-<form id="skinForm">
+  <div class="page-wrapper">
+    <form id="skinForm">
+      <div class="title">
+        Beri tahu kami tentang kulit Anda<br>
+        Agar rekomendasi face wash lebih akurat
+      </div>
 
-<div class="title">
-  Beri tahu kami tentang kulit Anda <br>
-  Agar rekomendasi face wash lebih akurat
-</div>
+      <div class="form-wrapper">
+        <div class="form-group">
+          <label for="umur">Umur</label>
+          <input 
+            type="number" 
+            id="umur"
+            name="umur" 
+            placeholder="Masukkan umur Anda"
+            required
+            min="1"
+            max="100"
+            inputmode="numeric"
+          >
+        </div>
 
-<div class="form-wrapper">
+        <div class="form-group">
+          <label for="gender">Jenis Kelamin</label>
+          <select id="gender" name="gender" required>
+            <option value="">-- Pilih Jenis Kelamin --</option>
+            <option value="laki-laki">Laki-laki</option>
+            <option value="perempuan">Perempuan</option>
+          </select>
+        </div>
+      </div>
 
-  <div class="form-group">
-    <label>Umur</label>
-    <input 
-      type="number" 
-      name="umur" 
-      placeholder="Masukkan umur Anda"
-      required
-      min="1"
-    >
+      <div class="section-title">Hamil?</div>
+      <div class="option-row">
+        <div>Hamil</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="hamil" value="ya"> ya</label>
+          <label><input type="radio" name="hamil" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="section-title">Jenis Kulit & Kondisi</div>
+
+      <!-- Gunakan loop di JS nanti? atau tetap hardcode → tetap hardcode untuk kontrol UX -->
+      <div class="option-row">
+        <div>Berminyak</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="berminyak" value="ya"> ya</label>
+          <label><input type="radio" name="berminyak" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Kering</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="kering" value="ya"> ya</label>
+          <label><input type="radio" name="kering" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Kusam</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="kusam" value="ya"> ya</label>
+          <label><input type="radio" name="kusam" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Berjerawat</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="berjerawat" value="ya"> ya</label>
+          <label><input type="radio" name="berjerawat" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Kulit Sensitif</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="sensitif" value="ya"> ya</label>
+          <label><input type="radio" name="sensitif" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Beruntusan</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="beruntusan" value="ya"> ya</label>
+          <label><input type="radio" name="beruntusan" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Flek Hitam</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="flek" value="ya"> ya</label>
+          <label><input type="radio" name="flek" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Kemerahan</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="kemerahan" value="ya"> ya</label>
+          <label><input type="radio" name="kemerahan" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Pori-pori Besar</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="pori" value="ya"> ya</label>
+          <label><input type="radio" name="pori" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div>Berkomedo</div>
+        <div class="yn-buttons">
+          <label><input type="radio" name="komedo" value="ya"> ya</label>
+          <label><input type="radio" name="komedo" value="tidak" checked> tidak</label>
+        </div>
+      </div>
+
+      <button class="btn-send" type="button" onclick="kirim()">Kirim</button>
+    </form>
   </div>
 
-  <div class="form-group">
-    <label>Jenis Kelamin</label>
-    <select name="gender" required>
-      <option value="">-- Pilih Jenis Kelamin --</option>
-      <option value="laki-laki">Laki-laki</option>
-      <option value="perempuan">Perempuan</option>
-    </select>
-  </div>
-
-</div>
-
-<div class="section-title">Hamil?</div>
-<div class="option-row">
-  <div></div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="hamil" value="ya"> ya</label>
-    <label><input type="radio" name="hamil" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="section-title">Jenis Kulit & Kondisi</div>
-
-<div class="option-row">
-  <div>Berminyak</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="berminyak" value="ya"> ya</label>
-    <label><input type="radio" name="berminyak" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Kering</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="kering" value="ya"> ya</label>
-    <label><input type="radio" name="kering" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Kusam</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="kusam" value="ya"> ya</label>
-    <label><input type="radio" name="kusam" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Berjerawat</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="berjerawat" value="ya"> ya</label>
-    <label><input type="radio" name="berjerawat" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Kulit Sensitif</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="sensitif" value="ya"> ya</label>
-    <label><input type="radio" name="sensitif" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Beruntusan</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="beruntusan" value="ya"> ya</label>
-    <label><input type="radio" name="beruntusan" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Flek Hitam</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="flek" value="ya"> ya</label>
-    <label><input type="radio" name="flek" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Kemerahan</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="kemerahan" value="ya"> ya</label>
-    <label><input type="radio" name="kemerahan" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Pori-pori Besar</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="pori" value="ya"> ya</label>
-    <label><input type="radio" name="pori" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<div class="option-row">
-  <div>Berkomedo</div>
-  <div class="yn-buttons">
-    <label><input type="radio" name="komedo" value="ya"> ya</label>
-    <label><input type="radio" name="komedo" value="tidak" checked> tidak</label>
-  </div>
-</div>
-
-<button class="btn-send" type="button" onclick="kirim()">Kirim</button>
-<br>
+  <!-- BOTTOM NAV (di luar .page-wrapper agar fixed benar) -->
   <div class="bottom-nav">
-
-    <div class="nav-item" data-page="index.html">
-      <a href="/index.html">
-        <img src="/assets/img/home.png" alt="Home">
+    <div class="nav-item">
+      <a href="/index.html" aria-label="Beranda">
+        <img src="/assets/img/home.png" alt="Beranda">
       </a>
     </div>
-
-    <div class="nav-item active" data-page="scanwajah.html">
-      <a href="/scanwajah.html" class="search-icon">
-        <img src="/assets/img/scanwajah.png" alt="Search">
+    <div class="nav-item active">
+      <a href="/scanwajah.html" aria-label="Analisis Wajah" class="search-icon">
+        <img src="/assets/img/scanwajah.png" alt="Analisis Wajah">
       </a>
     </div>
-
-    <div class="nav-item" data-page="favorite.html">
-      <a href="/favorite.html">
-        <img src="/assets/img/heart.png" alt="Favorite">
+    <div class="nav-item">
+      <a href="/favorite.html" aria-label="Favorit">
+        <img src="/assets/img/heart.png" alt="Favorit">
       </a>
     </div>
-
-    <div class="nav-item" data-page="profile.html">
-      <a href="/profile.html">
-        <img src="/assets/img/user.png" alt="Profile">
+    <div class="nav-item">
+      <a href="/profile.html" aria-label="Profil">
+        <img src="/assets/img/user.png" alt="Profil">
       </a>
     </div>
   </div>
-</form>
-</div>
 
-<!-- LOADING -->
-<div id="loading-overlay" class="loadingOverlay">
-  <div class="loading-box">
-    <div class="spinner-lux"></div>
-    <p>AI sedang menganalisis kulit Anda…<br>Mohon tunggu sebentar</p>
+  <!-- LOADING OVERLAY — SESUAI CLASS DI CSS BARU -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-box">
+      <div class="spinner-lux"></div>
+      <p>AI sedang menganalisis kulit Anda…<br><small>Mohon tunggu sebentar</small></p>
+    </div>
   </div>
-</div>
 
-<script>
-function kirim() {
-  const form = document.getElementById("skinForm");
+  <script>
+    function kirim() {
+      const form = document.getElementById("skinForm");
+      const umurInput = form.querySelector('input[name="umur"]');
+      const genderSelect = form.querySelector('select[name="gender"]');
 
-  const umur = form.querySelector('input[name="umur"]');
-  const gender = form.querySelector('select[name="gender"]');
+      // Validasi manual (lebih user-friendly)
+      if (!umurInput.value || umurInput.value < 1 || umurInput.value > 100) {
+        alert("Umur harus diisi antara 1–100");
+        umurInput.focus();
+        return;
+      }
 
-  if (!umur.value || Number(umur.value) <= 0) {
-    alert("Umur wajib diisi");
-    umur.focus();
-    return;
-  }
+      if (!genderSelect.value) {
+        alert("Jenis kelamin wajib dipilih");
+        genderSelect.focus();
+        return;
+      }
 
-  if (!gender.value) {
-    alert("Jenis kelamin wajib dipilih");
-    gender.focus();
-    return;
-  }
+      // Kumpulkan data
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.category = "facewash"; // hardcode kategori
 
-  const data = Object.fromEntries(new FormData(form).entries());
+      // Tampilkan loading
+      document.getElementById("loadingOverlay").classList.add("active");
 
-  // =========================
-  // ⬇️ AUTO CATEGORY (KUNCI)
-  // =========================
-  data.category = "facewash";
+      // Kirim ke n8n
+      fetch("https://aang34.app.n8n.cloud/webhook/skinqu-input", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(products => {
+        sessionStorage.setItem("skinqu_products", JSON.stringify(products));
+        window.location.href = "/product.html";
+      })
+      .catch(err => {
+        document.getElementById("loadingOverlay").classList.remove("active");
+        alert("Gagal mendapatkan rekomendasi. Coba lagi nanti.");
+        console.error("Error:", err);
+      });
+    }
 
-  document.getElementById("loadingOverlay").style.display = "flex";
-
-  fetch("https://aang34.app.n8n.cloud/webhook/skinqu-input", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(products => {
-    sessionStorage.setItem("skinqu_products", JSON.stringify(products));
-    window.location.href = "/product.html";
-  })
-  .catch(err => {
-    document.getElementById("loadingOverlay").style.display = "none";
-    alert("Gagal memproses rekomendasi");
-    console.error(err);
-  });
-}
-</script>
-
+    // ✅ Optional: Enter di input umur → submit
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.target.matches('input[name="umur"]')) {
+        e.preventDefault();
+        kirim();
+      }
+    });
+  </script>
 </body>
 </html>

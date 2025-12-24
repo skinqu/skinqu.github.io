@@ -1,17 +1,26 @@
 /* =====================================================
-   ROOT & BASE
+   ROOT & CUSTOM PROPERTIES
 ===================================================== */
 :root {
   --primary: #447DCE;
   --primary-dark: #093A73;
   --bg-soft: #F3F6FB;
   --card-bg: #FFFFFF;
-  --text-main: #222;
-  --text-soft: #555;
-  --border-soft: rgba(0,0,0,0.08);
+  --text-main: #222222;
+  --text-soft: #555555;
+  --border-soft: rgba(0, 0, 0, 0.08);
 
   --nav-height: 70px;
   --safe-bottom: env(safe-area-inset-bottom);
+}
+
+/* =====================================================
+   BASE STYLES
+===================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
@@ -20,27 +29,29 @@ html, body {
   width: 100%;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-soft);
+  color: var(--text-main);
+  line-height: 1.5;
 }
 
-/* =====================================================
-   PAGE CONTAINER (ANTI MEPET WEBVIEW)
-===================================================== */
+/* Hindari konten tertutup navbar bawah */
 body {
   padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
 }
 
-/* pembungkus utama halaman */
+/* =====================================================
+   PAGE LAYOUT
+===================================================== */
 .page-wrapper {
   max-width: 520px;
   margin: 0 auto;
-  padding: 20px 16px 10px;
+  padding: 20px 16px 12px;
 }
 
-/* =====================================================
-   HEADER / TITLE
-===================================================== */
+/* =========================
+   TITLE STYLES
+========================= */
 .title {
   font-size: 18px;
   font-weight: 600;
@@ -49,49 +60,24 @@ body {
   margin-bottom: 22px;
 }
 
-.page-wrapper {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 20px 16px 12px; /* JARAK KIRI-KANAN */
-  box-sizing: border-box;
-}
-
-/* =========================
-   TITLE (BIAR TIDAK MEPET)
-========================= */
-.title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
-  line-height: 1.4;
-  margin-bottom: 22px;
-}
-
-/* =========================
-   SECTION TITLE
-========================= */
 .section-title {
-  margin: 26px 0 10px;
+  margin: 26px 0 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #093A73;
+  color: var(--primary-dark);
 }
 
-
 /* =====================================================
-   FORM WRAPPER (CARD STYLE)
+   FORM STYLES
 ===================================================== */
 .form-wrapper {
   background: var(--card-bg);
   border-radius: 18px;
   padding: 18px 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   margin-bottom: 26px;
 }
 
-/* =====================================================
-   FORM GROUP
-===================================================== */
 .form-group {
   margin-bottom: 18px;
 }
@@ -109,12 +95,9 @@ body {
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
-
   border-radius: 14px;
   border: 1px solid var(--border-soft);
   background: #FAFAFA;
-
-  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -122,32 +105,21 @@ body {
   outline: none;
   border-color: var(--primary);
   background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(68, 125, 206, 0.1);
 }
 
 /* =====================================================
-   SECTION TITLE
-===================================================== */
-.section-title {
-  margin: 26px 0 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--primary-dark);
-}
-
-/* =====================================================
-   OPTION ROW (RADIO GROUP)
+   RADIO OPTION ROW (YES/NO)
 ===================================================== */
 .option-row {
   background: var(--card-bg);
   padding: 14px 16px;
   border-radius: 16px;
   margin-top: 10px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .option-row > div:first-child {
@@ -164,22 +136,17 @@ input[type="radio"] {
   accent-color: var(--primary);
   width: 18px;
   height: 18px;
+  cursor: pointer;
 }
 
 /* =====================================================
-   BUTTON SEND
+   SUBMIT BUTTON
 ===================================================== */
 .btn-send {
   margin-top: 28px;
   width: 100%;
   padding: 14px;
-
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    var(--primary-dark)
-  );
-
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   border-radius: 16px;
   color: #FFFFFF;
   font-weight: 600;
@@ -187,6 +154,11 @@ input[type="radio"] {
   text-align: center;
   cursor: pointer;
   border: none;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-send:hover {
+  opacity: 0.95;
 }
 
 .btn-send:active {
@@ -194,26 +166,21 @@ input[type="radio"] {
 }
 
 /* =====================================================
-   BOTTOM NAVBAR (STABIL – JANGAN DIUBAH)
+   BOTTOM NAVIGATION BAR
 ===================================================== */
 .bottom-nav {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-
   height: var(--nav-height);
   display: flex;
   justify-content: space-around;
   align-items: center;
-
   background: #FFFFFF;
   border-top: 1px solid var(--border-soft);
-  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
-
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
   padding-bottom: var(--safe-bottom);
-  box-sizing: content-box;
-
   z-index: 9999;
   transform: translateZ(0);
 }
@@ -222,7 +189,6 @@ input[type="radio"] {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,7 +201,7 @@ input[type="radio"] {
 }
 
 .bottom-nav .nav-item.active {
-  background: rgba(68,125,206,0.12);
+  background: rgba(68, 125, 206, 0.12);
 }
 
 .bottom-nav .nav-item.active img {
@@ -243,66 +209,20 @@ input[type="radio"] {
 }
 
 /* =====================================================
-   LOADING OVERLAY
-===================================================== */
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.95);
-  z-index: 99999;
-
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.loading-box {
-  text-align: center;
-  padding: 30px;
-}
-
-.loading-box p {
-  margin-top: 18px;
-  font-size: 14px;
-  color: var(--text-soft);
-  line-height: 1.5;
-}
-
-.spinner {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 4px solid #e0e0e0;
-  border-top-color: var(--primary);
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}/* =====================================================
-   LOADING OVERLAY — MOBILE-FIRST & LUXURY STYLE
+   LOADING OVERLAY — MOBILE-FIRST PREMIUM
 ===================================================== */
 .loading-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
-
-  /* Latar belakang semi-transparan dengan blur (jika didukung) */
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px); /* iOS Safari */
-
-  /* Safe area padding (iPhone notch/dynamic island) */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+  -webkit-backdrop-filter: blur(6px);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
            env(safe-area-inset-bottom) env(safe-area-inset-left);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* Fade-in/out halus */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s;
@@ -319,11 +239,11 @@ input[type="radio"] {
   padding: 24px 20px;
 }
 
-/* Spinner premium — ringkas & elegan */
 .spinner-lux {
   width: 48px;
   height: 48px;
   position: relative;
+  margin: 0 auto;
 }
 
 .spinner-lux::before,
@@ -335,16 +255,20 @@ input[type="radio"] {
 }
 
 .spinner-lux::before {
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 3px solid #E2E8F0;
-  border-top-color: #447DCE;
+  border-top-color: var(--primary);
 }
 
 .spinner-lux::after {
-  top: 50%; left: 50%;
-  width: 12px; height: 12px;
-  background: #447DCE;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
   transform: translate(-50%, -50%);
   opacity: 0.8;
   animation: pulseDot 1.8s ease-in-out infinite;
@@ -360,7 +284,6 @@ input[type="radio"] {
   50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
 }
 
-/* Teks loading — responsif & mudah dibaca */
 .loading-box p {
   margin-top: 16px;
   font-size: 15px;
@@ -370,7 +293,7 @@ input[type="radio"] {
   letter-spacing: -0.2px;
 }
 
-/* Versi lebih kecil untuk layar sangat kecil */
+/* Responsif: layar kecil & rendah */
 @media (max-height: 600px) {
   .spinner-lux {
     width: 40px;
@@ -386,18 +309,43 @@ input[type="radio"] {
   }
 }
 
-/* Opsional: mode gelap otomatis (jika sistem pakai dark mode) */
+/* Dark mode (otomatis mengikuti sistem) */
 @media (prefers-color-scheme: dark) {
+  :root {
+    --bg-soft: #0F172A;
+    --card-bg: #1E293B;
+    --text-main: #F1F5F9;
+    --text-soft: #94A3B8;
+    --border-soft: rgba(255, 255, 255, 0.08);
+  }
+
+  .form-group input,
+  .form-group select {
+    background: #1A2234;
+    border-color: #334155;
+    color: #F1F5F9;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #60A5FA;
+    background: #1E293B;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  }
+
   .loading-overlay {
-    background: rgba(20, 25, 35, 0.85);
+    background: rgba(15, 23, 42, 0.85);
   }
+
   .loading-box p {
-    color: #E2E8F0;
+    color: #CBD5E1;
   }
+
   .spinner-lux::before {
     border-color: #475569;
     border-top-color: #60A5FA;
   }
+
   .spinner-lux::after {
     background: #60A5FA;
   }
