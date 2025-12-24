@@ -23,7 +23,7 @@ body {
   height: 64px;
   padding: 0 20px;
 
-  background: #093A73;
+  background: #265EB3;
   position: relative;
   z-index: 20;
 
@@ -72,26 +72,30 @@ body {
 }
 
 /* =========================
-   BANNER SCROLL TRACK
+   BANNER SCROLL TRACK — DIPERBAIKI
 ========================= */
 .banner-track {
   display: flex;
   gap: 18px;
 
-  /* Banner aktif di tengah + preview kiri kanan */
-  padding: 0 15vw;
+  /* Ganti padding fleksibel → gunakan margin auto & flex untuk centering */
+  padding: 0;
+  justify-content: center;
+
+  /* Penting untuk snapping & smoothness */
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* smooth scroll di iOS */
 
   overflow-x: scroll;
-  scroll-behavior: smooth;
   scrollbar-width: none;
 }
-
 .banner-track::-webkit-scrollbar {
   display: none;
 }
 
 /* =========================
-   BANNER CARD
+   BANNER CARD — DIPERBAIKI
 ========================= */
 .banner {
   min-width: 300px;
@@ -101,70 +105,62 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 
-  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  /* Snap alignment — wajib untuk scroll snapping */
+  scroll-snap-align: center;
 
   /* Default (non-active) */
   transform: scale(0.88);
   opacity: 0.6;
-  transition: transform 0.45s ease, opacity 0.45s ease;
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 0.45s ease;
 }
 
-/* Banner aktif (tengah) */
+/* Hover & active lebih halus */
+.banner:hover {
+  transform: scale(0.92);
+  opacity: 0.8;
+  transition-duration: 0.25s;
+}
+
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
 }
 
 /* =========================
-   BANNER IMAGE (FULL COVER)
+   BANNER IMAGE & OVERLAY — tetap sama (sudah bagus)
 ========================= */
 .banner img {
   position: absolute;
   inset: 0;
-
   width: 100%;
   height: 100%;
   object-fit: cover;
-
   z-index: 1;
 }
 
-/* =========================
-   IMAGE OVERLAY
-========================= */
 .banner::after {
   content: "";
   position: absolute;
   inset: 0;
-
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.55),
-    rgba(0,0,0,0.15)
-  );
-
+  background: linear-gradient(to right, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
   z-index: 2;
 }
 
-/* =========================
-   BANNER TEXT CONTENT
-========================= */
 .banner-content {
   position: relative;
   z-index: 3;
-
   padding: 26px;
   color: #ffffff;
 }
-
 .banner-content h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
   line-height: 1.2;
 }
-
 .banner-content p {
   margin-top: 6px;
   font-size: 14px;
@@ -172,7 +168,7 @@ body {
 }
 
 /* =========================
-   DOT INDICATOR
+   DOT INDICATOR — sedikit tweak visual
 ========================= */
 .banner-dots {
   display: flex;
@@ -184,16 +180,17 @@ body {
 .banner-dots span {
   width: 8px;
   height: 8px;
-
   border-radius: 50%;
-  background: rgba(255,255,255,0.45);
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.45);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .banner-dots span.active {
   width: 18px;
+  height: 8px;
   border-radius: 6px;
   background: #ffffff;
+  transform: scale(1.1);
 }
 
 /* ===== SECTION TITLE ===== */
