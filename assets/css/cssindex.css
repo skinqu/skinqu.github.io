@@ -70,85 +70,84 @@ body {
   padding: 22px 0 26px;
   overflow: hidden;
   position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
 }
 
 /* =========================
    BANNER TRACK — FULLY OPTIMIZED
-   🔑 Kunci: scroll-padding + scroll-snap untuk centering visual
 ========================= */
 .banner-track {
   display: flex;
   gap: 18px;
+  padding: 0 20px;
 
-  /* ✅ FORCE CENTER DENGAN SCROLL-SNAP */
-  scroll-snap-type: x mandatory !important;
-  scroll-snap-stop: always !important; /* pastikan tidak skip banner */
+  /* Scroll behavior */
+  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; /* smooth inertia di iOS */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Center alignment with padding */
+  scroll-padding: 0 20px;
 
-  /* 🔥 INI YANG MEMASTIKAN BANNER AKTIF DI TENGAH VIEWPORT */
-  scroll-padding: 0 min(15vw, 60px) !important; /* responsive: di HP ~36px, desktop 15vw */
-
-  /* Hindari overflow horizontal dari parent */
+  /* Overflow handling */
   overflow-x: auto;
   overflow-y: hidden;
-
-  /* Sembunyikan scrollbar */
+  
+  /* Hide scrollbar */
   scrollbar-width: none;
+  -ms-overflow-style: none;
   
   /* Prevent text selection during drag */
   user-select: none;
+  -webkit-user-select: none;
+  
+  /* Smooth transitions */
+  transition: transform 0.3s ease;
 }
 
 .banner-track::-webkit-scrollbar {
   display: none;
 }
 
-/* Padding tambahan untuk safe area (iPhone notch/dynamic island) */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .banner-track {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-}
-
 /* =========================
-   BANNER CARD - DENGAN SNAP ALIGNMENT
+   BANNER CARD
 ========================= */
 .banner {
   min-width: 300px;
   height: 190px;
   flex-shrink: 0;
-
   position: relative;
   overflow: hidden;
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-
-  /* ✅ WAJIB: SNAP ALIGNMENT UNTUK CENTERING */
-  scroll-snap-align: center !important;
-  scroll-snap-stop: always !important;
-
-  /* Non-active state */
+  
+  /* Snap alignment */
+  scroll-snap-align: center;
+  
+  /* Initial state */
   transform: scale(0.88);
   opacity: 0.6;
-  transition: 
-    transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 0.45s ease,
-    box-shadow 0.3s ease;
+  transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Hover feedback (opsional, bagus di desktop) */
-.banner:hover:not(.is-active) {
-  transform: scale(0.9);
-  opacity: 0.75;
-}
-
-/* Active banner (tengah) - SESUAI DENGAN JS */
+/* Active state */
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+
+/* Hover effect for desktop */
+@media (hover: hover) {
+  .banner:hover {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  
+  .banner.is-active:hover {
+    transform: scale(1.02);
+  }
 }
 
 /* =========================
@@ -156,49 +155,65 @@ body {
 ========================= */
 .banner img {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   z-index: 1;
-  pointer-events: none; /* Prevent image dragging */
+  pointer-events: none;
 }
 
 .banner::after {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, 0.55),
-    rgba(0, 0, 0, 0.15)
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.1) 100%
   );
   z-index: 2;
+  pointer-events: none;
 }
 
 /* =========================
    TEXT CONTENT
 ========================= */
 .banner-content {
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 3;
   padding: 26px;
   color: #ffffff;
-  pointer-events: none; /* Allow clicking through to banner */
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
 }
 
 .banner-content h2 {
-  margin: 0;
+  margin: 0 0 4px 0;
   font-size: 22px;
   font-weight: 600;
   line-height: 1.2;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .banner-content p {
-  margin-top: 6px;
+  margin: 0;
   font-size: 14px;
   opacity: 0.92;
+  line-height: 1.4;
 }
 
 /* =========================
@@ -208,12 +223,13 @@ body {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 14px;
-  z-index: 10;
+  margin-top: 20px;
   position: relative;
+  z-index: 10;
 }
 
 .banner-dots span {
+  display: block;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -224,18 +240,21 @@ body {
 
 .banner-dots span.active {
   width: 18px;
-  height: 8px;
   border-radius: 6px;
   background: #ffffff;
   transform: scale(1.1);
+}
+
+.banner-dots span:hover {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* =========================
    DRAGGING STATE
 ========================= */
 .banner-track.dragging {
-  cursor: grabbing !important;
-  scroll-snap-type: none !important; /* Disable snap while dragging */
+  cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 .banner-track:active {
@@ -243,75 +262,155 @@ body {
 }
 
 /* =========================
-   RESPONSIVE — HP (MAX 480PX)
+   RESPONSIVE BREAKPOINTS
 ========================= */
+
+/* Mobile (up to 480px) */
 @media (max-width: 480px) {
   .banner-bg {
     padding: 18px 0 20px;
   }
-
+  
   .banner-track {
     gap: 14px;
-    scroll-padding: 0 44px !important; /* TETAPKAN 44px UNTUK CENTERING */
+    padding: 0 44px;
+    scroll-padding: 0 44px;
   }
-
+  
   .banner {
-    min-width: calc(100vw - 88px); /* 44px kiri + 44px kanan = scroll-padding */
-    height: 170px;
+    min-width: calc(100vw - 88px);
+    height: 160px;
   }
-
+  
   .banner-content {
     padding: 20px;
   }
-
+  
   .banner-content h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
-
+  
   .banner-content p {
     font-size: 13px;
   }
-
+  
   .banner-dots {
-    margin-top: 12px;
+    margin-top: 16px;
+  }
+  
+  .banner-dots span {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .banner-dots span.active {
+    width: 16px;
   }
 }
 
-/* =========================
-   RESPONSIVE — SMALL TABLET (UP TO 768PX)
-========================= */
-@media (max-width: 768px) and (min-width: 481px) {
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
   .banner-track {
-    scroll-padding: 0 50px !important;
+    padding: 0 50px;
+    scroll-padding: 0 50px;
   }
-
+  
   .banner {
     min-width: 320px;
     height: 180px;
   }
 }
 
-/* =========================
-   RESPONSIVE — TABLET & DESKTOP
-========================= */
+/* Desktop (769px and up) */
 @media (min-width: 769px) {
   .banner-track {
-    scroll-padding: 0 60px !important; /* FIXED PADDING UNTUK CENTERING */
+    padding: 0 60px;
+    scroll-padding: 0 60px;
+  }
+  
+  .banner {
+    min-width: 340px;
+    height: 200px;
+  }
+  
+  .banner-content h2 {
+    font-size: 24px;
+  }
+  
+  .banner-content p {
+    font-size: 15px;
+  }
+}
+
+/* Large Desktop (1200px and up) */
+@media (min-width: 1200px) {
+  .banner-track {
+    padding: 0 100px;
+    scroll-padding: 0 100px;
+  }
+  
+  .banner {
+    min-width: 380px;
+    height: 220px;
   }
 }
 
 /* =========================
-   LOADING STATE (Optional)
+   SAFE AREA SUPPORT (iPhones with notch)
+========================= */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .banner-bg {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  .banner-track {
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+  }
+}
+
+/* =========================
+   ACCESSIBILITY
+========================= */
+.banner:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+.banner-dots span:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+/* =========================
+   LOADING STATE
 ========================= */
 .banner.loading {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 255, 255, 0.2) 50%, 
+    rgba(255, 255, 255, 0.1) 75%);
   background-size: 200% 100%;
-  animation: loading 1.5s infinite;
+  animation: loading 1.5s ease-in-out infinite;
 }
 
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* =========================
+   PERFORMANCE OPTIMIZATIONS
+========================= */
+.banner {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.banner img {
+  will-change: transform;
 }
 
 /* ===== SECTION TITLE ===== */

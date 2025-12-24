@@ -281,4 +281,124 @@ input[type="radio"] {
   to {
     transform: rotate(360deg);
   }
+}/* =====================================================
+   LOADING OVERLAY — MOBILE-FIRST & LUXURY STYLE
+===================================================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  /* Latar belakang semi-transparan dengan blur (jika didukung) */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px); /* iOS Safari */
+
+  /* Safe area padding (iPhone notch/dynamic island) */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Fade-in/out halus */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.loading-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-box {
+  text-align: center;
+  max-width: 85%;
+  padding: 24px 20px;
+}
+
+/* Spinner premium — ringkas & elegan */
+.spinner-lux {
+  width: 48px;
+  height: 48px;
+  position: relative;
+}
+
+.spinner-lux::before,
+.spinner-lux::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  animation: pulseRotate 1.8s ease-in-out infinite;
+}
+
+.spinner-lux::before {
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 3px solid #E2E8F0;
+  border-top-color: #447DCE;
+}
+
+.spinner-lux::after {
+  top: 50%; left: 50%;
+  width: 12px; height: 12px;
+  background: #447DCE;
+  transform: translate(-50%, -50%);
+  opacity: 0.8;
+  animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
+}
+
+/* Teks loading — responsif & mudah dibaca */
+.loading-box p {
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #334155;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+}
+
+/* Versi lebih kecil untuk layar sangat kecil */
+@media (max-height: 600px) {
+  .spinner-lux {
+    width: 40px;
+    height: 40px;
+  }
+  .spinner-lux::after {
+    width: 10px;
+    height: 10px;
+  }
+  .loading-box p {
+    font-size: 14px;
+    margin-top: 14px;
+  }
+}
+
+/* Opsional: mode gelap otomatis (jika sistem pakai dark mode) */
+@media (prefers-color-scheme: dark) {
+  .loading-overlay {
+    background: rgba(20, 25, 35, 0.85);
+  }
+  .loading-box p {
+    color: #E2E8F0;
+  }
+  .spinner-lux::before {
+    border-color: #475569;
+    border-top-color: #60A5FA;
+  }
+  .spinner-lux::after {
+    background: #60A5FA;
+  }
 }
