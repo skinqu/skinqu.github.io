@@ -4,21 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!track || !dotsContainer) return;
 
-  // Gunakan ResizeObserver agar tetap responsif (termasuk rotate HP)
-  const resizeObserver = new ResizeObserver(() => {
-    if (interval) stopAuto();  // hindari conflict saat resize
-    setTimeout(() => {
-      goToBanner(index % bannerCount, false);
-      if (!interval) startAuto();
-    }, 100);
-  });
-  resizeObserver.observe(track);
-
   let banners = Array.from(track.children);
   const bannerCount = banners.length;
 
+  // ✅ Pastikan CSS punya: scroll-snap-type & scroll-padding!
+  // (lihat rekomendasi CSS di atas)
+
   /* ===== DOTS ===== */
-  dotsContainer.innerHTML = ""; // clear dulu (hindari duplikat saat reload)
+  dotsContainer.innerHTML = "";
   banners.forEach((_, i) => {
     const dot = document.createElement("span");
     if (i === 0) dot.classList.add("active");
@@ -26,48 +19,39 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const dots = dotsContainer.querySelectorAll("span");
 
-  /* ===== CLONE FOR INFINITE SCROLL (dua arah) ===== */
-  // Clone 1 set di kiri & 1 set di kanan → seamless ke kiri/kanan
+  /* ===== CLONE UNTUK INFINITE (2 set: kiri & kanan) ===== */
   const fragment = document.createDocumentFragment();
   banners.forEach(b => fragment.appendChild(b.cloneNode(true)));
-  track.prepend(fragment); // clone di kiri
-  track.append(fragment.cloneNode(true)); // clone di kanan
-  banners = Array.from(track.children); // update referensi
+  track.prepend(fragment);
+  track.append(fragment.cloneNode(true));
+  banners = Array.from(track.children);
 
-  let index = bannerCount; // mulai di clone pertama (posisi "asli" tengah)
+  let currentIndex = bannerCount; // mulai di banner asli pertama (posisi tengah visual)
   let interval = null;
   let resumeTimeout = null;
-  let isUserScrolling = false;
-
-  // Helper: ukuran 1 banner (responsif)
-  function bannerSize() {
-    return banners[bannerCount].offsetWidth + 18; // ambil dari banner asli (index bannerCount)
-  }
-
-  // Helper: offset ke tengah (termasuk padding/margin luar)
-  function centerOffset() {
-    return (track.offsetWidth - (banners[bannerCount]?.offsetWidth || 0)) / 2;
-  }
+  let isUserInteracting = false;
 
   function updateActive() {
-    const realIndex = (index % bannerCount + bannerCount) % bannerCount;
+    const realIndex = (currentIndex % bannerCount + bannerCount) % bannerCount;
 
     banners.forEach(b => b.classList.remove("is-active"));
-    banners[index].classList.add("is-active");
+    banners[currentIndex].classList.add("is-active");
 
-    dots.forEach(d => d.classList.remove("active"));
-    dots[realIndex].classList.add("active");
+    dots.forEach((d, i) => d.classList.toggle("active", i === realIndex));
   }
 
-  function goToBanner(targetIndex, smooth = true) {
-    index = targetIndex;
-    const targetScroll = index * bannerSize() - centerOffset();
+  // 🔥 FUNGSI UTAMA: pastikan banner benar-benar DI TENGAH VIEWPORT
+  function centerBanner(index, smooth = true) {
+    const banner = banners[index];
+    if (!banner) return;
 
-    track.scrollTo({
-      left: targetScroll,
-      behavior: smooth ? "smooth" : "auto"
+    banner.scrollIntoView({
+      behavior: smooth ? "smooth" : "auto",
+      block: "nearest",
+      inline: "center" // ✅ Ini kuncinya — force center secara visual
     });
 
+    currentIndex = index;
     updateActive();
   }
 
@@ -75,20 +59,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (interval) return;
 
     interval = setInterval(() => {
-      if (isUserScrolling) return;
+      if (isUserInteracting) return;
 
-      index++;
+      currentIndex++;
 
-      // Jika sampai di akhir clone kanan → lompat ke clone tengah (tanpa jump visual)
-      if (index >= bannerCount * 2) {
-        index = bannerCount; // reset ke posisi "asli" (index tengah)
-        track.scrollTo({
-          left: index * bannerSize() - centerOffset(),
-          behavior: "auto"
-        });
+      // Loop: jika melewati clone kanan, lompat ke clone tengah (tanpa jump)
+      if (currentIndex >= bannerCount * 2) {
+        // Reset ke posisi visual yang sama, tapi di clone tengah
+        currentIndex = bannerCount;
+        // Lompat langsung (tanpa animasi) ke posisi awal clone tengah
+        banners[currentIndex].scrollIntoView({ behavior: "auto", inline: "center" });
       }
 
-      goToBanner(index);
+      centerBanner(currentIndex);
     }, 3200);
   }
 
@@ -98,44 +81,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearTimeout(resumeTimeout);
     resumeTimeout = setTimeout(() => {
-      if (!isUserScrolling) startAuto();
+      if (!isUserInteracting) startAuto();
     }, 2500);
   }
 
   /* ===== USER INTERACTION ===== */
-  let startX = 0;
-  let scrollLeft = 0;
+  let touchStartX = 0;
+  let isDragging = false;
 
-  // Touch/Mouse start
   const handleStart = (e) => {
-    isUserScrolling = true;
+    isUserInteracting = true;
+    isDragging = true;
     stopAuto();
-    startX = (e.type === "touchstart" ? e.touches[0].clientX : e.clientX);
-    scrollLeft = track.scrollLeft;
+    touchStartX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
   };
 
-  // Touch/Mouse move (opsional: bisa skip jika hanya butuh scroll biasa)
   const handleMove = (e) => {
-    if (!isUserScrolling) return;
-    const x = (e.type === "touchmove" ? e.touches[0].clientX : e.clientX);
-    const walk = (x - startX) * 1.5; // sensitivitas
-    track.scrollLeft = scrollLeft - walk;
+    if (!isDragging) return;
+    const x = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+    const diff = touchStartX - x;
+    if (Math.abs(diff) > 10) {
+      // Biarkan scroll alami terjadi — jangan override
+    }
   };
 
-  // End: snap ke banner terdekat
   const handleEnd = () => {
-    if (!isUserScrolling) return;
-    isUserScrolling = false;
+    if (!isDragging) return;
+    isDragging = false;
+    isUserInteracting = false;
 
-    const scrollPos = track.scrollLeft + centerOffset();
-    const i = Math.round(scrollPos / bannerSize());
-    // Pastikan index tetap di range [bannerCount, bannerCount*2)
-    let targetIndex = Math.min(Math.max(i, bannerCount), bannerCount * 2 - 1);
-    goToBanner(targetIndex, true);
-    stopAuto(); // akan auto-resume setelah timeout
+    // 🔥 CARI BANNER PALING DEKAT DENGAN CENTER VIEWPORT
+    const rect = track.getBoundingClientRect();
+    const centerScreenX = rect.left + rect.width / 2;
+
+    let closestIndex = currentIndex;
+    let minDist = Infinity;
+
+    // Cari banner yang center-nya paling dekat dengan center layar
+    for (let i = 0; i < banners.length; i++) {
+      const bannerRect = banners[i].getBoundingClientRect();
+      const bannerCenterX = bannerRect.left + bannerRect.width / 2;
+      const dist = Math.abs(bannerCenterX - centerScreenX);
+      if (dist < minDist) {
+        minDist = dist;
+        closestIndex = i;
+      }
+    }
+
+    // Pastikan index tetap di zone tengah (bannerCount ... 2*bannerCount - 1)
+    closestIndex = Math.min(
+      Math.max(closestIndex, bannerCount),
+      bannerCount * 2 - 1
+    );
+
+    centerBanner(closestIndex, true);
+    stopAuto(); // akan resume otomatis
   };
 
-  // Event listener interaksi
+  // Event listeners
   track.addEventListener("mousedown", handleStart);
   track.addEventListener("touchstart", handleStart, { passive: true });
   track.addEventListener("mousemove", handleMove);
@@ -143,48 +146,38 @@ document.addEventListener("DOMContentLoaded", () => {
   track.addEventListener("mouseup", handleEnd);
   track.addEventListener("mouseleave", handleEnd);
   track.addEventListener("touchend", handleEnd);
+  track.addEventListener("touchcancel", handleEnd);
 
-  // Scroll snapping via wheel/trackpad
+  // Wheel (mouse/trackpad)
   track.addEventListener("wheel", (e) => {
-    if (e.deltaX !== 0) {
-      stopAuto();
-      isUserScrolling = true;
-      setTimeout(() => {
-        isUserScrolling = false;
-        const scrollPos = track.scrollLeft + centerOffset();
-        const i = Math.round(scrollPos / bannerSize());
-        let targetIndex = Math.min(Math.max(i, bannerCount), bannerCount * 2 - 1);
-        goToBanner(targetIndex, true);
-      }, 150);
-    }
+    if (e.deltaX === 0) return;
+    isUserInteracting = true;
+    stopAuto();
+    // Biarkan scroll alami, lalu snap via scroll event
   });
 
-  // Manual scroll (touchpad/mouse drag)
-  let scrollTimeout;
+  // Snap saat scroll berhenti
+  let scrollDebounce;
   track.addEventListener("scroll", () => {
-    clearTimeout(scrollTimeout);
-    if (!isUserScrolling) {
-      scrollTimeout = setTimeout(() => {
-        const scrollPos = track.scrollLeft + centerOffset();
-        const i = Math.round(scrollPos / bannerSize());
-        let targetIndex = Math.min(Math.max(i, bannerCount), bannerCount * 2 - 1);
-        if (Math.abs(index - targetIndex) > 0.5) {
-          goToBanner(targetIndex, false);
-        }
-      }, 100);
-    }
+    clearTimeout(scrollDebounce);
+    scrollDebounce = setTimeout(() => {
+      if (!isUserInteracting && !isDragging) {
+        handleEnd(); // force snap to nearest center
+      }
+    }, 120);
   });
 
   /* ===== DOT CLICK ===== */
   dots.forEach((dot, i) => {
     dot.addEventListener("click", () => {
       stopAuto();
-      // target ke clone tengah + offset i
-      goToBanner(bannerCount + i, true);
+      centerBanner(bannerCount + i, true);
     });
   });
 
   /* ===== INIT ===== */
-  goToBanner(bannerCount, false); // mulai di posisi tengah (clone pertama)
-  startAuto();
+  requestAnimationFrame(() => {
+    centerBanner(bannerCount, false); // pastikan benar-benar di tengah
+    startAuto();
+  });
 });

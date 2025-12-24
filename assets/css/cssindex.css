@@ -63,7 +63,7 @@ body {
 }
 
 /* =========================
-   BANNER BACKGROUND STRIP
+   BANNER CONTAINER (BG + PADDING)
 ========================= */
 .banner-bg {
   background: linear-gradient(135deg, #447DCE, #5E8FE0);
@@ -72,30 +72,43 @@ body {
 }
 
 /* =========================
-   BANNER SCROLL TRACK — DIPERBAIKI
+   BANNER TRACK — FULLY OPTIMIZED
+   🔑 Kunci: scroll-padding + scroll-snap untuk centering visual
 ========================= */
 .banner-track {
   display: flex;
   gap: 18px;
 
-  /* Ganti padding fleksibel → gunakan margin auto & flex untuk centering */
-  padding: 0;
-  justify-content: center;
-
-  /* Penting untuk snapping & smoothness */
+  /* ✅ Force center secara visual */
   scroll-snap-type: x mandatory;
+  scroll-snap-stop: always; /* pastikan tidak skip banner */
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; /* smooth scroll di iOS */
+  -webkit-overflow-scrolling: touch; /* smooth inertia di iOS */
 
-  overflow-x: scroll;
+  /* 🔥 INI YANG MEMASTIKAN BANNER AKTIF DI TENGAH VIEWPORT */
+  scroll-padding: 0 min(15vw, 60px); /* responsive: di HP ~36px, desktop 15vw */
+
+  /* Hindari overflow horizontal dari parent */
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* Sembunyikan scrollbar */
   scrollbar-width: none;
 }
 .banner-track::-webkit-scrollbar {
   display: none;
 }
 
+/* Padding tambahan untuk safe area (iPhone notch/dynamic island) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .banner-track {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
 /* =========================
-   BANNER CARD — DIPERBAIKI
+   BANNER CARD
 ========================= */
 .banner {
   min-width: 300px;
@@ -107,30 +120,33 @@ body {
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 
-  /* Snap alignment — wajib untuk scroll snapping */
+  /* ✅ Wajib: snap alignment */
   scroll-snap-align: center;
 
-  /* Default (non-active) */
+  /* Non-active state */
   transform: scale(0.88);
   opacity: 0.6;
-  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              opacity 0.45s ease;
+  transition: 
+    transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.45s ease,
+    box-shadow 0.3s ease;
 }
 
-/* Hover & active lebih halus */
-.banner:hover {
-  transform: scale(0.92);
-  opacity: 0.8;
-  transition-duration: 0.25s;
+/* Hover feedback (opsional, bagus di desktop) */
+.banner:hover:not(.is-active) {
+  transform: scale(0.9);
+  opacity: 0.75;
 }
 
+/* Active banner (tengah) */
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
 }
 
 /* =========================
-   BANNER IMAGE & OVERLAY — tetap sama (sudah bagus)
+   IMAGE & OVERLAY
 ========================= */
 .banner img {
   position: absolute;
@@ -145,22 +161,32 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.15)
+  );
   z-index: 2;
 }
 
+/* =========================
+   TEXT CONTENT
+========================= */
 .banner-content {
   position: relative;
   z-index: 3;
   padding: 26px;
   color: #ffffff;
 }
+
 .banner-content h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
   line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
+
 .banner-content p {
   margin-top: 6px;
   font-size: 14px;
@@ -168,7 +194,7 @@ body {
 }
 
 /* =========================
-   DOT INDICATOR — sedikit tweak visual
+   DOT INDICATOR
 ========================= */
 .banner-dots {
   display: flex;
@@ -191,6 +217,55 @@ body {
   border-radius: 6px;
   background: #ffffff;
   transform: scale(1.1);
+}
+
+/* =========================
+   RESPONSIVE — HP (MAX 480PX)
+========================= */
+@media (max-width: 480px) {
+  .banner-bg {
+    padding: 18px 0 20px;
+  }
+
+  .banner-track {
+    gap: 14px;
+    scroll-padding: 0 min(12vw, 44px); /* lebih ketat di HP */
+  }
+
+  .banner {
+    min-width: calc(100vw - 88px); /* 44px kiri + 44px kanan = scroll-padding */
+    height: 170px;
+  }
+
+  .banner-content {
+    padding: 20px;
+  }
+
+  .banner-content h2 {
+    font-size: 20px;
+  }
+
+  .banner-content p {
+    font-size: 13px;
+  }
+
+  .banner-dots {
+    margin-top: 12px;
+  }
+}
+
+/* =========================
+   RESPONSIVE — SMALL TABLET (UP TO 768PX)
+========================= */
+@media (max-width: 768px) and (min-width: 481px) {
+  .banner-track {
+    scroll-padding: 0 50px;
+  }
+
+  .banner {
+    min-width: 320px;
+    height: 180px;
+  }
 }
 
 /* ===== SECTION TITLE ===== */
