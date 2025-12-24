@@ -7,8 +7,19 @@ document.addEventListener("DOMContentLoaded", () => {
   let banners = Array.from(track.children);
   const bannerCount = banners.length;
 
-  // ✅ Pastikan CSS punya: scroll-snap-type & scroll-padding!
-  // (lihat rekomendasi CSS di atas)
+  // ✅ TAMBAH STYLE UNTUK CENTERING YANG LEBIH BAIK
+  const style = document.createElement("style");
+  style.textContent = `
+    .banner-track {
+      scroll-snap-type: x mandatory !important;
+      scroll-padding: 0 calc(50% - 160px) !important;
+    }
+    .banner-item {
+      scroll-snap-align: center !important;
+      scroll-snap-stop: always !important;
+    }
+  `;
+  document.head.appendChild(style);
 
   /* ===== DOTS ===== */
   dotsContainer.innerHTML = "";
@@ -19,165 +30,208 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const dots = dotsContainer.querySelectorAll("span");
 
-  /* ===== CLONE UNTUK INFINITE (2 set: kiri & kanan) ===== */
+  /* ===== CLONE UNTUK INFINITE ===== */
   const fragment = document.createDocumentFragment();
   banners.forEach(b => fragment.appendChild(b.cloneNode(true)));
   track.prepend(fragment);
   track.append(fragment.cloneNode(true));
   banners = Array.from(track.children);
 
-  let currentIndex = bannerCount; // mulai di banner asli pertama (posisi tengah visual)
+  let currentIndex = bannerCount;
   let interval = null;
-  let resumeTimeout = null;
   let isUserInteracting = false;
+  let resumeTimeout = null;
 
-  function updateActive() {
-    const realIndex = (currentIndex % bannerCount + bannerCount) % bannerCount;
-
-    banners.forEach(b => b.classList.remove("is-active"));
-    banners[currentIndex].classList.add("is-active");
-
-    dots.forEach((d, i) => d.classList.toggle("active", i === realIndex));
-  }
-
-  // 🔥 FUNGSI UTAMA: pastikan banner benar-benar DI TENGAH VIEWPORT
+  // 🔥 FUNGSI UTAMA UNTUK LOCK KE CENTER
   function centerBanner(index, smooth = true) {
     const banner = banners[index];
     if (!banner) return;
 
-    banner.scrollIntoView({
-      behavior: smooth ? "smooth" : "auto",
-      block: "nearest",
-      inline: "center" // ✅ Ini kuncinya — force center secara visual
+    // ⭐⭐ CARA YANG LEBIH AKURAT UNTUK CENTERING ⭐⭐
+    const trackRect = track.getBoundingClientRect();
+    const bannerRect = banner.getBoundingClientRect();
+    const trackCenter = trackRect.left + (trackRect.width / 2);
+    const bannerCenter = bannerRect.left + (bannerRect.width / 2);
+    const scrollDistance = bannerCenter - trackCenter;
+    
+    // Scroll manual untuk kontrol yang lebih presisi
+    track.scrollBy({
+      left: scrollDistance,
+      behavior: smooth ? "smooth" : "instant"
     });
 
     currentIndex = index;
     updateActive();
   }
 
-  function startAuto() {
-    if (interval) return;
+  function updateActive() {
+    const realIndex = (currentIndex % bannerCount + bannerCount) % bannerCount;
+    
+    // Update active class
+    banners.forEach(b => b.classList.remove("is-active"));
+    if (banners[currentIndex]) {
+      banners[currentIndex].classList.add("is-active");
+    }
+    
+    // Update dots
+    dots.forEach((d, i) => d.classList.toggle("active", i === realIndex));
+  }
 
+  // 🔥 FUNGSI UNTUK CARI BANNER TERDEKAT DENGAN CENTER
+  function findNearestCenterBanner() {
+    const trackRect = track.getBoundingClientRect();
+    const trackCenter = trackRect.left + (trackRect.width / 2);
+    
+    let closestIndex = currentIndex;
+    let minDistance = Infinity;
+    
+    for (let i = 0; i < banners.length; i++) {
+      const bannerRect = banners[i].getBoundingClientRect();
+      const bannerCenter = bannerRect.left + (bannerRect.width / 2);
+      const distance = Math.abs(bannerCenter - trackCenter);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
+    
+    // Pastikan tetap di zona tengah
+    if (closestIndex < bannerCount) {
+      closestIndex = bannerCount;
+    } else if (closestIndex >= bannerCount * 2) {
+      closestIndex = bannerCount * 2 - 1;
+    }
+    
+    return closestIndex;
+  }
+
+  function startAutoSlide() {
+    if (interval) clearInterval(interval);
+    
     interval = setInterval(() => {
       if (isUserInteracting) return;
-
+      
       currentIndex++;
-
-      // Loop: jika melewati clone kanan, lompat ke clone tengah (tanpa jump)
+      
+      // Reset jika sudah melewati clone kanan
       if (currentIndex >= bannerCount * 2) {
-        // Reset ke posisi visual yang sama, tapi di clone tengah
         currentIndex = bannerCount;
-        // Lompat langsung (tanpa animasi) ke posisi awal clone tengah
-        banners[currentIndex].scrollIntoView({ behavior: "auto", inline: "center" });
+        track.scrollTo({
+          left: banners[currentIndex].offsetLeft - (track.offsetWidth / 2) + (banners[currentIndex].offsetWidth / 2),
+          behavior: 'instant'
+        });
       }
-
-      centerBanner(currentIndex);
+      
+      centerBanner(currentIndex, true);
     }, 3200);
   }
 
-  function stopAuto() {
+  function stopAutoSlide() {
     clearInterval(interval);
     interval = null;
-
+    
     clearTimeout(resumeTimeout);
     resumeTimeout = setTimeout(() => {
-      if (!isUserInteracting) startAuto();
+      if (!isUserInteracting) startAutoSlide();
     }, 2500);
   }
 
-  /* ===== USER INTERACTION ===== */
-  let touchStartX = 0;
+  /* ===== EVENT HANDLERS ===== */
   let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
 
   const handleStart = (e) => {
     isUserInteracting = true;
     isDragging = true;
-    stopAuto();
-    touchStartX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+    stopAutoSlide();
+    
+    startX = e.type === "touchstart" ? e.touches[0].pageX : e.pageX;
+    scrollLeft = track.scrollLeft;
   };
 
   const handleMove = (e) => {
     if (!isDragging) return;
-    const x = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
-    const diff = touchStartX - x;
-    if (Math.abs(diff) > 10) {
-      // Biarkan scroll alami terjadi — jangan override
-    }
+    
+    e.preventDefault();
+    const x = e.type === "touchmove" ? e.touches[0].pageX : e.pageX;
+    const walk = (x - startX);
+    track.scrollLeft = scrollLeft - walk;
   };
 
   const handleEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    isUserInteracting = false;
-
-    // 🔥 CARI BANNER PALING DEKAT DENGAN CENTER VIEWPORT
-    const rect = track.getBoundingClientRect();
-    const centerScreenX = rect.left + rect.width / 2;
-
-    let closestIndex = currentIndex;
-    let minDist = Infinity;
-
-    // Cari banner yang center-nya paling dekat dengan center layar
-    for (let i = 0; i < banners.length; i++) {
-      const bannerRect = banners[i].getBoundingClientRect();
-      const bannerCenterX = bannerRect.left + bannerRect.width / 2;
-      const dist = Math.abs(bannerCenterX - centerScreenX);
-      if (dist < minDist) {
-        minDist = dist;
-        closestIndex = i;
-      }
-    }
-
-    // Pastikan index tetap di zone tengah (bannerCount ... 2*bannerCount - 1)
-    closestIndex = Math.min(
-      Math.max(closestIndex, bannerCount),
-      bannerCount * 2 - 1
-    );
-
-    centerBanner(closestIndex, true);
-    stopAuto(); // akan resume otomatis
+    
+    // Beri waktu untuk scroll berhenti
+    setTimeout(() => {
+      isUserInteracting = false;
+      const nearestIndex = findNearestCenterBanner();
+      centerBanner(nearestIndex, true);
+      stopAutoSlide(); // Auto restart
+    }, 100);
   };
 
-  // Event listeners
+  // Event Listeners
   track.addEventListener("mousedown", handleStart);
-  track.addEventListener("touchstart", handleStart, { passive: true });
+  track.addEventListener("touchstart", handleStart, { passive: false });
   track.addEventListener("mousemove", handleMove);
-  track.addEventListener("touchmove", handleMove, { passive: true });
+  track.addEventListener("touchmove", handleMove, { passive: false });
   track.addEventListener("mouseup", handleEnd);
   track.addEventListener("mouseleave", handleEnd);
   track.addEventListener("touchend", handleEnd);
   track.addEventListener("touchcancel", handleEnd);
 
-  // Wheel (mouse/trackpad)
-  track.addEventListener("wheel", (e) => {
-    if (e.deltaX === 0) return;
-    isUserInteracting = true;
-    stopAuto();
-    // Biarkan scroll alami, lalu snap via scroll event
-  });
-
-  // Snap saat scroll berhenti
-  let scrollDebounce;
+  // Scroll event untuk snap
+  let scrollTimeout;
   track.addEventListener("scroll", () => {
-    clearTimeout(scrollDebounce);
-    scrollDebounce = setTimeout(() => {
-      if (!isUserInteracting && !isDragging) {
-        handleEnd(); // force snap to nearest center
+    if (!isDragging) return;
+    
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      if (isDragging) {
+        const nearestIndex = findNearestCenterBanner();
+        centerBanner(nearestIndex, true);
       }
-    }, 120);
+    }, 150);
   });
 
-  /* ===== DOT CLICK ===== */
+  // Dot click
   dots.forEach((dot, i) => {
     dot.addEventListener("click", () => {
-      stopAuto();
+      stopAutoSlide();
       centerBanner(bannerCount + i, true);
     });
   });
 
-  /* ===== INIT ===== */
-  requestAnimationFrame(() => {
-    centerBanner(bannerCount, false); // pastikan benar-benar di tengah
-    startAuto();
+  // Wheel event
+  track.addEventListener("wheel", (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      isUserInteracting = true;
+      stopAutoSlide();
+      
+      setTimeout(() => {
+        isUserInteracting = false;
+        const nearestIndex = findNearestCenterBanner();
+        centerBanner(nearestIndex, true);
+      }, 300);
+    }
   });
+
+  /* ===== INITIALIZE ===== */
+  // Tunggu gambar/elemen selesai load
+  setTimeout(() => {
+    // Set scroll position ke banner pertama di tengah
+    const firstRealBanner = banners[bannerCount];
+    if (firstRealBanner) {
+      track.scrollTo({
+        left: firstRealBanner.offsetLeft - (track.offsetWidth / 2) + (firstRealBanner.offsetWidth / 2),
+        behavior: 'instant'
+      });
+      updateActive();
+    }
+    
+    startAutoSlide();
+  }, 100);
 });
