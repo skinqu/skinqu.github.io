@@ -433,15 +433,6 @@
 
   <script>
   const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
-  
-  // ====================== CONFIGURASI WAKTU PROSES ======================
-  const PROCESSING_CONFIG = {
-    INITIAL_WAIT: 3000,      // Tunggu 3 detik setelah scan sebelum mulai polling
-    POLLING_INTERVAL: 2000,  // Poll setiap 2 detik
-    MAX_POLLING_TIME: 45000,  // Maksimal 45 detik polling
-    PROGRESS_UPDATE: 500     // Update progress setiap 500ms
-  };
-  // =====================================================================
 
   const video = document.getElementById('video');
   const scanBtn = document.getElementById('scanBtn');
@@ -451,10 +442,7 @@
   const flashEl = document.getElementById('flash');
   const particlesContainer = document.getElementById('particles');
 
-  // Variabel untuk mengelola status loading
   let isProcessing = false;
-  let progressInterval;
-  let elapsedSeconds = 0;
 
   // ✨ Generate floating particles
   function createParticles() {
@@ -520,181 +508,86 @@
     });
   }
 
-  // 🔄 Update status loading steps dengan timer
+  // 🔄 Update status loading steps
   function updateLoadingStep(stepNumber, description = '') {
-    // Reset semua step
     for (let i = 1; i <= 4; i++) {
       const step = document.getElementById(`step${i}`);
       step.classList.remove('active');
     }
     
-    // Aktifkan step yang diminta
     for (let i = 1; i <= stepNumber; i++) {
       const step = document.getElementById(`step${i}`);
       step.classList.add('active');
     }
     
-    // Update description jika ada
     if (description && stepNumber <= 4) {
       const stepText = document.querySelector(`#step${stepNumber} .step-text`);
       if (stepText) {
-        stepText.innerHTML = description;
+        stepText.textContent = description;
       }
     }
   }
 
-  // ⏱️ Update progress timer di UI
-  function updateProgressTimer() {
-    elapsedSeconds++;
-    const timerText = document.querySelector('.loading-subtext');
-    if (timerText) {
-      timerText.textContent = `Proses AI membutuhkan waktu 9-15 detik. Sedang diproses: ${elapsedSeconds} detik...`;
+  // 📤 Scan & kirim - VERSI FINAL UNTUK PROSES AI
+  async function scanWajah() {
+    if (isProcessing) return;
+    
+    if (!video.srcObject) {
+      alert("Kamera belum siap. Tunggu sebentar...");
+      return;
     }
-    
-    // Update progress bar jika ada
-    const progressBar = document.querySelector('.progress-bar');
-    if (progressBar) {
-      const progressPercent = Math.min((elapsedSeconds / 15) * 100, 100);
-      progressBar.style.width = `${progressPercent}%`;
-    }
-  }
 
-  // 🔍 Polling untuk mengecek status proses AI di n8n
-  async function pollProcessingStatus(sessionId) {
-    const startTime = Date.now();
-    
-    while (Date.now() - startTime < PROCESSING_CONFIG.MAX_POLLING_TIME) {
-      try {
-        console.log(`Polling status untuk session: ${sessionId}`);
-        
-        // Kirim request ke endpoint status n8n (anda perlu buat endpoint ini di n8n)
-        const statusRes = await fetch(`${N8N_WEBHOOK}/status`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: sessionId })
-        });
-        
-        if (statusRes.ok) {
-          const statusData = await statusRes.json();
-          
-          // ====================== LOGIKA STATUS N8N ======================
-          // Anda perlu sesuaikan dengan respons n8n:
-          // status: "processing", "completed", "failed"
-          // products: (array jika completed)
-          // ==============================================================
-          
-          if (statusData.status === 'completed') {
-            return {
-              success: true,
-              products: statusData.products,
-              message: 'Proses AI selesai'
-            };
-          } else if (statusData.status === 'failed') {
-            return {
-              success: false,
-              error: statusData.error || 'Proses AI gagal'
-            };
-          }
-          // Jika masih processing, lanjut polling
-        }
-      } catch (error) {
-        console.warn('Polling error:', error);
-      }
-      
-      // Tunggu sebelum polling berikutnya
-      await new Promise(resolve => setTimeout(resolve, PROCESSING_CONFIG.POLLING_INTERVAL));
-    }
-    
-    return {
-      success: false,
-      error: 'Waktu proses AI terlalu lama (timeout)'
-    };
-  }
+    scanBtn.disabled = true;
+    isProcessing = true;
+    loadingOverlay.style.display = "flex";
+    updateLoadingStep(1, "Mengambil gambar wajah...");
 
-  // 📤 Scan & kirim - VERSI POLLING UNTUK PROSES AI 9-15 DETIK
-  // 📤 Scan & kirim - VERSI DIPERBAIKI dengan FALLBACK
-async function scanWajah() {
-  if (isProcessing) return;
-  
-  if (!video.srcObject) {
-    alert("Kamera belum siap. Tunggu sebentar...");
-    return;
-  }
-
-  // Nonaktifkan tombol scan
-  scanBtn.disabled = true;
-  isProcessing = true;
-  elapsedSeconds = 0;
-  
-  // Tampilkan loading overlay
-  loadingOverlay.style.display = "flex";
-  updateLoadingStep(1, "Mengambil gambar wajah...");
-
-  try {
-    // 1. Jalankan animasi scan
-    await runScanAnimation();
-    
-    // Tunggu sebentar untuk efek visual
-    await new Promise(r => setTimeout(r, 300));
-
-    // 2. Ambil gambar dari video
-    updateLoadingStep(2, "Menyimpan gambar untuk analisis...");
-    
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const size = Math.min(video.videoWidth, video.videoHeight);
-    const x = (video.videoWidth - size) / 2;
-    const y = (video.videoHeight - size) / 2;
-
-    canvas.width = 512;
-    canvas.height = 512;
-    ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
-    const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
-
-    // 3. Mulai progress timer
-    progressInterval = setInterval(updateProgressTimer, PROCESSING_CONFIG.PROGRESS_UPDATE);
-
-    // 4. Buat session ID unik untuk tracking
-    const sessionId = `scan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // 5. Kirim ke n8n UNTUK MEMULAI PROSES
-    updateLoadingStep(3, "Mengirim ke server AI...");
-    
-    const requestData = {
-      session_id: sessionId,
-      umur: "25",
-      gender: "netral",
-      hamil: "tidak",
-      category: "toner",
-      berminyak: "tidak",
-      kering: "tidak",
-      kusam: "tidak",
-      berjerawat: "tidak",
-      sensitif: "tidak",
-      beruntusan: "tidak",
-      flek: "tidak",
-      kemerahan: "tidak",
-      pori: "tidak",
-      komedo: "tidak",
-      image: imageBase64
-    };
-
-    console.log("📤 Mengirim data ke n8n...", { 
-      sessionId, 
-      imageSize: imageBase64.length,
-      timestamp: new Date().toISOString() 
-    });
-
-    // ====================== STRATEGI 1: KIRIM DAN TUNGGU LANGSUNG ======================
-    let n8nResponse;
-    let n8nError = null;
-    
     try {
-      // Kirim request ke n8n dengan timeout 25 detik
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000);
+      // 1. Jalankan animasi scan
+      await runScanAnimation();
+      await new Promise(r => setTimeout(r, 300));
+
+      // 2. Ambil gambar dari video
+      updateLoadingStep(2, "Mengolah gambar...");
       
-      const initiateRes = await fetch(N8N_WEBHOOK, {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const size = Math.min(video.videoWidth, video.videoHeight);
+      const x = (video.videoWidth - size) / 2;
+      const y = (video.videoHeight - size) / 2;
+
+      canvas.width = 512;
+      canvas.height = 512;
+      ctx.drawImage(video, x, y, size, size, 0, 0, 512, 512);
+      const imageBase64 = canvas.toDataURL('image/jpeg', 0.72);
+
+      // 3. Kirim HANYA gambar ke AI di n8n
+      updateLoadingStep(3, "Mengirim gambar ke AI...");
+      
+      console.log("📤 Mengirim gambar ke AI...");
+
+      // ✅ HANYA KIRIM GAMBAR - AI akan analisis sendiri
+      const requestData = {
+        image: imageBase64
+      };
+
+      updateLoadingStep(4, "AI menganalisis kulit... (9-15 detik)");
+      
+      // Timer untuk menunjukkan progres
+      let seconds = 0;
+      const timerInterval = setInterval(() => {
+        seconds++;
+        const timerText = document.querySelector('.loading-subtext');
+        if (timerText) {
+          timerText.textContent = `AI menganalisis kulit... (${seconds} detik)`;
+        }
+      }, 1000);
+
+      // Kirim dengan timeout 45 detik (AI butuh 9-15 detik)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+      
+      const response = await fetch(N8N_WEBHOOK, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -705,212 +598,87 @@ async function scanWajah() {
       });
       
       clearTimeout(timeoutId);
+      clearInterval(timerInterval);
       
-      if (!initiateRes.ok) {
-        throw new Error(`HTTP ${initiateRes.status}: ${await initiateRes.text()}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText}`);
       }
       
-      n8nResponse = await initiateRes.json();
-      console.log("✅ Respons n8n diterima:", n8nResponse);
+      const products = await response.json();
+      console.log("✅ Respons AI:", products);
       
-    } catch (fetchError) {
-      n8nError = fetchError;
-      console.warn("⚠️ Gagal mendapatkan respons langsung dari n8n:", fetchError);
-      
-      // JANGAN throw error di sini, lanjut ke fallback
-      updateLoadingStep(3, "Menghubungkan ke server AI...");
-    }
-
-    // ====================== STRATEGI 2: FALLBACK KE SIMULASI AI ======================
-    // Jika n8n gagal merespons dalam 25 detik, gunakan data simulasi
-    updateLoadingStep(4, "Menganalisis karakteristik kulit...");
-    
-    // Simulasi proses AI selama 5-8 detik
-    const aiProcessTime = 5000 + Math.random() * 3000;
-    await new Promise(r => setTimeout(r, aiProcessTime));
-    
-    updateLoadingStep(4, "Menyiapkan rekomendasi...");
-    
-    // ====================== DATA FALLBACK JIKA n8n ERROR ======================
-    let finalProducts;
-    
-    if (n8nResponse && n8nResponse.products) {
-      // Gunakan data dari n8n jika ada
-      finalProducts = n8nResponse.products;
-      console.log("✅ Menggunakan data real dari n8n");
-    } else {
-      // FALLBACK: Data simulasi berdasarkan kategori
-      console.log("⚠️ Menggunakan data fallback (n8n timeout/error)");
-      
-      // Data fallback berdasarkan kategori yang dipilih
-      const fallbackProducts = {
-        "toner": [
-          {
-            nama: "Toner Brightening Serum",
-            harga: "Rp 189.000",
-            brand: "SkinQu Expert",
-            deskripsi: "Toner mencerahkan dengan niacinamide 5%",
-            rating: 4.8,
-            image: "https://via.placeholder.com/300x200/2563eb/ffffff?text=Toner+AI"
-          },
-          {
-            nama: "Hydrating Toner Essence",
-            harga: "Rp 245.000",
-            brand: "HydraGlow",
-            deskripsi: "Toner hidrasi intensif dengan hyaluronic acid",
-            rating: 4.7,
-            image: "https://via.placeholder.com/300x200/10b981/ffffff?text=Hydrating+Toner"
-          },
-          {
-            nama: "Acne Care Toner",
-            harga: "Rp 167.500",
-            brand: "ClearSkin",
-            deskripsi: "Toner untuk kulit berjerawat dengan salicylic acid",
-            rating: 4.6,
-            image: "https://via.placeholder.com/300x200/ef4444/ffffff?text=Acne+Toner"
-          }
-        ],
-        "cleanser": [
-          {
-            nama: "Gentle Foaming Cleanser",
-            harga: "Rp 125.000",
-            brand: "SkinQu Pure",
-            deskripsi: "Pembersih wajah lembut pH-balanced",
-            rating: 4.9,
-            image: "https://via.placeholder.com/300x200/8b5cf6/ffffff?text=Cleanser+AI"
-          }
-        ],
-        "moisturizer": [
-          {
-            nama: "Intense Moisture Cream",
-            harga: "Rp 275.000",
-            brand: "SkinQu Hydra",
-            deskripsi: "Pelembab intensif 24 jam",
-            rating: 4.8,
-            image: "https://via.placeholder.com/300x200/0ea5e9/ffffff?text=Moisturizer+AI"
-          }
-        ]
-      };
-      
-      finalProducts = fallbackProducts[requestData.category] || fallbackProducts.toner;
-    }
-    
-    // Tambahkan data session ke produk untuk tracking
-    const productsWithMeta = finalProducts.map(p => ({
-      ...p,
-      session_id: sessionId,
-      scan_time: new Date().toISOString(),
-      source: n8nResponse ? 'n8n_ai' : 'fallback_simulation'
-    }));
-
-    // ====================== SIMPAN DAN LANJUTKAN ======================
-    // 9. Hentikan timer
-    clearInterval(progressInterval);
-    
-    // 10. Simpan data ke sessionStorage
-    sessionStorage.setItem("skinqu_products", JSON.stringify(productsWithMeta));
-    sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
-    sessionStorage.setItem("skinqu_session_id", sessionId);
-    sessionStorage.setItem("skinqu_scan_category", requestData.category);
-    
-    // Tambahkan log untuk debug
-    console.log("💾 Data disimpan ke sessionStorage:", {
-      sessionId,
-      productCount: productsWithMeta.length,
-      source: productsWithMeta[0]?.source
-    });
-
-    // 11. Update UI bahwa proses selesai
-    updateLoadingStep(4, "✅ Analisis selesai! Mengarahkan...");
-    
-    // Tampilkan konfirmasi sukses
-    const loadingText = document.querySelector('.loading-text');
-    const loadingSubtext = document.querySelector('.loading-subtext');
-    
-    if (loadingText) loadingText.textContent = "Analisis Berhasil!";
-    if (loadingSubtext) {
-      const sourceMsg = n8nResponse ? "dari AI n8n" : "dari sistem (n8n timeout)";
-      loadingSubtext.textContent = `Ditemukan ${productsWithMeta.length} produk ${sourceMsg}`;
-    }
-    
-    await new Promise(r => setTimeout(r, 1500));
-
-    // 12. Redirect ke halaman produk dengan parameter
-    window.location.href = `product.html?fromScan=true&session=${sessionId}&source=${productsWithMeta[0]?.source}`;
-
-  } catch (err) {
-    console.error("❌ Scan error:", err);
-    
-    // Hentikan timer
-    if (progressInterval) clearInterval(progressInterval);
-    
-    // Tentukan pesan error yang lebih spesifik
-    let errorMessage = "Gagal memproses analisis AI. ";
-    let errorDetail = "";
-    
-    if (err.name === 'AbortError') {
-      errorMessage = "Waktu koneksi ke server habis. ";
-      errorDetail = "Server AI membutuhkan waktu lebih lama dari yang diharapkan.";
-    } else if (err.message.includes('network') || err.message.includes('fetch')) {
-      errorMessage = "Masalah jaringan. ";
-      errorDetail = "Pastikan koneksi internet stabil dan coba lagi.";
-    } else if (err.message.includes('tidak ada produk')) {
-      errorMessage = "Tidak ada produk yang cocok. ";
-      errorDetail = "Coba dengan kategori produk yang berbeda.";
-    } else {
-      errorDetail = err.message || "Terjadi kesalahan tidak terduga.";
-    }
-    
-    // Tampilkan error di UI dengan detail
-    const loadingText = document.querySelector('.loading-text');
-    const loadingSubtext = document.querySelector('.loading-subtext');
-    
-    if (loadingText) loadingText.textContent = "⚠️ Proses Gagal";
-    if (loadingSubtext) loadingSubtext.textContent = `${errorMessage}${errorDetail}`;
-    
-    // Tambahkan tombol coba lagi
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const retryBtn = document.createElement('button');
-    retryBtn.innerHTML = "🔄 Coba Scan Ulang";
-    retryBtn.style.cssText = `
-      margin-top: 20px;
-      padding: 12px 24px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 15px;
-    `;
-    retryBtn.onclick = () => {
-      loadingOverlay.style.display = "none";
-      scanBtn.disabled = false;
-      isProcessing = false;
-      retryBtn.remove();
-    };
-    
-    loadingOverlay.appendChild(retryBtn);
-    
-    // Auto reset setelah 10 detik
-    setTimeout(() => {
-      if (loadingOverlay.contains(retryBtn)) {
-        loadingOverlay.removeChild(retryBtn);
+      // 4. Validasi respons sesuai format n8n Anda
+      if (!Array.isArray(products)) {
+        throw new Error('Format respons AI tidak valid');
       }
-      loadingOverlay.style.display = "none";
-      scanBtn.disabled = false;
-      isProcessing = false;
-    }, 10000);
-    
-    // Reset step descriptions
-    updateLoadingStep(1, "Mengambil gambar wajah");
-    document.querySelectorAll('.step-text').forEach((el, idx) => {
-      const texts = ["Mengambil gambar wajah", "Mengirim ke server AI", 
-                    "Analisis karakteristik kulit", "Menyiapkan rekomendasi"];
-      if (idx < texts.length) el.textContent = texts[idx];
-    });
+
+      // 5. Simpan data ke sessionStorage
+      sessionStorage.setItem("skinqu_products", JSON.stringify(products));
+      sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
+      
+      console.log(`💾 ${products.length} produk disimpan`);
+
+      // 6. Tampilkan sukses dan redirect
+      updateLoadingStep(4, "✅ Analisis selesai!");
+      
+      document.querySelector('.loading-text').textContent = "Rekomendasi Siap!";
+      document.querySelector('.loading-subtext').textContent = 
+        `Ditemukan ${products.length} produk untuk kulit Anda`;
+      
+      // Tunggu 2 detik agar user melihat hasil
+      await new Promise(r => setTimeout(r, 2000));
+
+      // 7. Redirect ke halaman produk
+      window.location.href = "product.html";
+
+    } catch (err) {
+      console.error("❌ Error:", err);
+      
+      // Hentikan semua interval
+      const intervals = window.setInterval(() => {});
+      for (let i = 0; i < intervals; i++) {
+        window.clearInterval(i);
+      }
+      
+      let errorMessage = "Gagal memproses analisis AI.";
+      
+      if (err.name === 'AbortError') {
+        errorMessage = "Proses AI terlalu lama (timeout 45 detik).";
+      } else if (err.message.includes('Server error')) {
+        errorMessage = `Server AI error: ${err.message}`;
+      } else if (err.message.includes('Format respons')) {
+        errorMessage = "AI mengembalikan data tidak valid.";
+      }
+      
+      document.querySelector('.loading-text').textContent = "⚠️ Gagal";
+      document.querySelector('.loading-subtext').textContent = errorMessage;
+      
+      // Reset UI setelah 3 detik
+      setTimeout(() => {
+        loadingOverlay.style.display = "none";
+        scanBtn.disabled = false;
+        isProcessing = false;
+        
+        // Reset semua step
+        updateLoadingStep(1, "Mengambil gambar wajah");
+        const defaultTexts = [
+          "Mengambil gambar wajah",
+          "Mengirim ke server AI", 
+          "Analisis karakteristik kulit", 
+          "Menyiapkan rekomendasi"
+        ];
+        
+        document.querySelectorAll('.step-text').forEach((el, idx) => {
+          if (idx < defaultTexts.length) el.textContent = defaultTexts[idx];
+        });
+        
+        document.querySelector('.loading-text').textContent = "Memproses analisis wajah";
+        document.querySelector('.loading-subtext').textContent = 
+          "AI kami sedang menganalisis kulit dan mencari produk terbaik untuk Anda";
+      }, 3000);
+    }
   }
-}
 
   // 🎯 Events
   scanBtn.addEventListener('click', scanWajah);
@@ -922,7 +690,6 @@ async function scanWajah() {
       scanBtn.disabled = false;
       isProcessing = false;
       loadingOverlay.style.display = "none";
-      if (progressInterval) clearInterval(progressInterval);
     }
   });
 </script>
