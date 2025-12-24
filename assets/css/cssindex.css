@@ -69,6 +69,7 @@ body {
   background: linear-gradient(135deg, #447DCE, #5E8FE0);
   padding: 22px 0 26px;
   overflow: hidden;
+  position: relative;
 }
 
 /* =========================
@@ -79,14 +80,14 @@ body {
   display: flex;
   gap: 18px;
 
-  /* ✅ Force center secara visual */
-  scroll-snap-type: x mandatory;
-  scroll-snap-stop: always; /* pastikan tidak skip banner */
+  /* ✅ FORCE CENTER DENGAN SCROLL-SNAP */
+  scroll-snap-type: x mandatory !important;
+  scroll-snap-stop: always !important; /* pastikan tidak skip banner */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch; /* smooth inertia di iOS */
 
   /* 🔥 INI YANG MEMASTIKAN BANNER AKTIF DI TENGAH VIEWPORT */
-  scroll-padding: 0 min(15vw, 60px); /* responsive: di HP ~36px, desktop 15vw */
+  scroll-padding: 0 min(15vw, 60px) !important; /* responsive: di HP ~36px, desktop 15vw */
 
   /* Hindari overflow horizontal dari parent */
   overflow-x: auto;
@@ -94,7 +95,11 @@ body {
 
   /* Sembunyikan scrollbar */
   scrollbar-width: none;
+  
+  /* Prevent text selection during drag */
+  user-select: none;
 }
+
 .banner-track::-webkit-scrollbar {
   display: none;
 }
@@ -108,7 +113,7 @@ body {
 }
 
 /* =========================
-   BANNER CARD
+   BANNER CARD - DENGAN SNAP ALIGNMENT
 ========================= */
 .banner {
   min-width: 300px;
@@ -120,8 +125,9 @@ body {
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
 
-  /* ✅ Wajib: snap alignment */
-  scroll-snap-align: center;
+  /* ✅ WAJIB: SNAP ALIGNMENT UNTUK CENTERING */
+  scroll-snap-align: center !important;
+  scroll-snap-stop: always !important;
 
   /* Non-active state */
   transform: scale(0.88);
@@ -138,7 +144,7 @@ body {
   opacity: 0.75;
 }
 
-/* Active banner (tengah) */
+/* Active banner (tengah) - SESUAI DENGAN JS */
 .banner.is-active {
   transform: scale(1);
   opacity: 1;
@@ -155,6 +161,7 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: 1;
+  pointer-events: none; /* Prevent image dragging */
 }
 
 .banner::after {
@@ -177,6 +184,7 @@ body {
   z-index: 3;
   padding: 26px;
   color: #ffffff;
+  pointer-events: none; /* Allow clicking through to banner */
 }
 
 .banner-content h2 {
@@ -201,6 +209,8 @@ body {
   justify-content: center;
   gap: 8px;
   margin-top: 14px;
+  z-index: 10;
+  position: relative;
 }
 
 .banner-dots span {
@@ -209,6 +219,7 @@ body {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.45);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
 }
 
 .banner-dots span.active {
@@ -217,6 +228,18 @@ body {
   border-radius: 6px;
   background: #ffffff;
   transform: scale(1.1);
+}
+
+/* =========================
+   DRAGGING STATE
+========================= */
+.banner-track.dragging {
+  cursor: grabbing !important;
+  scroll-snap-type: none !important; /* Disable snap while dragging */
+}
+
+.banner-track:active {
+  cursor: grabbing;
 }
 
 /* =========================
@@ -229,7 +252,7 @@ body {
 
   .banner-track {
     gap: 14px;
-    scroll-padding: 0 min(12vw, 44px); /* lebih ketat di HP */
+    scroll-padding: 0 44px !important; /* TETAPKAN 44px UNTUK CENTERING */
   }
 
   .banner {
@@ -259,13 +282,36 @@ body {
 ========================= */
 @media (max-width: 768px) and (min-width: 481px) {
   .banner-track {
-    scroll-padding: 0 50px;
+    scroll-padding: 0 50px !important;
   }
 
   .banner {
     min-width: 320px;
     height: 180px;
   }
+}
+
+/* =========================
+   RESPONSIVE — TABLET & DESKTOP
+========================= */
+@media (min-width: 769px) {
+  .banner-track {
+    scroll-padding: 0 60px !important; /* FIXED PADDING UNTUK CENTERING */
+  }
+}
+
+/* =========================
+   LOADING STATE (Optional)
+========================= */
+.banner.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ===== SECTION TITLE ===== */
