@@ -44,17 +44,14 @@
 </div>
 
 <script>
-// =======================
-// SUPABASE CONFIG
-// =======================
+// TIDAK PERLU SUPABASE CLIENT DI SINI!
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
-// =======================
 const MAX = 6;
 const grid = document.getElementById("productGrid");
 
-// SKELETON (FIXED HEIGHT)
+// SKELETON
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
@@ -66,14 +63,13 @@ for (let i = 0; i < MAX; i++) {
   `;
 }
 
-// FETCH SUPABASE
+// FETCH DATA LANGSUNG - TANPA BUAT CLIENT
 fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
   headers: {
-    apikey: SUPABASE_ANON_KEY,
-    Authorization: "Bearer " + SUPABASE_ANON_KEY
+    apikey: SUPABASE_KEY,
+    Authorization: "Bearer " + SUPABASE_KEY
   }
 })
-
 .then(res => res.json())
 .then(data => {
   grid.innerHTML = "";

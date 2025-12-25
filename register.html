@@ -303,266 +303,307 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // INIT SUPABASE
-    const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================
+// SUPABASE INIT - PAKAI NAMA UNIK
+// ============================================
+const supabaseAuth = supabase.createClient(
+  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
+);
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ============================================
+// ELEMENTS
+// ============================================
+const submitBtn = document.getElementById('submitBtn');
+const successModal = document.getElementById('successModal');
+const modalEmail = document.getElementById('modalEmail');
+const modalEmail2 = document.getElementById('modalEmail2');
+const modalName = document.getElementById('modalName');
+const modalUserId = document.getElementById('modalUserId');
+const modalDate = document.getElementById('modalDate');
+const countdownNumber = document.getElementById('countdownNumber');
+const goToLoginBtn = document.getElementById('goToLoginBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
 
-    // ELEMENTS
-    const submitBtn = document.getElementById('submitBtn');
-    const successModal = document.getElementById('successModal');
-    const modalEmail = document.getElementById('modalEmail');
-    const modalEmail2 = document.getElementById('modalEmail2');
-    const modalName = document.getElementById('modalName');
-    const modalUserId = document.getElementById('modalUserId');
-    const modalDate = document.getElementById('modalDate');
-    const countdownNumber = document.getElementById('countdownNumber');
-    const goToLoginBtn = document.getElementById('goToLoginBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+// ============================================
+// TOGGLE PASSWORD VISIBILITY
+// ============================================
+document.querySelectorAll('.toggle-password').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const input = this.previousElementSibling;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁️' : '🙈';
+  });
+});
 
-    // TOGGLE PASSWORD
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const input = this.previousElementSibling;
-        input.type = input.type === 'password' ? 'text' : 'password';
-        this.textContent = input.type === 'password' ? '👁️' : '🙈';
-      });
+// ============================================
+// SHOW SUCCESS MODAL FUNCTION
+// ============================================
+function showSuccessModal(email, name, userId) {
+  if (!successModal || !modalEmail || !modalName) return;
+  
+  modalEmail.textContent = email;
+  if (modalEmail2) modalEmail2.textContent = email;
+  modalName.textContent = name;
+  if (modalUserId) modalUserId.textContent = userId.substring(0, 8) + '...';
+  if (modalDate) {
+    modalDate.textContent = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
+  successModal.style.display = 'flex';
+  
+  // COUNTDOWN TIMER
+  let countdown = 10;
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    if (countdownNumber) countdownNumber.textContent = countdown;
+    
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
+    }
+  }, 1000);
+  
+  // BUTTON ACTIONS
+  if (goToLoginBtn) {
+    goToLoginBtn.onclick = function() {
+      clearInterval(countdownInterval);
+      window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
+    };
+  }
+  
+  if (closeModalBtn) {
+    closeModalBtn.onclick = function() {
+      clearInterval(countdownInterval);
+      successModal.style.display = 'none';
+      window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
+    };
+  }
+}
+
+// ============================================
+// REGISTER FORM SUBMISSION
+// ============================================
+document.getElementById("registerForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  
+  // GET FORM VALUES
+  const name = this.name.value.trim();
+  const email = this.email.value.trim();
+  const password = this.password.value;
+  const confirm = this.confirm_password.value;
+
+  // VALIDATION
+  if (!name || !email || !password || !confirm) {
+    alert("❌ Semua field wajib diisi");
+    return;
+  }
+  if (password.length < 8) {
+    alert("❌ Password minimal 8 karakter");
+    return;
+  }
+  if (password !== confirm) {
+    alert("❌ Konfirmasi password tidak cocok");
+    return;
+  }
+
+  // LOADING STATE
+  const originalText = submitBtn.textContent;
+  submitBtn.innerHTML = '<span class="spinner"></span>Mendaftarkan...';
+  submitBtn.disabled = true;
+
+  try {
+    console.log("=== START REGISTRATION ===");
+    
+    // 1. SIGN UP TO AUTH
+    console.log("1. Creating user account...");
+    const { data: authData, error: authError } = await supabaseAuth.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          email: email
+        }
+      }
     });
 
-    // SHOW SUCCESS MODAL
-    function showSuccessModal(email, name, userId) {
-      modalEmail.textContent = email;
-      modalEmail2.textContent = email;
-      modalName.textContent = name;
-      modalUserId.textContent = userId.substring(0, 8) + '...';
-      modalDate.textContent = new Date().toLocaleDateString('id-ID', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      
-      successModal.style.display = 'flex';
-      
-      // Start countdown
-      let countdown = 10;
-      const countdownInterval = setInterval(() => {
-        countdown--;
-        countdownNumber.textContent = countdown;
-        
-        if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
-        }
-      }, 1000);
-      
-      // Button event listeners
-      goToLoginBtn.onclick = function() {
-        clearInterval(countdownInterval);
-        window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
-      };
-      
-      closeModalBtn.onclick = function() {
-        clearInterval(countdownInterval);
-        successModal.style.display = 'none';
-        window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
-      };
+    if (authError) {
+      console.error("Auth Error:", authError);
+      throw new Error(authError.message);
     }
 
-    // REGISTER FORM
-    document.getElementById("registerForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      
-      const name = this.name.value.trim();
-      const email = this.email.value.trim();
-      const password = this.password.value;
-      const confirm = this.confirm_password.value;
+    console.log("2. Auth successful!");
+    
+    if (!authData.user) {
+      throw new Error("User tidak terbuat");
+    }
 
-      // VALIDASI
-      if (!name || !email || !password || !confirm) {
-        alert("❌ Semua field wajib diisi");
-        return;
-      }
-      if (password.length < 8) {
-        alert("❌ Password minimal 8 karakter");
-        return;
-      }
-      if (password !== confirm) {
-        alert("❌ Konfirmasi password tidak cocok");
-        return;
-      }
-
-      // LOADING STATE
-      const originalText = submitBtn.textContent;
-      submitBtn.innerHTML = '<span class="spinner"></span>Mendaftarkan...';
-      submitBtn.disabled = true;
-
-      try {
-        console.log("=== MEMULAI REGISTRASI ===");
-        
-        // 1. SIGN UP
-        console.log("1. Melakukan signUp...");
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: name,
-              email: email
-            },
-            emailRedirectTo: window.location.origin + '/login.html'
-          }
-        });
-
-        if (authError) {
-          console.error("Auth Error:", authError);
-          throw new Error(`Auth: ${authError.message}`);
-        }
-
-        console.log("2. SignUp berhasil, User ID:", authData.user?.id);
-        
-        if (!authData.user) {
-          throw new Error("User tidak terbuat");
-        }
-
-        const userId = authData.user.id;
-        
-        // 2. INSERT PROFILE (dengan retry mechanism)
-        console.log("3. Menyimpan ke tabel profiles...");
-        
-        let profileSaved = false;
-        let retryCount = 0;
-        const maxRetries = 2;
-        
-        while (!profileSaved && retryCount < maxRetries) {
-          try {
-            console.log(`   Percobaan ke-${retryCount + 1}...`);
-            
-            const { data: profileResult, error: profileError } = await supabase
-              .from("profiles")
-              .insert([
-                {
-                  id: userId,
-                  nama: name,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                }
-              ])
-              .select()
-              .single();
-            
-            if (profileError) {
-              console.warn(`   Percobaan ${retryCount + 1} gagal:`, profileError.message);
-              
-              // Coba update jika sudah ada
-              const { error: updateError } = await supabase
-                .from("profiles")
-                .update({ 
-                  nama: name,
-                  updated_at: new Date().toISOString()
-                })
-                .eq("id", userId);
-                
-              if (!updateError) {
-                console.log("   ✅ Berhasil update existing profile");
-                profileSaved = true;
-                break;
-              }
-              
-              retryCount++;
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            } else {
-              console.log("   ✅ Profile berhasil disimpan:", profileResult);
-              profileSaved = true;
-              break;
-            }
-          } catch (retryError) {
-            console.error("   Error dalam retry:", retryError);
-            retryCount++;
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        }
-        
-        if (!profileSaved) {
-          console.warn("   ⚠️ Gagal menyimpan profile, simpan ke localStorage");
-          localStorage.setItem('pending_profile_sync', JSON.stringify({
-            user_id: userId,
+    const userId = authData.user.id;
+    console.log("User ID:", userId);
+    
+    // 2. SAVE TO PROFILES TABLE
+    console.log("3. Saving to profiles table...");
+    
+    try {
+      const { data: profileData, error: profileError } = await supabaseAuth
+        .from("profiles")
+        .insert([
+          {
+            id: userId,
             nama: name,
-            email: email,
-            timestamp: new Date().toISOString()
-          }));
-        }
-
-        // 3. TAMPILKAN MODAL SUKSES
-        console.log("🎉 REGISTRASI BERHASIL!");
-        showSuccessModal(email, name, userId);
-
-      } catch (error) {
-        console.error("💥 ERROR REGISTRASI:", error);
-        
-        // Reset button
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-        // Error messages
-        let errorMessage = "Registrasi gagal: ";
-        
-        if (error.message.includes("already registered") || error.message.includes("duplicate")) {
-          errorMessage = "❌ Email sudah terdaftar! Silakan gunakan email lain.";
-        } else if (error.message.includes("profiles")) {
-          errorMessage = "⚠️ Sistem sedang dalam perbaikan. Silakan coba lagi nanti.";
-        } else if (error.message.includes("auth")) {
-          errorMessage = "❌ Error autentikasi: " + error.message;
-        } else {
-          errorMessage += error.message;
-        }
-        
-        alert(errorMessage);
-      }
-    });
-
-    // SINCRONISASI PENDING PROFILE
-    async function syncPendingProfile() {
-      const pending = localStorage.getItem('pending_profile_sync');
-      if (pending) {
-        try {
-          const profileData = JSON.parse(pending);
-          console.log("🔄 Mencoba sinkronisasi pending profile...");
-          
-          const { data, error } = await supabase
-            .from("profiles")
-            .upsert({
-              id: profileData.user_id,
-              nama: profileData.nama,
-              updated_at: new Date().toISOString()
-            }, {
-              onConflict: 'id'
-            });
-            
-          if (!error) {
-            console.log("✅ Pending profile berhasil disinkronisasi");
-            localStorage.removeItem('pending_profile_sync');
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           }
-        } catch (e) {
-          console.error("Error sinkronisasi:", e);
+        ])
+        .select()
+        .single();
+
+      if (profileError) {
+        console.warn("Profile insert warning:", profileError.message);
+        // Try update if already exists
+        const { error: updateError } = await supabaseAuth
+          .from("profiles")
+          .update({ 
+            nama: name,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", userId);
+          
+        if (updateError) {
+          console.warn("Update also failed:", updateError.message);
+        } else {
+          console.log("✅ Profile updated successfully");
         }
+      } else {
+        console.log("✅ Profile saved successfully:", profileData);
       }
+    } catch (profileErr) {
+      console.warn("Profile save issue:", profileErr.message);
+      // Continue anyway - profile can be created later
     }
 
-    // INIT
-    document.addEventListener('DOMContentLoaded', function() {
-      syncPendingProfile();
+    // 3. SHOW SUCCESS MESSAGE
+    console.log("🎉 REGISTRATION COMPLETE!");
+    showSuccessModal(email, name, userId);
+
+  } catch (error) {
+    console.error("💥 REGISTRATION ERROR:", error);
+    
+    // RESET BUTTON
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+    
+    // USER-FRIENDLY ERROR MESSAGES
+    let errorMessage = "Registrasi gagal: ";
+    
+    if (error.message.includes("already registered") || 
+        error.message.includes("duplicate") ||
+        error.message.includes("already exists")) {
+      errorMessage = "❌ Email sudah terdaftar! Silakan gunakan email lain atau lupa password.";
+    } else if (error.message.includes("profiles")) {
+      errorMessage = "⚠️ Sistem sedang dalam perbaikan. Akun Anda sudah dibuat, silakan login.";
+    } else if (error.message.includes("auth")) {
+      errorMessage = "❌ Error sistem: " + error.message;
+    } else {
+      errorMessage += error.message;
+    }
+    
+    alert(errorMessage);
+  }
+});
+
+// ============================================
+// SYNC PENDING PROFILES
+// ============================================
+async function syncPendingProfile() {
+  const pending = localStorage.getItem('pending_profile_sync');
+  if (pending) {
+    try {
+      const profileData = JSON.parse(pending);
+      console.log("🔄 Syncing pending profile...");
       
-      // Check if redirected from login with message
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('message')) {
-        alert(decodeURIComponent(urlParams.get('message')));
+      const { data, error } = await supabaseAuth
+        .from("profiles")
+        .upsert({
+          id: profileData.user_id,
+          nama: profileData.nama,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        });
+        
+      if (!error) {
+        console.log("✅ Pending profile synced");
+        localStorage.removeItem('pending_profile_sync');
       }
-    });
-  </script>
+    } catch (e) {
+      console.error("Sync error:", e);
+    }
+  }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("📄 Register page loaded");
+  
+  // Sync any pending profiles
+  syncPendingProfile();
+  
+  // Check for URL messages
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('message')) {
+    const message = decodeURIComponent(urlParams.get('message'));
+    alert("ℹ️ " + message);
+  }
+  
+  // Add spinner CSS
+  if (!document.querySelector('#spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'spinner-style';
+    style.textContent = `
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+});
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+function validatePassword(password) {
+  return password.length >= 8;
+}
+</script>
 </body>
 </html>
