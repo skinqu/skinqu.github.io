@@ -96,132 +96,138 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // INIT SUPABASE
-const supabase = supabase.createClient(
-  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
-);
-
-// TOGGLE PASSWORD
-document.querySelectorAll('.toggle-password').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const input = this.previousElementSibling;
-    input.type = input.type === 'password' ? 'text' : 'password';
-    this.textContent = input.type === 'password' ? '👁️' : '🙈';
-  });
-});
-
-// REGISTER FORM
+  // REGISTER FORM
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
   e.preventDefault();
+  e.stopPropagation();
 
   const name = this.name.value.trim();
   const email = this.email.value.trim();
   const password = this.password.value;
   const confirm = this.confirm_password.value;
 
-  // VALIDASI
+  // VALIDASI (sama seperti sebelumnya)
   if (!name || !email || !password || !confirm) {
-    alert("Semua field wajib diisi");
+    alert("❌ Semua field wajib diisi");
     return;
   }
-
   if (password.length < 8) {
-    alert("Password minimal 8 karakter");
+    alert("❌ Password minimal 8 karakter");
     return;
   }
-
   if (password !== confirm) {
-    alert("Konfirmasi password tidak cocok");
+    alert("❌ Konfirmasi password tidak cocok");
     return;
   }
 
-  // TAMPILKAN LOADING
+  // LOADING
   const submitBtn = this.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;
-  submitBtn.textContent = "Mendaftarkan...";
+  submitBtn.textContent = "⏳ Mendaftarkan...";
   submitBtn.disabled = true;
 
   try {
-    console.log("1. Memulai registrasi untuk:", email);
-    
-    // REGISTER KE SUPABASE AUTH
-    const { data, error } = await supabase.auth.signUp({
+    console.log("🚀 Memulai registrasi...");
+
+    // ========== 1. SIGN UP ==========
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          name: name
+          full_name: name,
+          email: email
         }
       }
     });
 
-    if (error) {
-      console.error("Error signUp:", error);
-      throw error;
+    if (authError) {
+      console.error("Auth Error:", authError);
+      throw new Error(`Auth Error: ${authError.message}`);
     }
 
-    console.log("2. Auth berhasil, user:", data.user?.id);
-
-    // JIKA USER BERHASIL DIBUAT
-    if (data.user) {
-      // CEK DULU APAKAH PROFILE SUDAH ADA (optional)
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", data.user.id)
-        .single();
-
-      if (!existingProfile) {
-        // INSERT PROFILE BARU
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert({
-            id: data.user.id,
-            nama: name,
-            email: email  // tambahkan email ke profile jika perlu
-          });
-
-        if (profileError) {
-          console.error("Error insert profile:", profileError);
-          
-          // Coba alternatif: update jika sudah ada
-          const { error: updateError } = await supabase
-            .from("profiles")
-            .update({ nama: name })
-            .eq("id", data.user.id);
-            
-          if (updateError) {
-            console.error("Error update profile:", updateError);
-            throw new Error("Gagal menyimpan profil: " + profileError.message);
-          }
-        }
-        
-        console.log("3. Profile berhasil disimpan");
-      } else {
-        console.log("3. Profile sudah ada, tidak perlu insert");
-      }
+    if (!authData.user) {
+      throw new Error("User tidak terbuat");
     }
 
-    // BERHASIL
-    alert("Registrasi berhasil! 🎉\nSilakan cek email Anda untuk verifikasi.");
+    const userId = authData.user.id;
+    console.log("✅ Auth berhasil! User ID:", userId);
+
+    // ========== 2. INSERT PROFILE ==========
+    console.log("🔄 Menyimpan profile...");
     
-    // Redirect setelah 2 detik
+    // Tunggu sebentar sebelum insert (kadang perlu delay)
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          id: userId,
+          nama: name,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ])
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error("❌ Profile Error:", profileError);
+      
+      // Coba alternatif: Update jika sudah ada
+      console.log("🔄 Coba update profile...");
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ 
+          nama: name,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", userId);
+      
+      if (updateError) {
+        console.error("❌ Update juga gagal:", updateError);
+        
+        // SIMPAN DI LOCALSTORAGE SEBAGAI BACKUP
+        localStorage.setItem('pending_profile', JSON.stringify({
+          id: userId,
+          nama: name,
+          email: email,
+          created_at: new Date().toISOString()
+        }));
+        
+        console.warn("⚠️ Profile disimpan di localStorage sebagai backup");
+      }
+    } else {
+      console.log("✅ Profile berhasil disimpan:", profileData);
+    }
+
+    // ========== 3. SUKSES ==========
+    console.log("🎉 Registrasi selesai!");
+    
+    alert(`✅ Registrasi berhasil!\n\n📧 Email: ${email}\n👤 Nama: ${name}\n\nSilakan cek email untuk verifikasi.`);
+    
     setTimeout(() => {
-      window.location.href = "login.html";
+      window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
     }, 2000);
 
   } catch (error) {
-    console.error("Full error:", error);
+    console.error("💥 ERROR:", error);
     
-    // TAMPILKAN ERROR YANG LEBIH SPESIFIK
+    // ERROR MESSAGE YANG LEBIH BAik
+    let userMessage = "Registrasi gagal: ";
+    
     if (error.message.includes("duplicate key")) {
-      alert("Email sudah terdaftar. Silakan gunakan email lain.");
+      userMessage = "Email sudah terdaftar!";
     } else if (error.message.includes("profiles")) {
-      alert("Gagal menyimpan profil. Pastikan tabel 'profiles' sudah dibuat di Supabase.");
+      userMessage = "Error database. Hubungi administrator.";
+    } else if (error.message.includes("auth")) {
+      userMessage = "Error autentikasi: " + error.message;
     } else {
-      alert("Registrasi gagal: " + error.message);
+      userMessage = error.message;
     }
+    
+    alert("❌ " + userMessage);
     
     // RESET BUTTON
     submitBtn.textContent = originalText;
