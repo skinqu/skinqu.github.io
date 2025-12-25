@@ -96,17 +96,31 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // REGISTER FORM
+  // INIT SUPABASE
+const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// TOGGLE PASSWORD
+document.querySelectorAll('.toggle-password').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const input = this.previousElementSibling;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.textContent = input.type === 'password' ? '👁️' : '🙈';
+  });
+});
+
+// REGISTER FORM
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-  e.stopPropagation();
-
+  
   const name = this.name.value.trim();
   const email = this.email.value.trim();
   const password = this.password.value;
   const confirm = this.confirm_password.value;
 
-  // VALIDASI (sama seperti sebelumnya)
+  // VALIDASI
   if (!name || !email || !password || !confirm) {
     alert("❌ Semua field wajib diisi");
     return;
@@ -120,120 +134,201 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     return;
   }
 
-  // LOADING
+  // LOADING STATE
   const submitBtn = this.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;
   submitBtn.textContent = "⏳ Mendaftarkan...";
   submitBtn.disabled = true;
 
   try {
-    console.log("🚀 Memulai registrasi...");
-
-    // ========== 1. SIGN UP ==========
+    console.log("=== REGISTRASI DIMULAI ===");
+    
+    // ========== METODE 1: SIGNUP DENGAN AUTO-LOGIN ==========
+    console.log("1. Melakukan signUp...");
+    
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: name,
-          email: email
+          full_name: name
         }
       }
     });
 
     if (authError) {
       console.error("Auth Error:", authError);
-      throw new Error(`Auth Error: ${authError.message}`);
+      throw new Error(`Auth: ${authError.message}`);
     }
 
+    console.log("2. SignUp berhasil, User ID:", authData.user?.id);
+    
     if (!authData.user) {
       throw new Error("User tidak terbuat");
     }
 
     const userId = authData.user.id;
-    console.log("✅ Auth berhasil! User ID:", userId);
-
-    // ========== 2. INSERT PROFILE ==========
-    console.log("🔄 Menyimpan profile...");
     
-    // Tunggu sebentar sebelum insert (kadang perlu delay)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // ========== TRICK: LOGIN DULU UNTUK DAPAT SESSION ==========
+    console.log("3. Melakukan login untuk mendapatkan session...");
+    
+    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .insert([
-        {
-          id: userId,
-          nama: name,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ])
-      .select()
-      .single();
-
-    if (profileError) {
-      console.error("❌ Profile Error:", profileError);
-      
-      // Coba alternatif: Update jika sudah ada
-      console.log("🔄 Coba update profile...");
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ 
-          nama: name,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", userId);
-      
-      if (updateError) {
-        console.error("❌ Update juga gagal:", updateError);
-        
-        // SIMPAN DI LOCALSTORAGE SEBAGAI BACKUP
-        localStorage.setItem('pending_profile', JSON.stringify({
-          id: userId,
-          nama: name,
-          email: email,
-          created_at: new Date().toISOString()
-        }));
-        
-        console.warn("⚠️ Profile disimpan di localStorage sebagai backup");
-      }
+    if (loginError) {
+      console.warn("Login otomatis gagal (mungkin butuh verifikasi):", loginError);
+      // Lanjutkan saja, mungkin user perlu verifikasi email dulu
     } else {
-      console.log("✅ Profile berhasil disimpan:", profileData);
+      console.log("4. Login berhasil, session aktif");
     }
 
-    // ========== 3. SUKSES ==========
-    console.log("🎉 Registrasi selesai!");
+    // ========== INSERT KE PROFILES ==========
+    console.log("5. Menyimpan ke tabel profiles...");
     
-    alert(`✅ Registrasi berhasil!\n\n📧 Email: ${email}\n👤 Nama: ${name}\n\nSilakan cek email untuk verifikasi.`);
+    // Tunggu sebentar untuk memastikan user ready
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
+    // Coba dengan RETRY mechanism
+    let profileSaved = false;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (!profileSaved && retryCount < maxRetries) {
+      try {
+        console.log(`   Percobaan ke-${retryCount + 1}...`);
+        
+        const { data: profileResult, error: profileError } = await supabase
+          .from("profiles")
+          .insert([
+            {
+              id: userId,
+              nama: name,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+        
+        if (profileError) {
+          console.warn(`   Percobaan ${retryCount + 1} gagal:`, profileError.message);
+          
+          if (profileError.message.includes("violates row-level security policy")) {
+            console.log("   RLS Policy error, coba dengan method alternatif...");
+            
+            // Alternatif: Update jika sudah ada (mungkin terbuat otomatis)
+            const { error: updateError } = await supabase
+              .from("profiles")
+              .update({ 
+                nama: name,
+                updated_at: new Date().toISOString()
+              })
+              .eq("id", userId);
+              
+            if (!updateError) {
+              console.log("   ✅ Berhasil update existing profile");
+              profileSaved = true;
+              break;
+            }
+          }
+          
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik
+        } else {
+          console.log("   ✅ Profile berhasil disimpan:", profileResult);
+          profileSaved = true;
+          break;
+        }
+      } catch (retryError) {
+        console.error("   Error dalam retry:", retryError);
+        retryCount++;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    
+    if (!profileSaved) {
+      console.warn("   ⚠️ Gagal menyimpan profile setelah beberapa percobaan");
+      console.log("   Menyimpan data ke localStorage untuk sinkronisasi nanti...");
+      
+      localStorage.setItem('pending_profile_sync', JSON.stringify({
+        user_id: userId,
+        nama: name,
+        email: email,
+        timestamp: new Date().toISOString()
+      }));
+    }
+
+    // ========== SUKSES ==========
+    console.log("🎉 PROSES REGISTRASI SELESAI!");
+    
+    // Tampilkan pesan sukses
+    alert(`✅ Registrasi berhasil!\n\n📧 Email: ${email}\n👤 Nama: ${name}\n\nSilakan cek email Anda untuk verifikasi akun.`);
+    
+    // Logout untuk keamanan (karena kita login otomatis tadi)
+    await supabase.auth.signOut();
+    
+    // Redirect ke login
     setTimeout(() => {
       window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
-    }, 2000);
+    }, 3000);
 
   } catch (error) {
-    console.error("💥 ERROR:", error);
+    console.error("💥 ERROR REGISTRASI:", error);
     
-    // ERROR MESSAGE YANG LEBIH BAik
-    let userMessage = "Registrasi gagal: ";
-    
-    if (error.message.includes("duplicate key")) {
-      userMessage = "Email sudah terdaftar!";
-    } else if (error.message.includes("profiles")) {
-      userMessage = "Error database. Hubungi administrator.";
-    } else if (error.message.includes("auth")) {
-      userMessage = "Error autentikasi: " + error.message;
-    } else {
-      userMessage = error.message;
-    }
-    
-    alert("❌ " + userMessage);
-    
-    // RESET BUTTON
+    // Reset button
     submitBtn.textContent = originalText;
     submitBtn.disabled = false;
+    
+    // Tampilkan error yang user-friendly
+    let errorMessage = "Registrasi gagal: ";
+    
+    if (error.message.includes("User already registered")) {
+      errorMessage = "Email sudah terdaftar!";
+    } else if (error.message.includes("duplicate key")) {
+      errorMessage = "Email sudah terdaftar!";
+    } else if (error.message.includes("profiles")) {
+      errorMessage = "Error sistem. Silakan coba lagi nanti.";
+    } else {
+      errorMessage += error.message;
+    }
+    
+    alert("❌ " + errorMessage);
   }
 });
+
+// Fungsi untuk sinkronisasi profile jika ada di localStorage
+async function syncPendingProfile() {
+  const pending = localStorage.getItem('pending_profile_sync');
+  if (pending) {
+    try {
+      const profileData = JSON.parse(pending);
+      console.log("🔄 Mencoba sinkronisasi pending profile...", profileData);
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: profileData.user_id,
+          nama: profileData.nama,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        })
+        .select();
+        
+      if (!error) {
+        console.log("✅ Pending profile berhasil disinkronisasi");
+        localStorage.removeItem('pending_profile_sync');
+      }
+    } catch (e) {
+      console.error("Error sinkronisasi:", e);
+    }
+  }
+}
+
+// Cek dan sinkron saat page load
+document.addEventListener('DOMContentLoaded', syncPendingProfile);
 </script>
 
 </body>
