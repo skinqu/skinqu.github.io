@@ -93,42 +93,81 @@
     </div>
   </div>
 
-  <script>
-    // Toggle password
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const input = this.previousElementSibling;
-        const type = input.type === 'password' ? 'text' : 'password';
-        input.type = type;
-        this.textContent = type === 'password' ? '👁️' : '🙈';
-      });
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // INIT SUPABASE
+  const supabase = supabase.createClient(
+    "https://bnawrgrhmvkyzkixlbkc.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
+  );
+
+  // TOGGLE PASSWORD
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const input = this.previousElementSibling;
+      input.type = input.type === 'password' ? 'text' : 'password';
+      this.textContent = input.type === 'password' ? '👁️' : '🙈';
+    });
+  });
+
+  // REGISTER FORM
+  document.getElementById("registerForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = this.name.value.trim();
+    const email = this.email.value.trim();
+    const password = this.password.value;
+    const confirm = this.confirm_password.value;
+
+    if (!name || !email || !password || !confirm) {
+      alert("Semua field wajib diisi");
+      return;
+    }
+
+    if (password.length < 8) {
+      alert("Password minimal 8 karakter");
+      return;
+    }
+
+    if (password !== confirm) {
+      alert("Konfirmasi password tidak cocok");
+      return;
+    }
+
+    // REGISTER KE SUPABASE AUTH
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
     });
 
-    // Register validation
-    document.getElementById('registerForm').addEventListener('submit', function (e) {
-      e.preventDefault();
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-      const password = this.password.value;
-      const confirm = this.confirm_password.value;
+    // SIMPAN PROFILE USER
+    const user = data.user;
 
-      if (password.length < 8) {
-        alert('Kata sandi minimal 8 karakter.');
+    if (user) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          nama: name
+        });
+
+      if (profileError) {
+        console.error(profileError);
+        alert("Gagal menyimpan profil");
         return;
       }
+    }
 
-      if (password !== confirm) {
-        alert('Konfirmasi kata sandi tidak cocok.');
-        return;
-      }
+    alert("Registrasi berhasil! Silakan cek email untuk verifikasi.");
+    window.location.href = "login.html";
+  });
+</script>
 
-      console.log('Register data:', {
-        name: this.name.value,
-        email: this.email.value,
-        password
-      });
-
-      // 🔜 Kirim ke backend
-    });
-  </script>
 </body>
 </html>
