@@ -78,32 +78,310 @@
     </div>
   </div>
 
-  <script>
-    // Toggle password visibility
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const input = this.previousElementSibling;
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        this.textContent = type === 'password' ? '👁️' : '🙈';
-      });
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================
+// SUPABASE INIT - PAKAI NAMA UNIK
+// ============================================
+const supabaseAuth = supabase.createClient(
+  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
+);
+
+// ============================================
+// ELEMENTS
+// ============================================
+const submitBtn = document.querySelector('.btn-primary');
+const loginForm = document.getElementById('loginForm');
+
+// ============================================
+// TOGGLE PASSWORD VISIBILITY
+// ============================================
+document.querySelectorAll('.toggle-password').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const input = this.previousElementSibling;
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+    this.textContent = type === 'password' ? '👁️' : '🙈';
+  });
+});
+
+// ============================================
+// CHECK URL PARAMS FOR REGISTRATION SUCCESS
+// ============================================
+function checkURLParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  if (urlParams.get('registered') === 'true') {
+    const email = urlParams.get('email');
+    const message = email 
+      ? `🎉 Registrasi berhasil! Akun dengan email ${decodeURIComponent(email)} telah dibuat. Silakan masuk.`
+      : '🎉 Registrasi berhasil! Silakan masuk dengan akun Anda.';
+    
+    // Tampilkan toast notification
+    showToast(message, 'success');
+    
+    // Clear URL params tanpa reload
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  
+  if (urlParams.get('verified') === 'true') {
+    showToast('✅ Email Anda telah berhasil diverifikasi! Silakan masuk.', 'success');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+
+// ============================================
+// SHOW TOAST NOTIFICATION
+// ============================================
+function showToast(message, type = 'info') {
+  // Hapus toast sebelumnya jika ada
+  const existingToast = document.querySelector('.toast-notification');
+  if (existingToast) existingToast.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = `toast-notification toast-${type}`;
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 20px;">${type === 'success' ? '✅' : '⚠️'}</span>
+      <div>${message}</div>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Animasi masuk
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  }, 10);
+  
+  // Auto remove setelah 5 detik
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, 5000);
+}
+
+// ============================================
+// LOGIN FORM SUBMISSION
+// ============================================
+loginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const email = this.email.value.trim();
+  const password = this.password.value;
+  
+  // VALIDATION
+  if (!email || !password) {
+    showToast('Harap isi email dan kata sandi.', 'error');
+    return;
+  }
+  
+  if (!validateEmail(email)) {
+    showToast('Format email tidak valid.', 'error');
+    return;
+  }
+  
+  if (password.length < 8) {
+    showToast('Password minimal 8 karakter.', 'error');
+    return;
+  }
+  
+  // LOADING STATE
+  const originalText = submitBtn.textContent;
+  submitBtn.innerHTML = '<span class="spinner"></span>Memproses...';
+  submitBtn.disabled = true;
+  
+  try {
+    console.log("=== LOGIN ATTEMPT ===");
+    console.log("Email:", email);
+    
+    // 1. ATTEMPT LOGIN
+    const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
+      email,
+      password
     });
-
-    // Form validation & submit (placeholder)
-    document.getElementById('loginForm')?.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = this.email.value.trim();
-      const password = this.password.value;
-
-      if (!email || !password) {
-        alert('Harap isi email dan kata sandi.');
-        return;
+    
+    if (authError) {
+      console.error("Login Error:", authError);
+      
+      // Check specific error types
+      if (authError.message.includes('Invalid login credentials')) {
+        throw new Error('Email atau password salah.');
+      } else if (authError.message.includes('Email not confirmed')) {
+        throw new Error('Email belum diverifikasi. Silakan cek inbox email Anda.');
+      } else if (authError.message.includes('rate limit')) {
+        throw new Error('Terlalu banyak percobaan login. Silakan coba lagi nanti.');
+      } else {
+        throw new Error(authError.message);
       }
+    }
+    
+    console.log("✅ Login successful!");
+    console.log("User:", authData.user);
+    
+    // 2. GET USER PROFILE
+    const userId = authData.user.id;
+    const { data: profileData, error: profileError } = await supabaseAuth
+      .from('profiles')
+      .select('nama')
+      .eq('id', userId)
+      .single();
+    
+    if (profileError) {
+      console.warn("Profile fetch warning:", profileError.message);
+    } else {
+      console.log("User profile:", profileData);
+      
+      // Save user info to localStorage/session
+      localStorage.setItem('user_name', profileData.nama || email.split('@')[0]);
+      localStorage.setItem('user_email', email);
+    }
+    
+    // 3. REDIRECT TO DASHBOARD/HOME
+    showToast('✅ Login berhasil! Mengalihkan...', 'success');
+    
+    setTimeout(() => {
+      window.location.href = 'index.html'; // Ganti dengan halaman tujuan
+    }, 1500);
+    
+  } catch (error) {
+    console.error("💥 LOGIN ERROR:", error);
+    
+    // RESET BUTTON
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+    
+    // SHOW ERROR TO USER
+    showToast(`❌ ${error.message}`, 'error');
+  }
+});
 
-      // 🔜 Kirim ke backend / API di sini
-      console.log('Login attempt:', { email, password });
-      // Contoh: fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+// ============================================
+// FORGOT PASSWORD HANDLER
+// ============================================
+document.querySelector('.forgot-link')?.addEventListener('click', async function(e) {
+  e.preventDefault();
+  
+  const email = prompt('Masukkan email Anda untuk reset password:');
+  if (!email) return;
+  
+  if (!validateEmail(email)) {
+    showToast('Format email tidak valid.', 'error');
+    return;
+  }
+  
+  try {
+    const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password.html`
     });
-  </script>
+    
+    if (error) {
+      throw error;
+    }
+    
+    showToast(`✅ Link reset password telah dikirim ke ${email}. Silakan cek inbox Anda.`, 'success');
+  } catch (error) {
+    console.error("Reset password error:", error);
+    showToast(`❌ Gagal mengirim email reset: ${error.message}`, 'error');
+  }
+});
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+// ============================================
+// AUTO FILL FROM URL PARAMS
+// ============================================
+function autoFillFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+  
+  if (email && document.getElementById('email')) {
+    document.getElementById('email').value = decodeURIComponent(email);
+  }
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("📄 Login page loaded");
+  
+  // Check for success messages from registration
+  checkURLParams();
+  
+  // Auto fill email from URL
+  autoFillFromURL();
+  
+  // Add spinner CSS
+  if (!document.querySelector('#spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'spinner-style';
+    style.textContent = `
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        color: #333;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        max-width: 400px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        border-left: 4px solid #4361ee;
+      }
+      
+      .toast-success {
+        border-left-color: #4CAF50;
+      }
+      
+      .toast-error {
+        border-left-color: #f44336;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+});
+
+// ============================================
+// SOCIAL LOGIN PLACEHOLDER
+// ============================================
+document.querySelectorAll('.btn-social').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const provider = this.classList.contains('btn-google') ? 'Google' : 'Facebook';
+    showToast(`⚠️ Login dengan ${provider} sedang dalam pengembangan.`, 'info');
+  });
+});
+</script>
 </body>
 </html>
