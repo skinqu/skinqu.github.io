@@ -4,8 +4,165 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daftar — SkinCare.id</title>
-  <link rel="stylesheet" href="/assets/css/resgister.css" />
+  <link rel="stylesheet" href="/assets/css/register.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* MODAL SUCCESS STYLES */
+    .success-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .success-modal {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.4s ease;
+      position: relative;
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite alternate;
+    }
+
+    .success-title {
+      color: #4CAF50;
+      font-size: 28px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .success-details {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: left;
+    }
+
+    .detail-item {
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .detail-icon {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .countdown-text {
+      color: #666;
+      font-size: 14px;
+      margin-top: 25px;
+    }
+
+    .countdown-number {
+      display: inline-block;
+      background: #4361ee;
+      color: white;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      animation: pulse 1s infinite;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+    }
+
+    .btn-modal-primary {
+      background: linear-gradient(135deg, #4361ee, #3a56d4);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .btn-modal-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .btn-modal-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-modal-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* LOADING SPINNER */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
@@ -71,7 +228,9 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-primary">Daftar</button>
+        <button type="submit" class="btn-primary" id="submitBtn">
+          Daftar
+        </button>
       </form>
 
       <div class="divider">
@@ -93,243 +252,317 @@
     </div>
   </div>
 
+  <!-- SUCCESS MODAL -->
+  <div id="successModal" class="success-modal-overlay">
+    <div class="success-modal">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">Registrasi Berhasil!</h2>
+      
+      <div class="success-details">
+        <div class="detail-item">
+          <span class="detail-icon">📧</span>
+          <strong>Email:</strong> <span id="modalEmail"></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">👤</span>
+          <strong>Nama:</strong> <span id="modalName"></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">🆔</span>
+          <strong>User ID:</strong> <span id="modalUserId"></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">📅</span>
+          <strong>Tanggal:</strong> <span id="modalDate"></span>
+        </div>
+      </div>
+
+      <p style="color: #4361ee; font-weight: 500; margin: 20px 0;">
+        ✅ Akun Anda telah berhasil dibuat!
+      </p>
+      
+      <p style="color: #666; font-size: 15px; line-height: 1.5;">
+        Kami telah mengirimkan email verifikasi ke <strong id="modalEmail2"></strong>. 
+        Silakan cek inbox Anda dan klik link verifikasi untuk mengaktifkan akun.
+      </p>
+
+      <p class="countdown-text">
+        Halaman akan redirect otomatis dalam 
+        <span class="countdown-number" id="countdownNumber">10</span> detik...
+      </p>
+
+      <div class="modal-buttons">
+        <button class="btn-modal-primary" id="goToLoginBtn">
+          🚀 Masuk Sekarang
+        </button>
+        <button class="btn-modal-secondary" id="closeModalBtn">
+          ✋ Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // INIT SUPABASE
+    const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
-<script>
-  // INIT SUPABASE
-const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ELEMENTS
+    const submitBtn = document.getElementById('submitBtn');
+    const successModal = document.getElementById('successModal');
+    const modalEmail = document.getElementById('modalEmail');
+    const modalEmail2 = document.getElementById('modalEmail2');
+    const modalName = document.getElementById('modalName');
+    const modalUserId = document.getElementById('modalUserId');
+    const modalDate = document.getElementById('modalDate');
+    const countdownNumber = document.getElementById('countdownNumber');
+    const goToLoginBtn = document.getElementById('goToLoginBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
 
-// TOGGLE PASSWORD
-document.querySelectorAll('.toggle-password').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const input = this.previousElementSibling;
-    input.type = input.type === 'password' ? 'text' : 'password';
-    this.textContent = input.type === 'password' ? '👁️' : '🙈';
-  });
-});
+    // TOGGLE PASSWORD
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const input = this.previousElementSibling;
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.textContent = input.type === 'password' ? '👁️' : '🙈';
+      });
+    });
 
-// REGISTER FORM
-document.getElementById("registerForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  
-  const name = this.name.value.trim();
-  const email = this.email.value.trim();
-  const password = this.password.value;
-  const confirm = this.confirm_password.value;
-
-  // VALIDASI
-  if (!name || !email || !password || !confirm) {
-    alert("❌ Semua field wajib diisi");
-    return;
-  }
-  if (password.length < 8) {
-    alert("❌ Password minimal 8 karakter");
-    return;
-  }
-  if (password !== confirm) {
-    alert("❌ Konfirmasi password tidak cocok");
-    return;
-  }
-
-  // LOADING STATE
-  const submitBtn = this.querySelector('button[type="submit"]');
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = "⏳ Mendaftarkan...";
-  submitBtn.disabled = true;
-
-  try {
-    console.log("=== REGISTRASI DIMULAI ===");
-    
-    // ========== METODE 1: SIGNUP DENGAN AUTO-LOGIN ==========
-    console.log("1. Melakukan signUp...");
-    
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name
+    // SHOW SUCCESS MODAL
+    function showSuccessModal(email, name, userId) {
+      modalEmail.textContent = email;
+      modalEmail2.textContent = email;
+      modalName.textContent = name;
+      modalUserId.textContent = userId.substring(0, 8) + '...';
+      modalDate.textContent = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      successModal.style.display = 'flex';
+      
+      // Start countdown
+      let countdown = 10;
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        countdownNumber.textContent = countdown;
+        
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
         }
+      }, 1000);
+      
+      // Button event listeners
+      goToLoginBtn.onclick = function() {
+        clearInterval(countdownInterval);
+        window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
+      };
+      
+      closeModalBtn.onclick = function() {
+        clearInterval(countdownInterval);
+        successModal.style.display = 'none';
+        window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
+      };
+    }
+
+    // REGISTER FORM
+    document.getElementById("registerForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      
+      const name = this.name.value.trim();
+      const email = this.email.value.trim();
+      const password = this.password.value;
+      const confirm = this.confirm_password.value;
+
+      // VALIDASI
+      if (!name || !email || !password || !confirm) {
+        alert("❌ Semua field wajib diisi");
+        return;
       }
-    });
+      if (password.length < 8) {
+        alert("❌ Password minimal 8 karakter");
+        return;
+      }
+      if (password !== confirm) {
+        alert("❌ Konfirmasi password tidak cocok");
+        return;
+      }
 
-    if (authError) {
-      console.error("Auth Error:", authError);
-      throw new Error(`Auth: ${authError.message}`);
-    }
+      // LOADING STATE
+      const originalText = submitBtn.textContent;
+      submitBtn.innerHTML = '<span class="spinner"></span>Mendaftarkan...';
+      submitBtn.disabled = true;
 
-    console.log("2. SignUp berhasil, User ID:", authData.user?.id);
-    
-    if (!authData.user) {
-      throw new Error("User tidak terbuat");
-    }
-
-    const userId = authData.user.id;
-    
-    // ========== TRICK: LOGIN DULU UNTUK DAPAT SESSION ==========
-    console.log("3. Melakukan login untuk mendapatkan session...");
-    
-    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (loginError) {
-      console.warn("Login otomatis gagal (mungkin butuh verifikasi):", loginError);
-      // Lanjutkan saja, mungkin user perlu verifikasi email dulu
-    } else {
-      console.log("4. Login berhasil, session aktif");
-    }
-
-    // ========== INSERT KE PROFILES ==========
-    console.log("5. Menyimpan ke tabel profiles...");
-    
-    // Tunggu sebentar untuk memastikan user ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Coba dengan RETRY mechanism
-    let profileSaved = false;
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (!profileSaved && retryCount < maxRetries) {
       try {
-        console.log(`   Percobaan ke-${retryCount + 1}...`);
+        console.log("=== MEMULAI REGISTRASI ===");
         
-        const { data: profileResult, error: profileError } = await supabase
-          .from("profiles")
-          .insert([
-            {
-              id: userId,
-              nama: name,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ])
-          .select()
-          .single();
+        // 1. SIGN UP
+        console.log("1. Melakukan signUp...");
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+              email: email
+            },
+            emailRedirectTo: window.location.origin + '/login.html'
+          }
+        });
+
+        if (authError) {
+          console.error("Auth Error:", authError);
+          throw new Error(`Auth: ${authError.message}`);
+        }
+
+        console.log("2. SignUp berhasil, User ID:", authData.user?.id);
         
-        if (profileError) {
-          console.warn(`   Percobaan ${retryCount + 1} gagal:`, profileError.message);
-          
-          if (profileError.message.includes("violates row-level security policy")) {
-            console.log("   RLS Policy error, coba dengan method alternatif...");
+        if (!authData.user) {
+          throw new Error("User tidak terbuat");
+        }
+
+        const userId = authData.user.id;
+        
+        // 2. INSERT PROFILE (dengan retry mechanism)
+        console.log("3. Menyimpan ke tabel profiles...");
+        
+        let profileSaved = false;
+        let retryCount = 0;
+        const maxRetries = 2;
+        
+        while (!profileSaved && retryCount < maxRetries) {
+          try {
+            console.log(`   Percobaan ke-${retryCount + 1}...`);
             
-            // Alternatif: Update jika sudah ada (mungkin terbuat otomatis)
-            const { error: updateError } = await supabase
+            const { data: profileResult, error: profileError } = await supabase
               .from("profiles")
-              .update({ 
-                nama: name,
-                updated_at: new Date().toISOString()
-              })
-              .eq("id", userId);
+              .insert([
+                {
+                  id: userId,
+                  nama: name,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                }
+              ])
+              .select()
+              .single();
+            
+            if (profileError) {
+              console.warn(`   Percobaan ${retryCount + 1} gagal:`, profileError.message);
               
-            if (!updateError) {
-              console.log("   ✅ Berhasil update existing profile");
+              // Coba update jika sudah ada
+              const { error: updateError } = await supabase
+                .from("profiles")
+                .update({ 
+                  nama: name,
+                  updated_at: new Date().toISOString()
+                })
+                .eq("id", userId);
+                
+              if (!updateError) {
+                console.log("   ✅ Berhasil update existing profile");
+                profileSaved = true;
+                break;
+              }
+              
+              retryCount++;
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            } else {
+              console.log("   ✅ Profile berhasil disimpan:", profileResult);
               profileSaved = true;
               break;
             }
+          } catch (retryError) {
+            console.error("   Error dalam retry:", retryError);
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-          
-          retryCount++;
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik
-        } else {
-          console.log("   ✅ Profile berhasil disimpan:", profileResult);
-          profileSaved = true;
-          break;
         }
-      } catch (retryError) {
-        console.error("   Error dalam retry:", retryError);
-        retryCount++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
-    
-    if (!profileSaved) {
-      console.warn("   ⚠️ Gagal menyimpan profile setelah beberapa percobaan");
-      console.log("   Menyimpan data ke localStorage untuk sinkronisasi nanti...");
-      
-      localStorage.setItem('pending_profile_sync', JSON.stringify({
-        user_id: userId,
-        nama: name,
-        email: email,
-        timestamp: new Date().toISOString()
-      }));
-    }
-
-    // ========== SUKSES ==========
-    console.log("🎉 PROSES REGISTRASI SELESAI!");
-    
-    // Tampilkan pesan sukses
-    alert(`✅ Registrasi berhasil!\n\n📧 Email: ${email}\n👤 Nama: ${name}\n\nSilakan cek email Anda untuk verifikasi akun.`);
-    
-    // Logout untuk keamanan (karena kita login otomatis tadi)
-    await supabase.auth.signOut();
-    
-    // Redirect ke login
-    setTimeout(() => {
-      window.location.href = "login.html?registered=true&email=" + encodeURIComponent(email);
-    }, 3000);
-
-  } catch (error) {
-    console.error("💥 ERROR REGISTRASI:", error);
-    
-    // Reset button
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
-    
-    // Tampilkan error yang user-friendly
-    let errorMessage = "Registrasi gagal: ";
-    
-    if (error.message.includes("User already registered")) {
-      errorMessage = "Email sudah terdaftar!";
-    } else if (error.message.includes("duplicate key")) {
-      errorMessage = "Email sudah terdaftar!";
-    } else if (error.message.includes("profiles")) {
-      errorMessage = "Error sistem. Silakan coba lagi nanti.";
-    } else {
-      errorMessage += error.message;
-    }
-    
-    alert("❌ " + errorMessage);
-  }
-});
-
-// Fungsi untuk sinkronisasi profile jika ada di localStorage
-async function syncPendingProfile() {
-  const pending = localStorage.getItem('pending_profile_sync');
-  if (pending) {
-    try {
-      const profileData = JSON.parse(pending);
-      console.log("🔄 Mencoba sinkronisasi pending profile...", profileData);
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .upsert({
-          id: profileData.user_id,
-          nama: profileData.nama,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id'
-        })
-        .select();
         
-      if (!error) {
-        console.log("✅ Pending profile berhasil disinkronisasi");
-        localStorage.removeItem('pending_profile_sync');
+        if (!profileSaved) {
+          console.warn("   ⚠️ Gagal menyimpan profile, simpan ke localStorage");
+          localStorage.setItem('pending_profile_sync', JSON.stringify({
+            user_id: userId,
+            nama: name,
+            email: email,
+            timestamp: new Date().toISOString()
+          }));
+        }
+
+        // 3. TAMPILKAN MODAL SUKSES
+        console.log("🎉 REGISTRASI BERHASIL!");
+        showSuccessModal(email, name, userId);
+
+      } catch (error) {
+        console.error("💥 ERROR REGISTRASI:", error);
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // Error messages
+        let errorMessage = "Registrasi gagal: ";
+        
+        if (error.message.includes("already registered") || error.message.includes("duplicate")) {
+          errorMessage = "❌ Email sudah terdaftar! Silakan gunakan email lain.";
+        } else if (error.message.includes("profiles")) {
+          errorMessage = "⚠️ Sistem sedang dalam perbaikan. Silakan coba lagi nanti.";
+        } else if (error.message.includes("auth")) {
+          errorMessage = "❌ Error autentikasi: " + error.message;
+        } else {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
       }
-    } catch (e) {
-      console.error("Error sinkronisasi:", e);
+    });
+
+    // SINCRONISASI PENDING PROFILE
+    async function syncPendingProfile() {
+      const pending = localStorage.getItem('pending_profile_sync');
+      if (pending) {
+        try {
+          const profileData = JSON.parse(pending);
+          console.log("🔄 Mencoba sinkronisasi pending profile...");
+          
+          const { data, error } = await supabase
+            .from("profiles")
+            .upsert({
+              id: profileData.user_id,
+              nama: profileData.nama,
+              updated_at: new Date().toISOString()
+            }, {
+              onConflict: 'id'
+            });
+            
+          if (!error) {
+            console.log("✅ Pending profile berhasil disinkronisasi");
+            localStorage.removeItem('pending_profile_sync');
+          }
+        } catch (e) {
+          console.error("Error sinkronisasi:", e);
+        }
+      }
     }
-  }
-}
 
-// Cek dan sinkron saat page load
-document.addEventListener('DOMContentLoaded', syncPendingProfile);
-</script>
-
+    // INIT
+    document.addEventListener('DOMContentLoaded', function() {
+      syncPendingProfile();
+      
+      // Check if redirected from login with message
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('message')) {
+        alert(decodeURIComponent(urlParams.get('message')));
+      }
+    });
+  </script>
 </body>
 </html>
