@@ -4,149 +4,103 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile | SkinQu</title>
+  <link rel="stylesheet" href="assets/css/profile.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- CSS utama -->
-  <link rel="stylesheet" href="assets/css/cssindex.css">
-
-  <!-- CSS khusus profile -->
-  <style>
-    .profile-container {
-      padding: 24px 20px 120px;
-    }
-
-    .profile-card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    }
-
-    .profile-avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      background: #447DCE;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 14px;
-      color: #fff;
-      font-size: 36px;
-      font-weight: 600;
-    }
-
-    .profile-name {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .profile-email {
-      font-size: 13px;
-      color: #777;
-    }
-
-    .profile-section {
-      margin-top: 24px;
-      text-align: left;
-    }
-
-    .profile-section h4 {
-      font-size: 14px;
-      margin-bottom: 12px;
-      color: #333;
-    }
-
-    .profile-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-    }
-
-    .profile-item span {
-      color: #666;
-    }
-
-    .logout-btn {
-      margin-top: 28px;
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      background: #447DCE;
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .logout-btn:hover {
-      opacity: 0.9;
-    }
-  </style>
+  <!-- CSS -->
+  
 </head>
 
 <body>
 
-  <!-- CONTENT -->
-  <div class="profile-container">
+<div class="profile-container">
 
-    <div class="profile-card">
-      <div class="profile-avatar">KA</div>
-      <div class="profile-name">KAJI ALMA</div>
-      <div class="profile-email">Alma@skinqu.dev</div>
-    </div>
-
-    <div class="profile-section">
-      <h4>Personal Info</h4>
-
-      <div class="profile-item">
-        <div>Gender</div>
-        <span>Perempuan</span>
-      </div>
-
-      <div class="profile-item">
-        <div>Age</div>
-        <span>23 Tahun</span>
-      </div>
-
-      <div class="profile-item">
-        <div>Skin Type</div>
-        <span>Berminyak & Berjerawat</span>
-      </div>
-    </div>
-
-    <button class="logout-btn">Logout</button>
-
+  <div class="profile-card">
+    <div class="profile-avatar" id="avatar">U</div>
+    <div class="profile-name" id="username">Loading...</div>
+    <div class="profile-email" id="email">Loading...</div>
   </div>
 
-  <!-- BOTTOM NAVBAR -->
-  <div class="bottom-nav">
+  <div class="profile-section">
+    <h4>Personal Info</h4>
 
-    <div class="nav-item" data-page="index.html">
-      <img src="assets/img/home.png" alt="Home">
+    <div class="profile-item">
+      <div>Gender</div>
+      <span id="gender">-</span>
     </div>
 
-    <div class="nav-item search-wrapper" data-page="scanwajah.html">
-      <a href="scanwajah.html" class="search-icon">
-        <img src="assets/img/scanwajah.png" alt="Search">
-      </a>
+    <div class="profile-item">
+      <div>Age</div>
+      <span id="age">-</span>
     </div>
-
-    <div class="nav-item" data-page="favorite.html">
-      <img src="assets/img/heart.png" alt="Favorite">
-    </div>
-
-    <div class="nav-item active" data-page="profile.html">
-      <img src="assets/img/user.png" alt="Profile">
-    </div>
-
   </div>
 
-  <!-- JS NAV ACTIVE -->
-  <script src="assets/js/nav-active.js"></script>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="location.href='index.html'">
+    <img src="assets/img/home.png">
+  </div>
+
+  <div class="nav-item" onclick="location.href='scanwajah.html'">
+    <img src="assets/img/scanwajah.png">
+  </div>
+
+  <div class="nav-item" onclick="location.href='favorite.html'">
+    <img src="assets/img/heart.png">
+  </div>
+
+  <div class="nav-item active">
+    <img src="assets/img/user.png">
+  </div>
+</div>
+
+<script>
+  // 🔐 SUPABASE CONFIG
+  const supabaseUrl = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function loadProfile() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    document.getElementById("username").innerText =
+      user.user_metadata?.full_name || "User";
+
+    document.getElementById("email").innerText = user.email;
+    document.getElementById("avatar").innerText =
+      (user.user_metadata?.full_name || "U")[0].toUpperCase();
+
+    // Ambil data dari table profiles
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profile) {
+      document.getElementById("gender").innerText = profile.gender || "-";
+      document.getElementById("age").innerText = profile.age ? profile.age + " Tahun" : "-";
+    }
+  }
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+  });
+
+  loadProfile();
+</script>
 
 </body>
 </html>
