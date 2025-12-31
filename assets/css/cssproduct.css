@@ -59,16 +59,14 @@ body {
 .product-card {
   background: #ffffff;
   border-radius: 14px;
-  padding: 12px;
+  padding: 8px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 
-  /* 🔒 Tetap pakai height: 260px seperti permintaan */
   height: 260px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  /* ❌ MATIKAN SEMUA ANIMASI */
   transition: none !important;
   transform: none !important;
 }
@@ -88,35 +86,35 @@ body {
   border-radius: 10px;
 }
 
-/* ✅ NAMA PRODUK: 2 BARIS, TIDAK TERPOTONG */
+/* ===== TEXT ===== */
 .product-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.4;
-  min-height: 38px; /* minimal tinggi 1 baris */
-  max-height: 56px; /* maksimal 2 baris (14 × 1.4 × 2 ≈ 39.2 → dibulatkan 56px aman) */
+  line-height: 1.35;
+  min-height: 28px;
+  max-height: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* batasi maksimal 2 baris */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  margin: 4px 0 2px 0;
 }
 
-/* Harga lebih ringkas */
 .product-price {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  margin: 4px 0;
+  margin: 0 0 4px 0;
 }
 
-/* Tombol tetap kompak */
+/* ===== BUTTON ===== */
 .buy-btn {
   background: #447DCE;
-  color: #fff;
+  color: #fff; /* ✅ TEKS PUTIH */
   border: none;
   padding: 8px 0;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 14px; /* 🔺 DIPERBESAR — INI YANG ANDA MAU! */
   font-weight: 600;
   cursor: pointer;
   width: 100%;
@@ -142,8 +140,13 @@ body {
   z-index: 9999;
 }
 
+/* supaya konten tidak ketutup navbar */
+body {
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
 /* =========================
-   NAV ITEM
+   NAV ITEM (SEMUA SAMA)
 ========================= */
 
 .bottom-nav .nav-item {
@@ -157,6 +160,7 @@ body {
   transition: all 0.25s ease;
 }
 
+/* ICON */
 .bottom-nav .nav-item img {
   width: 24px;
   height: 24px;
@@ -164,6 +168,10 @@ body {
   opacity: 0.75;
   transition: all 0.25s ease;
 }
+
+/* =========================
+   HOVER (SEMUA)
+========================= */
 
 .bottom-nav .nav-item:hover {
   background: rgba(68,125,206,0.08);
@@ -174,17 +182,25 @@ body {
   transform: scale(1.1);
 }
 
+/* =========================
+   CLICK / TAP
+========================= */
+
 .bottom-nav .nav-item:active {
   transform: scale(0.92);
   background: rgba(68,125,206,0.15);
 }
 
-/* SEARCH */
+/* =========================
+   SEARCH (TENGAH, SAMA)
+========================= */
+
 .search-wrapper {
   position: relative;
   top: -6px;
 }
 
+/* search tidak punya style sendiri */
 .search-icon {
   width: 46px;
   height: 46px;
@@ -192,10 +208,12 @@ body {
   align-items: center;
   justify-content: center;
   background: transparent;
+  box-shadow: none;
   border-radius: 14px;
   transition: all 0.25s ease;
 }
 
+/* ICON SEARCH */
 .search-icon img {
   width: 24px;
   height: 24px;
@@ -203,6 +221,7 @@ body {
   transition: all 0.25s ease;
 }
 
+/* search ikut hover nav-item */
 .bottom-nav .nav-item:hover .search-icon {
   background: rgba(68,125,206,0.08);
 }
@@ -216,6 +235,10 @@ body {
   transform: scale(0.92);
   background: rgba(68,125,206,0.15);
 }
+
+/* =========================
+   ACTIVE (DARI JS)
+========================= */
 
 .bottom-nav .nav-item.active {
   background: rgba(68,125,206,0.12);
