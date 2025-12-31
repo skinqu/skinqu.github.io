@@ -82,8 +82,8 @@ body {
 /* ===== IMAGE (FIXED SIZE) ===== */
 .product-card img {
   width: 100%;
-  height: 130px;
-  object-fit: contain;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   background: #f1f1f1;
   border-radius: 10px;
 }
