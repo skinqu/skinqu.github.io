@@ -4,21 +4,26 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
   background: #F4F8FA;
   padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== TOPBAR ===== */
 .topbar {
-  padding: 15px 20px;
-  font-size: 20px;
+  padding: 15px 16px;
+  font-size: clamp(18px, 4vw, 22px);
   font-weight: 600;
   background: #ffffff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .back-btn {
@@ -27,48 +32,69 @@ body {
   border: none;
   padding: 8px 14px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: clamp(12px, 2.5vw, 14px);
   font-weight: 600;
   cursor: pointer;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 /* ===== GRID ===== */
 .product-grid {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 }
 
-@media (max-width: 600px) {
+@media (max-width: 360px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (min-width: 601px) and (max-width: 900px) {
+
+@media (min-width: 481px) and (max-width: 768px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
-@media (min-width: 901px) {
+
+@media (min-width: 769px) and (max-width: 1024px) {
   .product-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* ===== CARD (ANTI KEDUT) ===== */
+@media (min-width: 1025px) {
+  .product-grid {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* ===== CARD ===== */
 .product-card {
   background: #ffffff;
   border-radius: 14px;
   padding: 8px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-
-  height: 260px;
+  height: auto;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
   transition: none !important;
   transform: none !important;
+  break-inside: avoid;
 }
 
 /* ❌ NO HOVER EFFECT */
@@ -78,58 +104,74 @@ body {
 }
 
 /* ===== IMAGE (FIXED RATIO 1:1) ===== */
-.product-card img {
+.product-image-container {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
-  background: #f1f1f1;
+  overflow: hidden;
   border-radius: 10px;
+  background: #f1f1f1;
+}
+
+.product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* ===== TEXT ===== */
 .product-name {
-  font-size: 12px;
+  font-size: clamp(11px, 2.5vw, 13px);
   font-weight: 600;
   line-height: 1.35;
-  min-height: 28px;
+  min-height: 32px;
   max-height: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  margin: 4px 0 2px 0;
+  margin: 8px 0 4px 0;
+  color: #333;
 }
 
 .product-price {
-  font-size: 12px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
+  font-size: clamp(12px, 2.5vw, 14px);
+  font-weight: 700;
+  margin: 4px 0 8px 0;
+  color: #447DCE;
 }
 
 /* ===== BUTTON ===== */
 .buy-btn {
   background: #447DCE;
-  color: #fff; /* ✅ TEKS PUTIH */
+  color: #fff;
   border: none;
-  padding: 8px 0;
+  padding: 10px 0;
   border-radius: 10px;
-  font-size: 14px; /* 🔺 DIPERBESAR — INI YANG ANDA MAU! */
+  font-size: clamp(13px, 3vw, 15px);
   font-weight: 600;
   cursor: pointer;
   width: 100%;
+  transition: background-color 0.2s ease;
+  margin-top: auto;
+}
+
+.buy-btn:active {
+  background-color: #3a6cb5;
+  transform: scale(0.98);
 }
 
 /* =========================
    BOTTOM NAVBAR
 ========================= */
-
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 70px;
+  height: calc(60px + env(safe-area-inset-bottom));
+  min-height: 60px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -140,111 +182,119 @@ body {
   z-index: 9999;
 }
 
-/* supaya konten tidak ketutup navbar */
-body {
-  padding-bottom: calc(70px + env(safe-area-inset-bottom));
-}
-
 /* =========================
-   NAV ITEM (SEMUA SAMA)
+   NAV ITEM
 ========================= */
-
 .bottom-nav .nav-item {
-  width: 46px;
-  height: 46px;
+  flex: 1;
+  max-width: 80px;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 14px;
   transition: all 0.25s ease;
+  position: relative;
 }
 
 /* ICON */
-.bottom-nav .nav-item img {
+.bottom-nav .nav-item .icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
   opacity: 0.75;
   transition: all 0.25s ease;
+  margin-bottom: 4px;
 }
 
-/* =========================
-   HOVER (SEMUA)
-========================= */
-
-.bottom-nav .nav-item:hover {
-  background: rgba(68,125,206,0.08);
-}
-
-.bottom-nav .nav-item:hover img {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* =========================
-   CLICK / TAP
-========================= */
-
-.bottom-nav .nav-item:active {
-  transform: scale(0.92);
-  background: rgba(68,125,206,0.15);
-}
-
-/* =========================
-   SEARCH (TENGAH, SAMA)
-========================= */
-
+/* Search khusus */
 .search-wrapper {
   position: relative;
-  top: -6px;
 }
 
-/* search tidak punya style sendiri */
-.search-icon {
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 14px;
-  transition: all 0.25s ease;
+.search-wrapper .nav-item {
+  top: -10px;
+  background: #447DCE;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  max-width: 56px;
+  box-shadow: 0 4px 12px rgba(68,125,206,0.3);
 }
 
-/* ICON SEARCH */
-.search-icon img {
-  width: 24px;
-  height: 24px;
-  opacity: 0.75;
-  transition: all 0.25s ease;
-}
-
-/* search ikut hover nav-item */
-.bottom-nav .nav-item:hover .search-icon {
-  background: rgba(68,125,206,0.08);
-}
-
-.bottom-nav .nav-item:hover .search-icon img {
+.search-wrapper .nav-item .icon {
+  filter: brightness(0) invert(1);
   opacity: 1;
-  transform: scale(1.1);
-}
-
-.bottom-nav .nav-item:active .search-icon {
-  transform: scale(0.92);
-  background: rgba(68,125,206,0.15);
 }
 
 /* =========================
-   ACTIVE (DARI JS)
+   ACTIVE STATE
 ========================= */
-
 .bottom-nav .nav-item.active {
   background: rgba(68,125,206,0.12);
 }
 
-.bottom-nav .nav-item.active img {
+.bottom-nav .nav-item.active .icon {
   opacity: 1;
   transform: scale(1.1);
+}
+
+/* =========================
+   UTILITY CLASSES
+========================= */
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Touch-friendly sizes */
+@media (max-width: 480px) {
+  .bottom-nav {
+    height: calc(65px + env(safe-area-inset-bottom));
+  }
+  
+  .product-grid {
+    gap: 8px;
+  }
+  
+  .product-card {
+    padding: 6px;
+  }
+}
+
+/* Tablet optimization */
+@media (min-width: 769px) {
+  .product-grid {
+    gap: 20px;
+    padding: 24px;
+  }
+  
+  .product-card {
+    padding: 12px;
+  }
+}
+
+/* Landscape mode */
+@media (orientation: landscape) and (max-height: 500px) {
+  .bottom-nav {
+    height: 55px;
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .product-card {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .bottom-nav {
+    border-top: 0.5px solid rgba(0,0,0,0.1);
+  }
 }
