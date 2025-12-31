@@ -42,34 +42,37 @@ body {
 /* ===== GRID ===== */
 .product-grid {
   display: grid;
-  gap: clamp(10px, 2vw, 16px);
+  gap: clamp(12px, 2vw, 16px);
   padding: clamp(12px, 3vw, 16px);
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
 }
 
 @media (max-width: 360px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 10px;
+    gap: 10px;
+    padding: 12px;
   }
 }
 
 @media (min-width: 361px) and (max-width: 480px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .product-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .product-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
   }
 }
 
@@ -78,17 +81,18 @@ body {
     grid-template-columns: repeat(5, 1fr);
     max-width: 1400px;
     margin: 0 auto;
+    gap: 20px;
   }
 }
 
-/* ===== CARD (ANTI KEDUT) ===== */
+/* ===== CARD ===== */
 .product-card {
   background: #ffffff;
   border-radius: 14px;
-  padding: clamp(6px, 1.5vw, 8px);
+  padding: clamp(8px, 2vw, 12px);
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   height: auto;
-  min-height: 260px;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -110,6 +114,7 @@ body {
   overflow: hidden;
   border-radius: 10px;
   background: #f1f1f1;
+  margin-bottom: 8px;
 }
 
 .product-card img {
@@ -119,48 +124,75 @@ body {
   display: block;
 }
 
-/* ===== TEXT ===== */
+/* ===== TEXT CONTAINER ===== */
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100px;
+}
+
+/* ===== PRODUCT NAME - FIXED ===== */
 .product-name {
-  font-size: clamp(11px, 2.5vw, 12px);
+  font-size: clamp(13px, 2.8vw, 14px);
   font-weight: 600;
-  line-height: 1.35;
-  min-height: 32px;
-  max-height: 56px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
+  color: #333;
+  margin: 0 0 6px 0;
   
-  /* Standard line-clamp property with vendor prefixes */
+  /* PERBAIKAN: Biarkan nama produk wrap natural */
+  display: block;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  min-height: 38px;
+  max-height: none;
+  
+  /* Hapus line-clamp untuk nama produk */
+  -webkit-line-clamp: initial;
+  -moz-line-clamp: initial;
+  line-clamp: initial;
+  -webkit-box-orient: initial;
+  -moz-box-orient: initial;
+  box-orient: initial;
+}
+
+/* ===== PRODUCT BRAND ===== */
+.product-brand {
+  font-size: clamp(11px, 2.2vw, 12px);
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* ===== PRODUCT DESCRIPTION ===== */
+.product-desc {
+  font-size: clamp(10px, 2vw, 11px);
+  color: #777;
+  line-height: 1.3;
+  margin-bottom: 8px;
+  
+  /* Line clamp hanya untuk deskripsi */
   display: -webkit-box;
   display: -moz-box;
   -webkit-line-clamp: 2;
   -moz-line-clamp: 2;
-  line-clamp: 2; /* Standard property */
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   -moz-box-orient: vertical;
-  box-orient: vertical; /* Standard property */
-  
-  margin: 8px 0 4px 0;
-  color: #333;
+  box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 26px;
 }
 
-/* Fallback for browsers that don't support line-clamp */
-@supports not (line-clamp: 2) {
-  .product-name {
-    /* Fallback: Just truncate with ellipsis */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    min-height: auto;
-    max-height: none;
-  }
-}
-
+/* ===== PRODUCT PRICE ===== */
 .product-price {
-  font-size: clamp(12px, 2.5vw, 12px);
+  font-size: clamp(20px, 3vw, 16px);
   font-weight: 700;
-  margin: 4px 0 8px 0;
-  color: #447DCE;
+  margin: 6px 0 10px 0;
+  color: #e7a109;
 }
 
 /* ===== BUTTON ===== */
@@ -168,14 +200,15 @@ body {
   background: #447DCE;
   color: #fff;
   border: none;
-  padding: 10px 0;
+  padding: 12px 0;
   border-radius: 10px;
-  font-size: clamp(13px, 3vw, 14px);
+  font-size: clamp(14px, 3vw, 15px);
   font-weight: 600;
   cursor: pointer;
   width: 100%;
   transition: background-color 0.2s ease;
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .buy-btn:active {
@@ -322,31 +355,28 @@ body {
 /* Optimasi untuk HP kecil (di bawah 360px) */
 @media (max-width: 360px) {
   .product-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 10px;
   }
   
   .product-card {
-    min-height: 240px;
-    padding: 5px;
+    min-height: 260px;
+    padding: 6px;
   }
   
   .product-name {
-    font-size: 10px;
-    min-height: 28px;
-    -webkit-line-clamp: 2;
-    -moz-line-clamp: 2;
-    line-clamp: 2;
+    font-size: 12px;
+    min-height: 34px;
   }
   
   .product-price {
-    font-size: 11px;
+    font-size: 13px;
   }
   
   .buy-btn {
-    padding: 8px 0;
-    font-size: 12px;
+    padding: 10px 0;
+    font-size: 13px;
   }
   
   .bottom-nav {
@@ -354,10 +384,42 @@ body {
   }
 }
 
+/* HP sedang - nama produk lebih lebar */
+@media (min-width: 361px) and (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .product-name {
+    font-size: 13px;
+    min-height: 36px;
+  }
+}
+
+/* Tablet - lebih banyak ruang */
+@media (min-width: 481px) and (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .product-card {
+    min-height: 300px;
+  }
+  
+  .product-name {
+    font-size: 14px;
+    min-height: 40px;
+  }
+}
+
 /* Optimasi untuk tablet landscape */
 @media (orientation: landscape) and (max-height: 600px) {
   .product-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .product-card {
+    min-height: 280px;
   }
   
   .bottom-nav {
@@ -365,24 +427,29 @@ body {
   }
 }
 
-/* Optimasi untuk desktop besar */
+/* Desktop besar */
 @media (min-width: 1200px) {
   .product-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
     padding: 24px;
   }
   
   .product-card {
-    padding: 12px;
-    min-height: 280px;
+    min-height: 320px;
+    padding: 16px;
+  }
+  
+  .product-name {
+    font-size: 15px;
+    min-height: 42px;
   }
 }
 
 /* Touch device optimization */
 @media (hover: none) and (pointer: coarse) {
   .buy-btn {
-    padding: 12px 0;
+    padding: 14px 0;
   }
   
   .product-card {
@@ -408,4 +475,10 @@ body {
   .bottom-nav {
     border-top: 0.5px solid rgba(0,0,0,0.1);
   }
+}
+
+/* Fallback untuk nama produk yang sangat panjang */
+.product-name-long {
+  word-break: break-word;
+  hyphens: auto;
 }
