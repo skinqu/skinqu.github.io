@@ -32,14 +32,6 @@
     </div>
   </div>
 
-  <!-- Tambahan untuk menampilkan data dari tabel profiles -->
-  <div class="profile-section">
-    <h4>Profile Data</h4>
-    <div id="userProfileData" class="profile-data">
-      Loading profile data...
-    </div>
-  </div>
-
   <button class="logout-btn" id="logoutBtn">Logout</button>
 
 </div>
@@ -64,9 +56,8 @@
 <script type="module">
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  // GANTI DENGAN KUNCI SUPABASE ANDA
   const supabaseUrl = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"; // Ganti dengan key Anda
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   async function loadProfile() {
@@ -81,106 +72,52 @@
     const userEmail = user.email;
     const userId = user.id;
     
-    // Tampilkan email user
+    // Tampilkan email user (tetap dari auth)
     document.getElementById("email").innerText = userEmail;
     
     // Set avatar dengan inisial email
     document.getElementById("avatar").innerText = 
       (userEmail || "U")[0].toUpperCase();
 
-    // 🔥 AMBIL DATA DARI TABEL profiles BERDASARKAN USER ID YANG LOGIN
+    // 🔥 AMBIL DATA NAMA DARI TABEL PROFILES BERDASARKAN USER ID
     const { data: profileData, error: profileError } = await supabase
-      .from("profiles") // NAMA TABEL: profiles
-      .select("nama, gender, age, created_at, updated_at") // Kolom yang ada di tabel
+      .from("profiles")
+      .select("nama, gender, age") // Ambil data dari tabel profiles
       .eq("id", userId) // Filter berdasarkan ID user yang login
-      .maybeSingle(); // Ambil satu record jika ada, jika tidak return null
-
-    console.log("Profile Data:", profileData); // Untuk debugging
-    console.log("User ID:", userId); // Untuk debugging
+      .single(); // Ambil satu record
 
     if (profileError) {
       console.error("Error loading profile:", profileError);
-      document.getElementById("userProfileData").innerHTML = 
-        "<div class='error'>Gagal memuat data dari database</div>";
       
-      // Tetap tampilkan username dari email sebagai fallback
-      const username = userEmail.split('@')[0];
-      document.getElementById("username").innerText = username;
+      // JIKA TIDAK ADA DATA DI TABEL PROFILES
+      if (profileError.code === 'PGRST116') {
+        // Tampilkan username dari email sebagai fallback SAJA
+        const username = userEmail.split('@')[0];
+        document.getElementById("username").innerText = username;
+      } else {
+        // Error lainnya
+        document.getElementById("username").innerText = "User";
+      }
       
       return;
     }
 
-    // Jika data ditemukan di tabel profiles
-    if (profileData && profileData.nama) {
-      // Tampilkan nama dari kolom "nama" di tabel profiles
-      document.getElementById("username").innerText = profileData.nama;
+    // JIKA ADA DATA DI TABEL PROFILES
+    if (profileData) {
+      // 1. Tampilkan NAMA dari tabel profiles (bukan dari email!)
+      document.getElementById("username").innerText = profileData.nama || "User";
       
-      // Tampilkan gender dan age jika ada
-      if (profileData.gender) {
-        document.getElementById("gender").innerText = profileData.gender;
-      }
-      
-      if (profileData.age) {
-        document.getElementById("age").innerText = profileData.age;
-      }
-      
-      // Tampilkan informasi lengkap dari database
-      let profileHTML = `
-        <div class="profile-info">
-          <div class="info-row">
-            <strong>Nama Lengkap:</strong> ${profileData.nama}
-          </div>
-          <div class="info-row">
-            <strong>Gender:</strong> ${profileData.gender || "-"}
-          </div>
-          <div class="info-row">
-            <strong>Umur:</strong> ${profileData.age || "-"}
-          </div>
-          <div class="info-row">
-            <strong>Dibuat pada:</strong> ${profileData.created_at ? 
-              new Date(profileData.created_at).toLocaleString('id-ID') : '-'}
-          </div>
-          <div class="info-row">
-            <strong>User ID:</strong> ${userId.substring(0, 8)}...
-          </div>
-        </div>
-      `;
-      
-      document.getElementById("userProfileData").innerHTML = profileHTML;
-    } 
-    // Jika tidak ada data di tabel profiles
-    else {
-      // Gunakan username dari email
-      const username = userEmail.split('@')[0];
-      document.getElementById("username").innerText = username;
-      
-      document.getElementById("userProfileData").innerHTML = `
-        <div class="no-data">
-          Profil Anda belum dilengkapi di database.<br>
-          Silakan lengkapi data profil Anda.
-          <br><br>
-          <button class="btn-update" onclick="updateProfile()">Lengkapi Profil</button>
-        </div>
-      `;
+      // 2. Tampilkan gender dan age dari tabel profiles
+      document.getElementById("gender").innerText = profileData.gender || "-";
+      document.getElementById("age").innerText = profileData.age || "-";
     }
   }
 
-  // Fungsi untuk melengkapi profil (opsional)
-  function updateProfile() {
-    const nama = prompt("Masukkan nama lengkap Anda:");
-    if (nama) {
-      // Di sini Anda bisa menambahkan kode untuk menyimpan ke database
-      alert(`Nama ${nama} akan disimpan. (Fitur penyimpanan perlu diimplementasikan)`);
-    }
-  }
-
-  // Logout function
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
   });
 
-  // Load profile saat halaman dimuat
   loadProfile();
 </script>
 
