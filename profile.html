@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile | SkinQu</title>
-  <link rel="stylesheet" href="assets/css/profile.css">
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- CSS -->
-  
+  <link rel="stylesheet" href="assets/css/profile.css">
 </head>
 
 <body>
@@ -40,29 +36,29 @@
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <div class="bottom-nav">
   <div class="nav-item" onclick="location.href='index.html'">
     <img src="assets/img/home.png">
   </div>
-
   <div class="nav-item" onclick="location.href='scanwajah.html'">
     <img src="assets/img/scanwajah.png">
   </div>
-
   <div class="nav-item" onclick="location.href='favorite.html'">
     <img src="assets/img/heart.png">
   </div>
-
   <div class="nav-item active">
     <img src="assets/img/user.png">
   </div>
 </div>
 
-<script>
+<!-- ✅ SUPABASE MODULE -->
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
   const supabaseUrl = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   async function loadProfile() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -73,32 +69,33 @@
     }
 
     const user = session.user;
-
-    // TAMPILKAN EMAIL & AVATAR DARI AUTH
     document.getElementById("email").innerText = user.email;
     document.getElementById("avatar").innerText =
       (user.email || "U")[0].toUpperCase();
 
-    // =============================
-    // AMBIL DATA NAMA DARI DATABASE
-    // =============================
+    // 🔥 AMBIL SEMUA DATA
     const { data, error } = await supabase
       .from("profiles")
-      .select("nama")
-      .limit(1)
-      .single();
+      .select("nama");
 
     if (error) {
       console.error(error);
-      document.getElementById("username").innerText = "User";
+      document.getElementById("userList").innerText = "Gagal load data";
       return;
     }
 
-    document.getElementById("username").innerText = data.nama || "User";
+    if (!data.length) {
+      document.getElementById("userList").innerText = "Tidak ada data";
+      return;
+    }
 
-    // Karena belum ada kolom lain
-    document.getElementById("gender").innerText = "-";
-    document.getElementById("age").innerText = "-";
+    // TAMPILKAN SEMUA NAMA
+    let html = "";
+    data.forEach((item, index) => {
+      html += `<div class="user-row">${index + 1}. ${item.nama}</div>`;
+    });
+
+    document.getElementById("userList").innerHTML = html;
   }
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -108,6 +105,7 @@
 
   loadProfile();
 </script>
+
 
 </body>
 </html>
