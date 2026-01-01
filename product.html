@@ -60,16 +60,21 @@
   <div class="nav-item"><a href="profile.html"><img src="assets/img/user.png"></a></div>
 </div>
 
-<!-- ================= SESSION HANDLER (TAMBAHAN) ================= -->
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const supabase = createClient(
-  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
-);
+const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
-(async () => {
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const MAX = 6;
+const grid = document.getElementById("productGrid");
+
+let USER_ID = null;
+
+/* ================= INIT SESSION ================= */
+async function initSession() {
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
@@ -77,27 +82,14 @@ const supabase = createClient(
     return;
   }
 
-  // inject ke global
-  window.USER_ID = session.user.id;
-})();
-</script>
-
-<!-- ================= SCRIPT UTAMA (TIDAK DIUBAH) ================= -->
-<script>
-const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
-
-let USER_ID = null;
-const MAX = 6;
-
-const grid = document.getElementById("productGrid");
+  USER_ID = session.user.id;
+  loadProducts(); // 🔥 baru load setelah session siap
+}
 
 /* ================= CHECK FAVORITE ================= */
 async function isFavorite(productName) {
-  if (!window.USER_ID) return false;
-
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${productName}`,
+    `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${encodeURIComponent(productName)}`,
     {
       headers: {
         apikey: SUPABASE_KEY,
@@ -112,13 +104,11 @@ async function isFavorite(productName) {
 
 /* ================= TOGGLE FAVORITE ================= */
 async function toggleFavorite(el, product) {
-  if (!window.USER_ID) return;
-
   const isFav = await isFavorite(product.nama);
 
   if (isFav) {
     await fetch(
-      `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${product.nama}`,
+      `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${encodeURIComponent(product.nama)}`,
       {
         method: "DELETE",
         headers: {
@@ -145,15 +135,19 @@ async function toggleFavorite(el, product) {
   }
 }
 
-/* ================= LOAD DATA ================= */
-fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
-  headers: {
-    apikey: SUPABASE_KEY,
-    Authorization: "Bearer " + SUPABASE_KEY
-  }
-})
-.then(res => res.json())
-.then(async data => {
+/* ================= LOAD PRODUK ================= */
+async function loadProducts() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`,
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  const data = await res.json();
   grid.innerHTML = "";
 
   for (const p of data) {
@@ -167,7 +161,7 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
         <div class="price-row">
           <div class="product-price">${p.harga}</div>
           <div class="favorite-btn ${fav ? 'active' : ''}"
-               onclick='toggleFavorite(this, ${JSON.stringify(p)})'>
+            onclick='toggleFavorite(this, ${JSON.stringify(p)})'>
             ♥
           </div>
         </div>
@@ -179,8 +173,10 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
       </div>
     `;
   }
-});
-</script>
+}
 
+/* START */
+initSession();
+</script>
 </body>
 </html>
