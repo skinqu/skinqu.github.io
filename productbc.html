@@ -33,15 +33,18 @@
   justify-content: center;
 }
 
+/* MERAH MERONA */
 .favorite-btn.active {
-  color: #ff2d55;
+  color: #ff2d55; /* merah lebih hidup */
   text-shadow: 0 0 6px rgba(255, 45, 85, 0.6);
   transform: scale(1.25);
 }
 
+/* hover efek */
 .favorite-btn:hover {
   transform: scale(1.15);
 }
+
 </style>
 </head>
 
@@ -60,42 +63,17 @@
   <div class="nav-item"><a href="profile.html"><img src="assets/img/user.png"></a></div>
 </div>
 
-<!-- ================= SESSION HANDLER (TAMBAHAN) ================= -->
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-const supabase = createClient(
-  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"
-);
-
-(async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  // inject ke global
-  window.USER_ID = session.user.id;
-})();
-</script>
-
-<!-- ================= SCRIPT UTAMA (TIDAK DIUBAH) ================= -->
 <script>
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg"; // GANTI INI
 
-let USER_ID = null;
+const USER_ID = "guest"; // nanti bisa diganti auth user
 const MAX = 6;
 
 const grid = document.getElementById("productGrid");
 
 /* ================= CHECK FAVORITE ================= */
 async function isFavorite(productName) {
-  if (!window.USER_ID) return false;
-
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${productName}`,
     {
@@ -112,11 +90,10 @@ async function isFavorite(productName) {
 
 /* ================= TOGGLE FAVORITE ================= */
 async function toggleFavorite(el, product) {
-  if (!window.USER_ID) return;
-
   const isFav = await isFavorite(product.nama);
 
   if (isFav) {
+    // DELETE
     await fetch(
       `${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${USER_ID}&product->>nama=eq.${product.nama}`,
       {
@@ -129,6 +106,7 @@ async function toggleFavorite(el, product) {
     );
     el.classList.remove("active");
   } else {
+    // INSERT
     await fetch(`${SUPABASE_URL}/rest/v1/favorites`, {
       method: "POST",
       headers: {
@@ -147,6 +125,7 @@ async function toggleFavorite(el, product) {
 
 /* ================= LOAD DATA ================= */
 fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
+
   headers: {
     apikey: SUPABASE_KEY,
     Authorization: "Bearer " + SUPABASE_KEY
@@ -183,4 +162,4 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
 </script>
 
 </body>
-</html>
+</html> 
