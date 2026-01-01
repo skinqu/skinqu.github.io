@@ -7,7 +7,6 @@
 
 <link rel="stylesheet" href="assets/css/cssproduct.css">
 
-<!-- SUPABASE JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -64,32 +63,29 @@
 </div>
 
 <script>
-/* ================== SUPABASE INIT ================== */
+/* ================= SUPABASE INIT ================= */
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const MAX = 6;
 let USER_ID = null;
+const MAX = 6;
 
 const grid = document.getElementById("productGrid");
 
-/* ================= AUTH CHECK ================= */
-async function checkUser() {
+/* ================= GET USER ================= */
+async function getUser() {
   const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    alert("Silakan login terlebih dahulu");
-    window.location.href = "login.html";
-    return;
+  if (user) {
+    USER_ID = user.id;
   }
-
-  USER_ID = user.id;
 }
 
 /* ================= CHECK FAVORITE ================= */
 async function isFavorite(productName) {
+  if (!USER_ID) return false;
+
   const { data } = await supabase
     .from("favorites")
     .select("id")
@@ -101,6 +97,12 @@ async function isFavorite(productName) {
 
 /* ================= TOGGLE FAVORITE ================= */
 async function toggleFavorite(el, product) {
+  if (!USER_ID) {
+    alert("Silakan login terlebih dahulu ❤️");
+    window.location.href = "login.html";
+    return;
+  }
+
   const isFav = await isFavorite(product.nama);
 
   if (isFav) {
@@ -134,7 +136,7 @@ async function loadProducts() {
   grid.innerHTML = "";
 
   for (const p of data) {
-    const fav = await isFavorite(p.nama);
+    const fav = USER_ID ? await isFavorite(p.nama) : false;
 
     grid.innerHTML += `
       <div class="product-card">
@@ -160,7 +162,7 @@ async function loadProducts() {
 
 /* ================= INIT ================= */
 (async () => {
-  await checkUser();
+  await getUser();
   await loadProducts();
 })();
 </script>
