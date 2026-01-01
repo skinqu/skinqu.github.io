@@ -4,66 +4,103 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Produk Rekomendasi – SkinQu</title>
+
 <link rel="stylesheet" href="assets/css/cssproduct.css">
+
+<style>
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.favorite-btn {
+  font-size: 26px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: #cfcfcf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MERAH MERONA */
+.favorite-btn.active {
+  color: #ff2d55; /* merah lebih hidup */
+  text-shadow: 0 0 6px rgba(255, 45, 85, 0.6);
+  transform: scale(1.25);
+}
+
+/* hover efek */
+.favorite-btn:hover {
+  transform: scale(1.15);
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <span>Produk Rekomendasi </span>
+  <span>Produk Rekomendasi</span>
 </div>
 
 <div class="product-grid" id="productGrid"></div>
 
 <div class="bottom-nav">
-
-  <div class="nav-item" data-page="index.html">
-    <a href="index.html">
-      <img src="assets/img/home.png" alt="Home">
-    </a>
-  </div>
-
-  <div class="nav-item search-wrapper" data-page="scanwajah.html">
-    <a href="scanwajah.html" class="search-icon">
-      <img src="assets/img/scanwajah.png" alt="Search">
-    </a>
-  </div>
-
-  <div class="nav-item" data-page="favorite.html">
-    <a href="favorite.html">
-      <img src="assets/img/heart.png" alt="Favorite">
-    </a>
-  </div>
-
-  <div class="nav-item" data-page="profile.html">
-    <a href="profile.html">
-      <img src="assets/img/user.png" alt="Profile">
-    </a>
-  </div>
-
+  <div class="nav-item"><a href="index.html"><img src="assets/img/home.png"></a></div>
+  <div class="nav-item"><a href="scanwajah.html"><img src="assets/img/scanwajah.png"></a></div>
+  <div class="nav-item"><a href="favorite.html"><img src="assets/img/heart.png"></a></div>
+  <div class="nav-item"><a href="profile.html"><img src="assets/img/user.png"></a></div>
 </div>
 
 <script>
-// TIDAK PERLU SUPABASE CLIENT DI SINI!
 const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
 const MAX = 6;
 const grid = document.getElementById("productGrid");
 
-// SKELETON
+// Simpan favorite (tanpa auto-load)
+function toggleFavorite(el, product) {
+  el.classList.toggle("active");
+
+  let favs = JSON.parse(localStorage.getItem("favorites")) || [];
+
+  if (el.classList.contains("active")) {
+    favs.push(product);
+  } else {
+    favs = favs.filter(p => p.nama !== product.nama);
+  }
+
+  localStorage.setItem("favorites", JSON.stringify(favs));
+}
+
+// skeleton
 for (let i = 0; i < MAX; i++) {
   grid.innerHTML += `
     <div class="product-card">
       <img src="https://via.placeholder.com/300x200?text=SkinQu">
-      <div class="product-name">Menyiapkan rekomendasi...</div>
-      <div class="product-price">Rp --</div>
+      <div class="product-name">Loading...</div>
+      <div class="price-row">
+        <div class="product-price">Rp --</div>
+        <div class="favorite-btn">♥</div>
+      </div>
       <button class="buy-btn" disabled>Pesan Produk</button>
     </div>
   `;
 }
 
-// FETCH DATA LANGSUNG - TANPA BUAT CLIENT
+// fetch data
 fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc&limit=${MAX}`, {
   headers: {
     apikey: SUPABASE_KEY,
@@ -81,9 +118,17 @@ fetch(`${SUPABASE_URL}/rest/v1/rekomendasi_produk?select=*&order=created_at.desc
       <div class="product-card">
         <img src="${p.image}" alt="${p.nama}">
         <div class="product-name">${p.nama}</div>
-        <div class="product-price">${p.harga}</div>
+
+        <div class="price-row">
+          <div class="product-price">${p.harga}</div>
+
+          <div class="favorite-btn"
+          onclick='toggleFavorite(this, ${JSON.stringify(p)})'>
+            ♥
+          </div>
+        </div>
         <button class="buy-btn"
-          onclick="window.open('https://shopee.co.id/search?keyword=${q}','_blank')">
+          onclick="window.open("https://shopee.co.id/search?keyword=${q}","_blank")">
           Pesan Produk
         </button>
       </div>
