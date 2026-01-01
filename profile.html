@@ -19,18 +19,16 @@
   </div>
 
   <div class="profile-section">
-    <h4>Personal Info</h4>
-
+    <h4>Status Profil</h4>
     <div class="profile-item">
-      <div>Gender</div>
-      <span id="gender">-</span>
-    </div>
-
-    <div class="profile-item">
-      <div>Age</div>
-      <span id="age">-</span>
+      <div>Database Status</div>
+      <span id="dbStatus">Checking...</span>
     </div>
   </div>
+
+  <button class="btn-update" id="updateProfileBtn" style="display:none; margin: 10px 0;">
+    📝 Lengkapi Profil Saya
+  </button>
 
   <button class="logout-btn" id="logoutBtn">Logout</button>
 
@@ -72,52 +70,107 @@
     const userEmail = user.email;
     const userId = user.id;
     
-    // Tampilkan email user
+    // Tampilkan email
     document.getElementById("email").innerText = userEmail;
     
-    // Set avatar dengan inisial email
+    // Set avatar
     document.getElementById("avatar").innerText = 
       (userEmail || "U")[0].toUpperCase();
 
-    // 🔥 AMBIL DATA DARI TABEL profiles - KOLOM name (bukan nama)
-    const { data: profileData, error: profileError } = await supabase
+    console.log("=== USER INFO ===");
+    console.log("Email:", userEmail);
+    console.log("User ID:", userId);
+    console.log("Full Name from Auth:", user.user_metadata?.full_name);
+
+    // 1. CEK APAKAH USER SUDAH ADA DI TABEL PROFILES
+    const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
-      .select("name, created_at, updated_at") // PERHATIKAN: name bukan nama
-      .eq("id", userId) // Filter berdasarkan ID user yang login
-      .single(); // Ambil satu record
+      .select("id, nama, created_at")
+      .eq("id", userId) // Cari berdasarkan ID user
+      .maybeSingle();
 
-    console.log("User ID mencari:", userId);
-    console.log("Data dari profiles tabel:", profileData);
-    console.log("Error jika ada:", profileError);
+    console.log("=== CHECK PROFILES TABLE ===");
+    console.log("Existing Profile Data:", existingProfile);
+    console.log("Error:", profileError);
 
-    if (profileError) {
-      console.error("Error loading profile:", profileError);
+    // 2. JIKA TIDAK ADA, BUAT PROFIL BARU OTOMATIS
+    if (!existingProfile) {
+      console.log("⚠️ User tidak ada di tabel profiles, membuat baru...");
+      document.getElementById("dbStatus").innerText = "Membuat profil baru...";
       
-      // JIKA TIDAK ADA DATA DI TABEL PROFILES
-      if (profileError.code === 'PGRST116') {
-        // Tampilkan username dari email sebagai fallback SAJA
-        const username = userEmail.split('@')[0];
-        document.getElementById("username").innerText = username;
-        console.log("Data tidak ditemukan, menggunakan email:", username);
+      // Ambil nama dari email (bagian sebelum @)
+      const defaultName = userEmail.split('@')[0];
+      
+      // Coba buat profil baru
+      const { data: newProfile, error: insertError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: userId, // PASTIKAN ID SAMA DENGAN auth.users.id
+            nama: defaultName,
+            email: userEmail, // TAMBAHKAN KOLOM EMAIL JIKA ADA
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("❌ Gagal membuat profil:", insertError);
+        document.getElementById("dbStatus").innerText = "Error membuat profil";
+        
+        // Fallback ke username dari email
+        document.getElementById("username").innerText = defaultName;
+        document.getElementById("updateProfileBtn").style.display = 'block';
       } else {
-        // Error lainnya
-        document.getElementById("username").innerText = "User";
+        console.log("✅ Profil berhasil dibuat:", newProfile);
+        document.getElementById("dbStatus").innerText = "Profil berhasil dibuat";
+        document.getElementById("username").innerText = newProfile.nama || defaultName;
       }
+    } 
+    // 3. JIKA SUDAH ADA, TAMPILKAN DATA
+    else {
+      console.log("✅ Profil ditemukan di database");
+      document.getElementById("dbStatus").innerText = "Profil ditemukan";
       
-      return;
+      // Tampilkan nama dari database
+      document.getElementById("username").innerText = existingProfile.nama || userEmail.split('@')[0];
     }
 
-    // JIKA ADA DATA DI TABEL PROFILES
-    if (profileData && profileData.name) {
-      // Tampilkan NAMA dari tabel profiles (kolom name)
-      document.getElementById("username").innerText = profileData.name;
-      console.log("Nama ditemukan dari DB:", profileData.name);
-    } else {
-      // Fallback ke email jika name kosong
-      const username = userEmail.split('@')[0];
-      document.getElementById("username").innerText = username;
-    }
+    // 4. TAMPILKAN SEMUA DATA PROFIL UNTUK DEBUGGING
+    const { data: allProfiles } = await supabase
+      .from("profiles")
+      .select("id, nama, created_at")
+      .limit(5);
+    
+    console.log("=== ALL PROFILES (5 pertama) ===");
+    console.log(allProfiles);
   }
+
+  // Fungsi untuk update profil manual
+  document.getElementById("updateProfileBtn").addEventListener("click", async () => {
+    const newName = prompt("Masukkan nama lengkap Anda:");
+    if (newName) {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session.user.id;
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update({ 
+          nama: newName,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", userId);
+      
+      if (error) {
+        alert("Gagal update: " + error.message);
+      } else {
+        alert("Nama berhasil diupdate!");
+        location.reload();
+      }
+    }
+  });
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await supabase.auth.signOut();
