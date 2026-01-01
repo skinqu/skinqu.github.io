@@ -72,19 +72,23 @@
     const userEmail = user.email;
     const userId = user.id;
     
-    // Tampilkan email user (tetap dari auth)
+    // Tampilkan email user
     document.getElementById("email").innerText = userEmail;
     
     // Set avatar dengan inisial email
     document.getElementById("avatar").innerText = 
       (userEmail || "U")[0].toUpperCase();
 
-    // 🔥 AMBIL DATA NAMA DARI TABEL PROFILES BERDASARKAN USER ID
+    // 🔥 AMBIL DATA DARI TABEL profiles - KOLOM name (bukan nama)
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
-      .select("nama, gender, age") // Ambil data dari tabel profiles
+      .select("name, created_at, updated_at") // PERHATIKAN: name bukan nama
       .eq("id", userId) // Filter berdasarkan ID user yang login
       .single(); // Ambil satu record
+
+    console.log("User ID mencari:", userId);
+    console.log("Data dari profiles tabel:", profileData);
+    console.log("Error jika ada:", profileError);
 
     if (profileError) {
       console.error("Error loading profile:", profileError);
@@ -94,6 +98,7 @@
         // Tampilkan username dari email sebagai fallback SAJA
         const username = userEmail.split('@')[0];
         document.getElementById("username").innerText = username;
+        console.log("Data tidak ditemukan, menggunakan email:", username);
       } else {
         // Error lainnya
         document.getElementById("username").innerText = "User";
@@ -103,13 +108,14 @@
     }
 
     // JIKA ADA DATA DI TABEL PROFILES
-    if (profileData) {
-      // 1. Tampilkan NAMA dari tabel profiles (bukan dari email!)
-      document.getElementById("username").innerText = profileData.nama || "User";
-      
-      // 2. Tampilkan gender dan age dari tabel profiles
-      document.getElementById("gender").innerText = profileData.gender || "-";
-      document.getElementById("age").innerText = profileData.age || "-";
+    if (profileData && profileData.name) {
+      // Tampilkan NAMA dari tabel profiles (kolom name)
+      document.getElementById("username").innerText = profileData.name;
+      console.log("Nama ditemukan dari DB:", profileData.name);
+    } else {
+      // Fallback ke email jika name kosong
+      const username = userEmail.split('@')[0];
+      document.getElementById("username").innerText = username;
     }
   }
 
