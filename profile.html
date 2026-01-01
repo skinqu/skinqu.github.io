@@ -60,38 +60,45 @@
 </div>
 
 <script>
-  // 🔐 SUPABASE CONFIG
   const supabaseUrl = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
-
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   async function loadProfile() {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
 
-    if (!user) {
+    if (!session) {
       window.location.href = "login.html";
       return;
     }
 
-    document.getElementById("username").innerText =
-      user.user_metadata?.full_name || "User";
+    const user = session.user;
 
+    // TAMPILKAN EMAIL & AVATAR DARI AUTH
     document.getElementById("email").innerText = user.email;
     document.getElementById("avatar").innerText =
-      (user.user_metadata?.full_name || "U")[0].toUpperCase();
+      (user.email || "U")[0].toUpperCase();
 
-    // Ambil data dari table profiles
-    const { data: profile } = await supabase
+    // =============================
+    // AMBIL DATA NAMA DARI DATABASE
+    // =============================
+    const { data, error } = await supabase
       .from("profiles")
-      .select("*")
-      .eq("id", user.id)
+      .select("nama")
+      .limit(1)
       .single();
 
-    if (profile) {
-      document.getElementById("gender").innerText = profile.gender || "-";
-      document.getElementById("age").innerText = profile.age ? profile.age + " Tahun" : "-";
+    if (error) {
+      console.error(error);
+      document.getElementById("username").innerText = "User";
+      return;
     }
+
+    document.getElementById("username").innerText = data.nama || "User";
+
+    // Karena belum ada kolom lain
+    document.getElementById("gender").innerText = "-";
+    document.getElementById("age").innerText = "-";
   }
 
   document.getElementById("logoutBtn").addEventListener("click", async () => {
