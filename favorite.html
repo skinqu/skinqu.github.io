@@ -3,13 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Favorite Produk – SkinQu</title>
+  <title>Produk Favorit – SkinQu</title>
 
   <link rel="stylesheet" href="assets/css/cssproduct.css">
   <link rel="stylesheet" href="assets/css/cssindex.css">
 
-  <!-- AUTH -->
-  <script type="module" src="assets/js/auth-guard.js"></script>
+  <style>
+    /* STYLE TAMBAHAN UNTUK KONSISTENSI */
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      text-align: left;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0;
+    }
+
+    .favorite-btn {
+      font-size: 26px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: #ff2d55; /* Langsung merah karena sudah favorit */
+      text-shadow: 0 0 6px rgba(255, 45, 85, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .favorite-btn.active {
+      color: #ff2d55;
+      text-shadow: 0 0 6px rgba(255, 45, 85, 0.6);
+      transform: scale(1.25);
+    }
+
+    .favorite-btn:hover {
+      transform: scale(1.15);
+    }
+
+    /* GAYA KHUSUS UNTUK FAVORITE PAGE */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+
+    .empty-state img {
+      width: 100px;
+      opacity: 0.5;
+      margin-bottom: 20px;
+    }
+
+    .empty-state p {
+      margin: 10px 0;
+    }
+
+    .explore-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
 </head>
 
 <body>
@@ -20,76 +84,175 @@
   <button class="back-btn" onclick="history.back()">Kembali</button>
 </div>
 
-<!-- GRID -->
+<!-- GRID PRODUK -->
 <div class="product-grid" id="favoriteGrid"></div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="nav-item">
-    <a href="index.html"><img src="assets/img/home.png"></a>
+    <a href="index.html"><img src="assets/img/home.png" alt="Home"></a>
   </div>
   <div class="nav-item search-wrapper">
-    <a href="scanwajah.html"><img src="assets/img/scanwajah.png"></a>
+    <a href="scanwajah.html"><img src="assets/img/scanwajah.png" alt="Scan Wajah"></a>
   </div>
   <div class="nav-item active">
-    <a href="favorite.html"><img src="assets/img/heart.png"></a>
+    <a href="favorite.html"><img src="assets/img/heart.png" alt="Favorit"></a>
   </div>
   <div class="nav-item">
-    <a href="profile.html"><img src="assets/img/user.png"></a>
+    <a href="profile.html"><img src="assets/img/user.png" alt="Profil"></a>
   </div>
 </div>
 
+<!-- SUPABASE + RENDER -->
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const supabase = createClient(
-  "https://bnawrgrhmvkyzkixlbkc.supabase.co",
-  "ANON_PUBLIC_KEY_KAMU"
-);
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
 
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const grid = document.getElementById("favoriteGrid");
 
-async function loadFavorites() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+let USER_ID = null;
+let ACCESS_TOKEN = null;
 
-  const { data, error } = await supabase
-    .from("favorites")
-    .select("product")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+/* ================= INIT SESSION ================= */
+async function initSession() {
+  const { data: { session } } = await supabase.auth.getSession();
 
-  console.log("FAVORITES:", data);
-
-  if (error || !data || data.length === 0) {
-    grid.innerHTML = "<p style='padding:16px'>Belum ada produk favorit ❤️</p>";
+  if (!session) {
+    window.location.href = "login.html";
     return;
   }
 
-  grid.innerHTML = "";
+  USER_ID = session.user.id;
+  ACCESS_TOKEN = session.access_token;
 
-  data.forEach(row => {
-    const p = row.product;
-
-    grid.innerHTML += `
-      <div class="product-card">
-        <img src="${p.image}" />
-        <div class="product-name">${p.nama}</div>
-        <div class="product-price">${p.harga}</div>
-
-        <button class="buy-btn"
-          onclick="window.open('${p.url}', '_blank')">
-          Lihat Produk
-        </button>
-      </div>
-    `;
-  });
+  loadFavorites();
 }
 
-loadFavorites();
+/* ================= LOAD FAVORITES ================= */
+async function loadFavorites() {
+  try {
+    // Fetch data favorites menggunakan REST API
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/favorites?select=*&user_id=eq.${USER_ID}&order=created_at.desc`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: "Bearer " + ACCESS_TOKEN,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const data = await res.json();
+    console.log("FAVORITE DATA:", data);
+
+    // Jika tidak ada data
+    if (!data || data.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <img src="assets/img/empty-favorite.png" alt="Empty">
+          <h3>Belum ada produk favorit</h3>
+          <p>Tambahkan produk yang kamu sukai dari halaman rekomendasi</p>
+          <a href="index.html" class="explore-btn">Jelajahi Produk</a>
+        </div>
+      `;
+      return;
+    }
+
+    // Render produk favorit
+    grid.innerHTML = "";
+
+    for (const fav of data) {
+      const product = fav.product; // Product data disimpan di kolom 'product'
+      
+      // Fallback untuk gambar error
+      const imgSrc = product.image || "https://via.placeholder.com/150";
+      
+      grid.innerHTML += `
+        <div class="product-card">
+          <img src="${imgSrc}" 
+               alt="${product.nama}" 
+               onerror="this.src='https://via.placeholder.com/150?text=Gambar+Produk'">
+          <div class="product-name">${product.nama}</div>
+          
+          <div class="price-row">
+            <div class="product-price">${product.harga || 'Rp 0'}</div>
+            <div class="favorite-btn active"
+                 onclick='removeFavorite(this, "${fav.id}", ${JSON.stringify(product)})'>
+              ♥
+            </div>
+          </div>
+          
+          <button class="buy-btn"
+            onclick="window.open('${product.url || `https://shopee.co.id/search?keyword=${encodeURIComponent(product.nama)}`}', '_blank')">
+            Lihat Produk
+          </button>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Error loading favorites:", error);
+    grid.innerHTML = `
+      <p style="padding:16px;text-align:center;color:#ff2d55">
+        Error memuat data favorit. Silakan refresh halaman.
+      </p>
+    `;
+  }
+}
+
+/* ================= REMOVE FAVORITE ================= */
+window.removeFavorite = async function (el, favoriteId, product) {
+  try {
+    // Hapus dari database
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/favorites?id=eq.${favoriteId}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: "Bearer " + ACCESS_TOKEN,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    
+    // Hapus elemen dari UI
+    el.closest('.product-card').remove();
+    
+    // Tampilkan pesan jika tidak ada favorit lagi
+    if (grid.children.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <img src="assets/img/empty-favorite.png" alt="Empty">
+          <h3>Belum ada produk favorit</h3>
+          <p>Tambahkan produk yang kamu sukai dari halaman rekomendasi</p>
+          <a href="index.html" class="explore-btn">Jelajahi Produk</a>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Error removing favorite:", error);
+    alert("Gagal menghapus favorit. Coba lagi.");
+  }
+};
+
+/* ================= START ================= */
+initSession();
 </script>
 
-<script src="assets/js/nav-active.js"></script>
+<!-- Script untuk aktifkan nav -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Aktifkan nav item favorite
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => item.classList.remove('active'));
+  document.querySelector('.nav-item:nth-child(3)').classList.add('active');
+});
+</script>
 
 </body>
 </html>
