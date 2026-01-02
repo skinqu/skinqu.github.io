@@ -5,6 +5,377 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkinQu Search</title>
 <link rel="stylesheet" href="assets/css/search.css">
+
+<!-- STYLE UNTUK PRODUK CARD & HAMBURGER MENU -->
+<style>
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+
+  .product-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    text-align: left;
+    transition: transform 0.2s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f5f5f5;
+    margin-bottom: 10px;
+  }
+
+  .product-name {
+    font-weight: 600;
+    margin: 8px 0 4px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.3;
+    height: 36px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px 0;
+  }
+
+  .product-price {
+    color: #ff2d55;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .favorite-btn {
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: #cfcfcf;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+  }
+
+  .favorite-btn.active {
+    color: #ff2d55;
+    text-shadow: 0 0 6px rgba(255, 45, 85, 0.6);
+    transform: scale(1.2);
+  }
+
+  .favorite-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .buy-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-size: 14px;
+  }
+
+  .buy-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* LOADING STATE */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    grid-column: 1 / -1;
+  }
+
+  .loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+    grid-column: 1 / -1;
+  }
+
+  /* HEADER STYLE */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px 10px;
+  }
+
+  .greeting h2 {
+    margin: 0;
+    color: #333;
+    font-size: 22px;
+  }
+
+  .greeting p {
+    margin: 5px 0 0;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .header-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .header-icon {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .bell-icon {
+    position: relative;
+  }
+
+  .hamburger-menu {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .hamburger-menu span {
+    width: 20px;
+    height: 2px;
+    background: #333;
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  .hamburger-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+
+  /* FILTER SIDEBAR */
+  .filter-sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .filter-sidebar.active {
+    right: 0;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .sidebar-header h3 {
+    margin: 0;
+    color: #333;
+  }
+
+  .close-sidebar {
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-option {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: white;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .filter-option.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  }
+
+  .filter-option:hover:not(.active) {
+    border-color: #667eea;
+    background: #f8f8ff;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* SEARCH BOX */
+  .search-box {
+    padding: 0 16px 16px;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 16px;
+    background: #f8f8f8;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    border-top: 1px solid #eee;
+    z-index: 1000;
+  }
+
+  .nav-item {
+    text-align: center;
+  }
+
+  .nav-item img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+  }
+
+  .nav-item.active img {
+    opacity: 1;
+  }
+
+  /* PRODUCT REASON */
+  .product-reason {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 34px;
+  }
+
+  /* ACTIVE FILTER BADGE */
+  .active-filter {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  /* CATEGORY BADGE */
+  .category-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+</style>
 </head>
 
 <body>
@@ -14,50 +385,709 @@
   <!-- HEADER -->
   <div class="header">
     <div class="greeting">
-      <h2>Hi Kaji Alma 🤍</h2>
+      <h2 id="userGreeting">Hi User! 🤍</h2>
       <p>Explore and find your favorites</p>
     </div>
-    <div class="header-icon">🔔</div>
+    <div class="header-icons">
+      <div class="header-icon bell-icon">🔔</div>
+      <div class="hamburger-menu" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
   </div>
 
   <!-- SEARCH BAR -->
   <div class="search-box">
-    <input type="text" placeholder="Search Product" oninput="searchProduct(this.value)">
+    <input type="text" id="searchInput" placeholder="Search Product" oninput="searchProduct(this.value)">
   </div>
 
-  <!-- CATEGORY -->
-  <div class="section-title">Popular Products</div>
-  <div class="category">
-    <button class="chip active" onclick="filterCategory('all')">All</button>
-    <button class="chip" onclick="filterCategory('sunscreen')">Sunscreen</button>
-    <button class="chip" onclick="filterCategory('moisturizer')">Moisturizer</button>
-    <button class="chip" onclick="filterCategory('serum')">Serum</button>
+  <!-- ACTIVE FILTER INFO -->
+  <div class="section-title" style="padding: 0 16px 16px;">
+    <span>Popular Products</span>
+    <span id="activeFilterBadge" class="active-filter" style="display:none;"></span>
   </div>
 
   <!-- PRODUCT GRID -->
-  <div class="product-grid" id="productGrid"></div>
+  <div class="product-grid" id="productGrid">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading products...</p>
+    </div>
+  </div>
 
+</div>
+
+<!-- FILTER SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="filter-sidebar" id="filterSidebar">
+  <div class="sidebar-header">
+    <h3>Filter Kategori</h3>
+    <div class="close-sidebar" onclick="closeSidebar()">×</div>
+  </div>
+  <div class="filter-options">
+    <button class="filter-option active" onclick="filterCategory('all')">
+      Semua Produk
+    </button>
+    <button class="filter-option" onclick="filterCategory('sunscreen')">
+      🌞 Sunscreen
+    </button>
+    <button class="filter-option" onclick="filterCategory('moisturizer')">
+      💧 Moisturizer
+    </button>
+    <button class="filter-option" onclick="filterCategory('serum')">
+      ✨ Serum
+    </button>
+    <button class="filter-option" onclick="filterCategory('toner')">
+      🌀 Toner
+    </button>
+    <button class="filter-option" onclick="filterCategory('facewash')">
+      🧼 Facewash
+    </button>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="nav-item">
     <a href="index.html">
-        <img src="assets/img/home.png">
+      <img src="assets/img/home.png">
     </a>
-</div>
-<div class="nav-item active"><img src="assets/img/search.png"></div>
+  </div>
+  <div class="nav-item active">
+    <img src="assets/img/search.png">
+  </div>
   <div class="nav-item">
     <a href="favorite.html">
-        <img src="assets/img/heart.png">
+      <img src="assets/img/heart.png">
     </a>
-</div>
+  </div>
   <div class="nav-item">
     <a href="profile.html">
-        <img src="assets/img/user.png">
-    </a></div>
+      <img src="assets/img/user.png">
+    </a>
+  </div>
 </div>
 
-<script src="assets/js/search.js"></script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+/* ================= CONFIG ================= */
+const SUPABASE_URL = "https://bnawrgrhmvkyzkixlbkc.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYXdyZ3JobXZreXpraXhsYmtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDA2MDUsImV4cCI6MjA4MTIxNjYwNX0.msUs2RMnJqAs086mkV4FTNIEOHb_3i-hGX5B0sWtolg";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const grid = document.getElementById("productGrid");
+const searchInput = document.getElementById("searchInput");
+const userGreeting = document.getElementById("userGreeting");
+const activeFilterBadge = document.getElementById("activeFilterBadge");
+
+let USER_ID = null;
+let USER_NAME = "User";
+let ACCESS_TOKEN = null;
+let allProducts = [];
+let currentCategory = 'all';
+let currentSearch = '';
+
+/* ================= SIDEBAR FUNCTIONS ================= */
+window.toggleSidebar = function() {
+  const sidebar = document.getElementById('filterSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const hamburger = document.querySelector('.hamburger-menu');
+  
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  hamburger.classList.toggle('active');
+};
+
+window.closeSidebar = function() {
+  const sidebar = document.getElementById('filterSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const hamburger = document.querySelector('.hamburger-menu');
+  
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+  hamburger.classList.remove('active');
+};
+
+/* ================= ULTRA STRICT CATEGORY DETECTION ================= */
+function getProductCategory(product) {
+  const name = (product.nama || '').toLowerCase().trim();
+  const reason = (product.alasan || '').toLowerCase().trim();
+  const fullText = name + ' ' + reason;
+  
+  // HARUS KETAT: Gunakan dictionary mapping untuk produk yang diketahui
+  const knownProducts = {
+    // Contoh mapping manual jika diperlukan
+    // 'nivea men oil control face wash': 'facewash',
+    // 'somethinc glow serum': 'serum',
+    // 'emina witch hazel toner': 'toner',
+    // 'scarlett whitening floral toner': 'toner'
+  };
+  
+  // Cek dulu di knownProducts
+  if (knownProducts[name]) {
+    console.log(`✅ KNOWN: "${product.nama}" → ${knownProducts[name]}`);
+    return knownProducts[name];
+  }
+  
+  // STRICT CATEGORY MATCHING - HARUS EXACT WORD
+  const strictCategories = {
+    'sunscreen': {
+      keywords: ['sunscreen', 'sun screen', 'sunblock', 'tabir surya', 'spf'],
+      patterns: [
+        /\b(sunscreen|sun\s*screen)\b/i,
+        /\b(sunblock|sun\s*block)\b/i,
+        /\b(tabir\s*surya)\b/i,
+        /\b(spf\s*\d+)\b/i
+      ]
+    },
+    'moisturizer': {
+      keywords: ['moisturizer', 'moisturizing', 'pelembab', 'cream', 'lotion'],
+      patterns: [
+        /\b(moisturizer)\b/i,
+        /\b(pelembab)\b/i,
+        /\b(night\s*cream|day\s*cream)\b/i,
+        /\b(hydrating\s*cream)\b/i
+      ]
+    },
+    'serum': {
+      keywords: ['serum'],
+      patterns: [
+        /\b(serum)\b/i,
+        /\b(serum\s+[a-z]+\s+serum)\b/i, // serum vitamin c serum
+        /\b([a-z]+\s+serum)\b/i // vitamin c serum
+      ]
+    },
+    'toner': {
+      keywords: ['toner'],
+      patterns: [
+        /\b(toner)\b/i,
+        /\b(toning)\b/i,
+        /\b(astringen)\b/i
+      ]
+    },
+    'facewash': {
+      keywords: ['facewash', 'face wash', 'facial wash', 'pencuci wajah'],
+      patterns: [
+        /\b(facewash|face\s*wash)\b/i,
+        /\b(facial\s*wash)\b/i,
+        /\b(pencuci\s*wajah)\b/i,
+        /\b(sabun\s*wajah)\b/i
+      ]
+    }
+  };
+  
+  // PRIORITAS 1: Cek apakah nama produk mengandung kata kategori TEPAT di akhir
+  // Contoh: "Somethinc Glow Serum" → serum
+  const nameWords = name.split(/\s+/);
+  const lastWord = nameWords[nameWords.length - 1];
+  
+  for (const [category, data] of Object.entries(strictCategories)) {
+    if (data.keywords.includes(lastWord)) {
+      console.log(`✅ LAST WORD: "${product.nama}" → ${category} (last word: "${lastWord}")`);
+      return category;
+    }
+  }
+  
+  // PRIORITAS 2: Cek dengan STRICT patterns
+  for (const [category, data] of Object.entries(strictCategories)) {
+    for (const pattern of data.patterns) {
+      if (pattern.test(fullText)) {
+        console.log(`✅ PATTERN: "${product.nama}" → ${category} (pattern: ${pattern})`);
+        return category;
+    }
+    }
+  }
+  
+  // PRIORITAS 3: Cek apakah mengandung kata kunci TEPAT di mana saja
+  const wordSet = new Set(fullText.split(/\s+/));
+  
+  for (const [category, data] of Object.entries(strictCategories)) {
+    for (const keyword of data.keywords) {
+      if (wordSet.has(keyword)) {
+        console.log(`✅ EXACT WORD: "${product.nama}" → ${category} (keyword: "${keyword}")`);
+        return category;
+      }
+    }
+  }
+  
+  // PRIORITAS 4: Scoring system dengan penalti untuk overlap
+  const scores = {};
+  const penaltyWords = {
+    'serum': ['toner', 'wash', 'cream', 'sunscreen'],
+    'toner': ['serum', 'wash', 'cream', 'sunscreen'],
+    'facewash': ['serum', 'toner', 'cream', 'sunscreen'],
+    'moisturizer': ['serum', 'toner', 'wash', 'sunscreen'],
+    'sunscreen': ['serum', 'toner', 'wash', 'cream']
+  };
+  
+  for (const [category, data] of Object.entries(strictCategories)) {
+    scores[category] = 0;
+    
+    // Positive points untuk keyword exact match
+    for (const keyword of data.keywords) {
+      const exactRegex = new RegExp(`\\b${keyword}\\b`, 'i');
+      if (exactRegex.test(fullText)) {
+        scores[category] += 20; // High score untuk exact match
+        
+        // Extra points jika di nama produk (bukan hanya alasan)
+        if (exactRegex.test(name)) {
+          scores[category] += 15;
+        }
+        
+        // Extra points jika di akhir nama
+        if (name.endsWith(keyword)) {
+          scores[category] += 10;
+        }
+      }
+    }
+    
+    // Negative points untuk kata dari kategori lain
+    if (penaltyWords[category]) {
+      for (const penaltyWord of penaltyWords[category]) {
+        const penaltyRegex = new RegExp(`\\b${penaltyWord}\\b`, 'i');
+        if (penaltyRegex.test(fullText)) {
+          scores[category] -= 25; // High penalty untuk kategori yang bertentangan
+        }
+      }
+    }
+  }
+  
+  // Cari kategori dengan score tertinggi
+  let bestCategory = 'other';
+  let bestScore = 0;
+  
+  for (const [category, score] of Object.entries(scores)) {
+    if (score > bestScore) {
+      bestScore = score;
+      bestCategory = category;
+    }
+  }
+  
+  // Hanya return kategori jika score cukup tinggi
+  if (bestScore >= 20) { // Threshold tinggi
+    console.log(`⚠️ SCORED: "${product.nama}" → ${bestCategory} (score: ${bestScore})`);
+    return bestCategory;
+  }
+  
+  console.log(`❓ UNKNOWN: "${product.nama}" → OTHER (best score: ${bestScore})`);
+  return 'other';
+}
+
+/* ================= FILTER DAN CLEAN DATA ================= */
+function filterAndCleanProducts(products) {
+  if (!products || products.length === 0) return [];
+  
+  // 1. Filter produk yang memiliki data minimal
+  const validProducts = products.filter(product => {
+    if (!product.nama || product.nama.trim() === '') return false;
+    
+    const hasValidImage = product.image && 
+                         product.image.trim() !== '' && 
+                         product.image !== 'null' && 
+                         product.image !== 'undefined' &&
+                         (product.image.includes('http://') || 
+                          product.image.includes('https://'));
+    
+    return hasValidImage;
+  });
+  
+  // 2. Hapus duplikat berdasarkan nama (case insensitive)
+  const uniqueProducts = [];
+  const seenNames = new Set();
+  
+  for (const product of validProducts) {
+    const normalizedName = product.nama.toLowerCase().trim();
+    
+    if (!seenNames.has(normalizedName)) {
+      seenNames.add(normalizedName);
+      uniqueProducts.push(product);
+    }
+  }
+  
+  // 3. Clean URL gambar dan assign kategori dengan DETECTION ULTRA KETAT
+  const cleanedProducts = uniqueProducts.map(product => {
+    const cleaned = { ...product };
+    
+    // Clean image URL
+    if (cleaned.image) {
+      cleaned.image = cleaned.image
+        .replace('httpst//', 'https://')
+        .replace('httpsi//', 'https://')
+        .replace('https//', 'https://')
+        .replace('supabase..', 'supabase.co')
+        .replace(/\.\./g, '.')
+        .replace(/\s+/g, '');
+    }
+    
+    // Assign kategori dengan DETECTION ULTRA KETAT
+    cleaned.category = getProductCategory(cleaned);
+    
+    return cleaned;
+  });
+  
+  // Log distribution untuk debugging
+  console.log('='.repeat(50));
+  console.log('📊 DISTRIBUSI KATEGORI PRODUK:');
+  console.log('='.repeat(50));
+  
+  const distribution = {};
+  cleanedProducts.forEach(p => {
+    distribution[p.category] = (distribution[p.category] || 0) + 1;
+  });
+  
+  // Tampilkan detail per kategori
+  for (const category in distribution) {
+    const productsInCategory = cleanedProducts.filter(p => p.category === category);
+    console.log(`\n📦 ${category.toUpperCase()} (${distribution[category]} produk):`);
+    productsInCategory.forEach(p => {
+      console.log(`   - ${p.nama}`);
+    });
+  }
+  
+  console.log('='.repeat(50));
+  console.log(`🔧 Total: ${cleanedProducts.length} produk setelah filter`);
+  console.log('='.repeat(50));
+  
+  return cleanedProducts;
+}
+
+/* ================= INIT SESSION ================= */
+async function initSession() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      console.log("No session, loading public products");
+      loadProducts();
+      return;
+    }
+
+    USER_ID = session.user.id;
+    ACCESS_TOKEN = session.access_token;
+    
+    // Ambil nama user dari metadata atau email
+    const userMetadata = session.user.user_metadata;
+    USER_NAME = userMetadata?.full_name || 
+                userMetadata?.name || 
+                session.user.email?.split('@')[0] || 
+                "User";
+    
+    // Update greeting dengan nama user
+    userGreeting.textContent = `Hi ${USER_NAME}! 🤍`;
+    console.log("User logged in:", USER_NAME, USER_ID);
+    
+    loadProducts();
+  } catch (error) {
+    console.error("Session error:", error);
+    loadProducts();
+  }
+}
+
+/* ================= CHECK FAVORITE ================= */
+window.isFavorite = async function (productName) {
+  if (!USER_ID) return false;
+  
+  try {
+    const { data, error } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', USER_ID)
+      .eq('product->>nama', productName);
+    
+    if (error) {
+      console.error("Error checking favorite:", error);
+      return false;
+    }
+    
+    return data.length > 0;
+  } catch (error) {
+    console.error("Favorite check failed:", error);
+    return false;
+  }
+};
+
+/* ================= TOGGLE FAVORITE ================= */
+window.toggleFavorite = async function (el, product) {
+  if (!USER_ID) {
+    alert('Silakan login untuk menambahkan favorit');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const isActive = el.classList.contains('active');
+  
+  try {
+    if (isActive) {
+      // DELETE favorite
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', USER_ID)
+        .eq('product->>nama', product.nama);
+      
+      if (error) throw error;
+      el.classList.remove('active');
+    } else {
+      // INSERT favorite
+      const { error } = await supabase
+        .from('favorites')
+        .insert({
+          user_id: USER_ID,
+          product: product
+        });
+      
+      if (error) throw error;
+      el.classList.add('active');
+    }
+  } catch (error) {
+    console.error("Toggle favorite error:", error);
+    alert('Gagal memperbarui favorit');
+  }
+};
+
+/* ================= LOAD PRODUCTS ================= */
+async function loadProducts() {
+  try {
+    grid.innerHTML = `
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Memuat produk...</p>
+      </div>
+    `;
+
+    // Load data dari tabel rekomendasi_produk
+    const { data, error } = await supabase
+      .from('rekomendasi_produk')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    console.log("📥 Produk dari database:", data?.length || 0);
+    
+    // Filter dan clean data dengan DETECTION ULTRA KETAT
+    allProducts = filterAndCleanProducts(data || []);
+    
+    renderProducts(allProducts);
+  } catch (error) {
+    console.error("Error loading products:", error);
+    grid.innerHTML = `
+      <div class="empty-state">
+        <p>Gagal memuat produk. Silakan coba lagi.</p>
+        <button onclick="loadProducts()" class="buy-btn" style="width:auto;margin-top:10px;padding:8px 16px;">
+          Coba Lagi
+        </button>
+      </div>
+    `;
+  }
+}
+
+/* ================= RENDER PRODUCTS ================= */
+async function renderProducts(products) {
+  if (!products || products.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <p>Tidak ada produk yang tersedia</p>
+        <p style="font-size:14px;color:#999">Semua produk telah difilter karena data tidak lengkap</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = '';
+  let productCount = 0;
+  
+  console.log(`\n🎯 RENDER: Filter aktif = "${currentCategory}", Search = "${currentSearch}"`);
+  
+  // Filter produk berdasarkan search dan category
+  const filteredProducts = products.filter(product => {
+    // Search filter
+    const matchesSearch = currentSearch === '' || 
+      (product.nama?.toLowerCase() || '').includes(currentSearch) ||
+      (product.alasan?.toLowerCase() || '').includes(currentSearch);
+    
+    // Category filter - HARUS TEPAT
+    const matchesCategory = currentCategory === 'all' || 
+      product.category === currentCategory;
+    
+    const shouldRender = matchesSearch && matchesCategory;
+    
+    if (shouldRender) {
+      console.log(`   ✓ "${product.nama}" → ${product.category}`);
+    }
+    
+    return shouldRender;
+  });
+  
+  if (filteredProducts.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <p>Tidak ada produk dalam kategori "${getCategoryLabel(currentCategory)}"</p>
+        <p style="font-size:14px;color:#999">Coba kategori lain atau gunakan pencarian</p>
+        <button onclick="filterCategory('all')" class="filter-option" style="margin-top:10px">
+          Tampilkan Semua
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  console.log(`   📊 Akan menampilkan ${filteredProducts.length} produk\n`);
+  
+  // Render produk yang difilter
+  for (const product of filteredProducts) {
+    productCount++;
+    
+    // Check favorite status
+    const isFav = USER_ID ? await isFavorite(product.nama) : false;
+    
+    // Pastikan gambar valid
+    let imageUrl = product.image || '';
+    
+    // Fallback jika URL tidak valid
+    if (!imageUrl.startsWith('http')) {
+      imageUrl = 'https://via.placeholder.com/150?text=No+Image';
+    }
+    
+    // Emoji untuk kategori
+    const categoryEmoji = {
+      'sunscreen': '🌞',
+      'moisturizer': '💧', 
+      'serum': '✨',
+      'toner': '🌀',
+      'facewash': '🧼',
+      'other': '📦'
+    };
+    
+    const emoji = categoryEmoji[product.category] || '';
+    const label = getCategoryLabel(product.category);
+    
+    grid.innerHTML += `
+      <div class="product-card">
+        <img src="${imageUrl}" 
+             alt="${product.nama}" 
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Image+Error'">
+        <div class="product-name">${product.nama || 'Produk Tanpa Nama'}</div>
+        
+        ${product.category && product.category !== 'other' ? 
+          `<div class="category-badge">${emoji} ${label}</div>` : ''}
+        
+        <div class="price-row">
+          <div class="product-price">${product.harga || 'Rp 0'}</div>
+          <button class="favorite-btn ${isFav ? 'active' : ''}"
+                  onclick='toggleFavorite(this, ${JSON.stringify(product).replace(/'/g, "&#39;")})'
+                  title="${isFav ? 'Hapus dari favorit' : 'Tambahkan ke favorit'}">
+            ♥
+          </button>
+        </div>
+        
+        <button class="buy-btn"
+          onclick="window.open('${product.url || `https://shopee.co.id/search?keyword=${encodeURIComponent(product.nama)}`}', '_blank')"
+          title="Buka di Shopee">
+          Lihat Produk
+        </button>
+        
+        ${product.alasan ? `
+          <div class="product-reason" title="${product.alasan}">
+            ${product.alasan}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+  
+  // Tampilkan jumlah produk yang ditemukan
+  if (productCount > 0) {
+    const countInfo = document.createElement('div');
+    countInfo.style.cssText = `
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding: 10px;
+      border-top: 1px solid #eee;
+      margin-top: 10px;
+    `;
+    countInfo.textContent = `Menampilkan ${productCount} produk ${currentCategory !== 'all' ? `dalam kategori ${getCategoryLabel(currentCategory)}` : ''}`;
+    grid.appendChild(countInfo);
+  }
+}
+
+/* ================= GET CATEGORY LABEL ================= */
+function getCategoryLabel(category) {
+  const labels = {
+    'all': 'Semua',
+    'sunscreen': 'Sunscreen',
+    'moisturizer': 'Moisturizer',
+    'serum': 'Serum',
+    'toner': 'Toner',
+    'facewash': 'Facewash',
+    'other': 'Lainnya'
+  };
+  return labels[category] || category;
+}
+
+/* ================= FILTER CATEGORY ================= */
+window.filterCategory = function (category) {
+  // Update active filter in sidebar
+  document.querySelectorAll('.filter-option').forEach(option => {
+    option.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Close sidebar
+  closeSidebar();
+  
+  // Update current category
+  currentCategory = category;
+  
+  // Update active filter badge
+  if (category === 'all') {
+    activeFilterBadge.style.display = 'none';
+  } else {
+    activeFilterBadge.textContent = getCategoryLabel(category);
+    activeFilterBadge.style.display = 'inline-block';
+  }
+  
+  console.log(`\n🎯🎯🎯 FILTER DIKLIK: ${category.toUpperCase()} 🎯🎯🎯`);
+  
+  // Debug: Tampilkan semua produk dalam kategori ini
+  const productsInCategory = allProducts.filter(p => p.category === category);
+  console.log(`📋 PRODUK DALAM KATEGORI "${category}":`);
+  if (productsInCategory.length === 0) {
+    console.log('   (Tidak ada produk)');
+  } else {
+    productsInCategory.forEach(p => {
+      console.log(`   - ${p.nama}`);
+    });
+  }
+  console.log('');
+  
+  renderProducts(allProducts);
+};
+
+/* ================= SEARCH FUNCTION ================= */
+window.searchProduct = function (value) {
+  currentSearch = value.toLowerCase().trim();
+  renderProducts(allProducts);
+};
+
+/* ================= START ================= */
+initSession();
+</script>
+
+<script>
+// Active nav item
+document.addEventListener('DOMContentLoaded', function() {
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => item.classList.remove('active'));
+  document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+});
+</script>
+
 </body>
 </html>
