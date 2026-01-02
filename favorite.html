@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Favorite Produk – SkinQu</title>
 
-  <!-- CSS utama -->
+  <!-- CSS -->
   <link rel="stylesheet" href="assets/css/cssproduct.css">
   <link rel="stylesheet" href="assets/css/cssindex.css">
 </head>
@@ -20,29 +20,7 @@
 
 <!-- FAVORITE GRID -->
 <div class="product-grid" id="favoriteGrid">
-
-  <!-- DUMMY CARD -->
-  <div class="product-card">
-    <img src="https://via.placeholder.com/300x200?text=SkinQu">
-    <div class="product-name">Somethinc Low pH Gentle Cleanser</div>
-    <div class="product-price">Rp 89.000</div>
-    <button class="buy-btn">Lihat Produk</button>
-  </div>
-
-  <div class="product-card">
-    <img src="https://via.placeholder.com/300x200?text=SkinQu">
-    <div class="product-name">Skintific 5X Ceramide Barrier Repair</div>
-    <div class="product-price">Rp 139.000</div>
-    <button class="buy-btn">Lihat Produk</button>
-  </div>
-
-  <div class="product-card">
-    <img src="https://via.placeholder.com/300x200?text=SkinQu">
-    <div class="product-name">Azarine Hydrasoothe Sunscreen Gel</div>
-    <div class="product-price">Rp 69.000</div>
-    <button class="buy-btn">Lihat Produk</button>
-  </div>
-
+  <!-- Akan diisi otomatis dari Supabase -->
 </div>
 
 <!-- BOTTOM NAVBAR -->
@@ -54,13 +32,13 @@
     </a>
   </div>
 
-  <div class="nav-item search-wrapper" data-page="scan wajah">
+  <div class="nav-item search-wrapper" data-page="scanwajah.html">
     <a href="scanwajah.html" class="search-icon">
       <img src="assets/img/scanwajah.png" alt="Search">
     </a>
   </div>
 
-  <div class="nav-item" data-page="favorite.html">
+  <div class="nav-item active" data-page="favorite.html">
     <a href="favorite.html">
       <img src="assets/img/heart.png" alt="Favorite">
     </a>
@@ -74,8 +52,14 @@
 
 </div>
 
-<!-- ACTIVE NAV -->
+<!-- NAV ACTIVE -->
 <script src="assets/js/nav-active.js"></script>
+
+<!-- AUTH SESSION GUARD -->
+<script type="module" src="assets/js/auth-guard.js"></script>
+
+<!-- FAVORITE LOGIC -->
+<script type="module" src="assets/js/favorite.js"></script>
 
 </body>
 </html>
