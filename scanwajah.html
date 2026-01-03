@@ -222,54 +222,46 @@
       line-height: 1.5;
     }
 
-    .btn {
-      width: 100%;
-      max-width: 380px;
+  .button-container {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .scan-btn {
+    flex: 2.7;
+    padding: 16px;
+    font-size: clamp(16px, 4.2vw, 17px);
+    font-weight: 600;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #447DCE, #447DCE);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 4px 16px rgba(30, 64, 175, 0.3),
+      0 0 0 2px rgba(59, 130, 246, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .scan-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 20px rgba(30, 64, 175, 0.45),
+      0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+
+    .upload-side-btn {
+      flex: 0.3;
       padding: 16px;
-      font-size: clamp(16px, 4.2vw, 17px);
+      font-size: clamp(14px, 3.8vw, 15px);
       font-weight: 600;
-      border: none;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #447DCE, #447DCE);
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow:
-        0 4px 16px rgba(30, 64, 175, 0.3),
-        0 0 0 2px rgba(59, 130, 246, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow:
-        0 6px 20px rgba(30, 64, 175, 0.45),
-        0 0 0 3px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      transform: none;
-      cursor: not-allowed;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .upload-btn-container {
-      margin-top: 16px;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .upload-btn {
-      width: 100%;
-      padding: 16px;
-      font-size: clamp(16px, 4.2vw, 17px);
-      font-weight: 600;
-      border: none;
       border-radius: 20px;
       background: linear-gradient(135deg, #7c3aed, #6d28d9);
       color: white;
@@ -283,11 +275,10 @@
       justify-content: center;
       gap: 8px;
       text-decoration: none;
-      display: block;
       text-align: center;
     }
 
-    .upload-btn:hover {
+    .upload-side-btn:hover {
       transform: translateY(-2px);
       box-shadow:
         0 6px 20px rgba(124, 58, 237, 0.45),
@@ -481,7 +472,12 @@
     <div class="particles" id="particles"></div>
   </div>
 
-  <button id="scanBtn" class="btn" disabled>
+  <div class="button-container">
+    <a href="upload.html" class="upload-side-btn">
+    <i class="fas fa-cloud-upload-alt"></i>
+    Upload
+  </a>
+  <button id="scanBtn" class="scan-btn" disabled>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="3"></circle>
       <path d="M12 3v2"></path>
@@ -495,13 +491,16 @@
     </svg>
     Mulai Pemindaian
   </button>
+  
+  
+</div>
 
-  <div class="upload-btn-container">
+  <!--<div class="upload-btn-container">
     <a href="upload.html" class="upload-btn">
       <i class="fas fa-cloud-upload-alt"></i>
       Upload Foto dari Galeri
     </a>
-  </div>
+  </div>-->
 
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
