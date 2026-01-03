@@ -196,36 +196,231 @@ body {
 }
 
 /* =========================
-   DOT INDICATOR
+   DOT INDICATOR - PERBAIKAN UNTUK MOBILE
 ========================= */
 .banner-dots {
   display: flex;
   justify-content: center;
+  align-items: center; /* Tambahkan ini */
   gap: 8px;
   margin-top: 20px;
   position: relative;
   z-index: 10;
+  padding: 0 20px; /* Tambahkan padding agar tidak ketutup */
 }
 
 .banner-dots span {
   display: block;
-  width: 8px;
-  height: 8px;
+  width: 10px; /* Perbesar dari 8px */
+  height: 10px; /* Perbesar dari 8px */
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.45);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
+  flex-shrink: 0; /* Tambahkan ini */
 }
 
 .banner-dots span.active {
-  width: 18px;
+  width: 22px; /* Perbesar dari 18px */
   border-radius: 6px;
   background: #ffffff;
   transform: scale(1.1);
 }
 
+/* =========================
+   MOBILE VIEW - PERBAIKAN
+========================= */
+@media (max-width: 480px) {
+  /* ... kode lainnya tetap ... */
+  
+  .banner-track {
+    gap: 14px;
+    padding: 0 20px; /* Ubah dari 44px ke 20px */
+    scroll-padding: 0 20px; /* Ubah dari 44px ke 20px */
+  }
+  
+  .banner {
+    min-width: calc(100vw - 40px); /* Ubah dari 88px ke 40px */
+    height: 160px;
+  }
+  
+  /* PERBAIKAN DOTS UNTUK MOBILE */
+  .banner-dots {
+    margin-top: 18px;
+    gap: 10px; /* Tambah gap sedikit */
+  }
+  
+  .banner-dots span {
+    width: 12px; /* Perbesar untuk mobile */
+    height: 12px; /* Perbesar untuk mobile */
+  }
+  
+  .banner-dots span.active {
+    width: 28px; /* Perbesar untuk mobile */
+    height: 12px; /* Pastikan tinggi tetap */
+  }
+  
+  /* Tambahkan ini untuk touch target yang lebih baik */
+  .banner-dots span {
+    min-width: 24px;
+    min-height: 24px;
+    position: relative;
+  }
+  
+  .banner-dots span::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+}
+
+/* =========================
+   TABLET VIEW - PENYESUAIAN
+========================= */
+@media (min-width: 481px) and (max-width: 768px) {
+  .banner-track {
+    padding: 0 30px; /* Kurangi dari 50px */
+    scroll-padding: 0 30px; /* Kurangi dari 50px */
+  }
+  
+  .banner {
+    min-width: 320px;
+    height: 180px;
+  }
+  
+  .banner-dots {
+    margin-top: 22px;
+  }
+  
+  .banner-dots span {
+    width: 11px;
+    height: 11px;
+  }
+  
+  .banner-dots span.active {
+    width: 25px;
+  }
+}
+
+/* =========================
+   DESKTOP VIEW - PENYESUAIAN
+========================= */
+@media (min-width: 769px) {
+  .banner-track {
+    padding: 0 40px; /* Kurangi dari 60px */
+    scroll-padding: 0 40px; /* Kurangi dari 60px */
+  }
+  
+  .banner {
+    min-width: 340px;
+    height: 200px;
+  }
+  
+  .banner-dots {
+    margin-top: 24px;
+  }
+  
+  .banner-dots span {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .banner-dots span.active {
+    width: 30px;
+  }
+}
+
+/* =========================
+   LARGE DESKTOP VIEW - PENYESUAIAN
+========================= */
+@media (min-width: 1200px) {
+  .banner-track {
+    padding: 0 60px; /* Kurangi dari 100px */
+    scroll-padding: 0 60px; /* Kurangi dari 100px */
+  }
+  
+  .banner {
+    min-width: 380px;
+    height: 220px;
+  }
+  
+  .banner-dots {
+    margin-top: 28px;
+    gap: 12px;
+  }
+  
+  .banner-dots span {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .banner-dots span.active {
+    width: 35px;
+  }
+}
+
+/* =========================
+   SAFE AREA SUPPORT - UPDATE
+========================= */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .banner-track {
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+    scroll-padding-left: calc(20px + env(safe-area-inset-left));
+    scroll-padding-right: calc(20px + env(safe-area-inset-right));
+  }
+  
+  .banner-dots {
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+  }
+}
+
+/* =========================
+   TOUCH FRIENDLY TAP TARGETS - UPDATE
+========================= */
+@media (max-width: 768px) {
+  .banner-dots span {
+    min-width: 32px; /* Perbesar untuk touch */
+    min-height: 32px; /* Perbesar untuk touch */
+  }
+  
+  /* Pastikan area klik lebih besar dari visual dots */
+  .banner-dots span::after {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* =========================
+   ANIMASI TAMBAHAN UNTUK DOTS
+========================= */
+.banner-dots span {
+  transform-origin: center;
+}
+
 .banner-dots span:hover {
-  background: rgba(255, 255, 255, 0.7);
+  transform: scale(1.3);
+}
+
+.banner-dots span.active:hover {
+  transform: scale(1.15);
+}
+
+/* Animasi saat berpindah dot */
+@keyframes dotPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.banner-dots span.active {
+  animation: dotPulse 0.6s ease-out;
 }
 
 /* =========================
