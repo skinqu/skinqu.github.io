@@ -573,8 +573,43 @@
   // Event Listeners
   uploadArea.addEventListener('click', () => {
     if (!selectedFile) {
+      // Hapus atribut capture agar membuka galeri
+      fileInput.removeAttribute('capture');
+      fileInput.accept = 'image/*';
       fileInput.click();
     }
+  });
+
+  // Tambahkan event listener untuk memilih dari kamera
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tambahkan tombol kamera di atas upload area jika diinginkan
+    const cameraBtn = document.createElement('button');
+    cameraBtn.innerHTML = '<i class="fas fa-camera"></i> Ambil Foto';
+    cameraBtn.style.cssText = `
+      margin-bottom: 12px;
+      padding: 10px 20px;
+      border-radius: 50px;
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 12px;
+    `;
+    
+    cameraBtn.addEventListener('click', function() {
+      // Set atribut untuk kamera
+      fileInput.setAttribute('capture', 'environment');
+      fileInput.accept = 'image/*';
+      fileInput.click();
+    });
+    
+    // Sisipkan tombol kamera sebelum upload area
+    uploadArea.parentNode.insertBefore(cameraBtn, uploadArea);
   });
 
   fileInput.addEventListener('change', function(e) {
@@ -636,7 +671,7 @@
       cropCanvas.width = cropCanvas.offsetWidth * 2;
       cropCanvas.height = cropCanvas.offsetHeight * 2;
       
-      // Set initial crop size (80% of smaller dimension)
+      // Set initial crop size (70% of smaller dimension)
       const minDimension = Math.min(cropCanvas.width, cropCanvas.height);
       cropSize = minDimension * 0.7;
       
@@ -683,7 +718,7 @@
     cropContext.textAlign = 'center';
     cropContext.fillText('Atur wajah dalam lingkaran', cropCanvas.width/2, 40);
     cropContext.font = '14px Arial';
-    cropContext.fillText('Gunakan dua jari untuk memperbesar/mengecil', cropCanvas.width/2, cropCanvas.height - 30);
+    cropContext.fillText('Geser untuk memposisikan, cubit untuk memperbesar', cropCanvas.width/2, cropCanvas.height - 30);
   }
 
   function handleCropStart(e) {
@@ -926,6 +961,28 @@
   document.addEventListener('touchend', function() {
     initialDistance = null;
   });
-  </script>
+
+  // Handle zoom with mouse wheel for desktop
+  cropCanvas.addEventListener('wheel', function(e) {
+    if (cropOverlay.style.display === 'flex') {
+      e.preventDefault();
+      
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      const newSize = cropSize * (1 + delta);
+      
+      // Limit zoom range
+      const minSize = Math.min(cropCanvas.width, cropCanvas.height) * 0.3;
+      const maxSize = Math.min(cropCanvas.width, cropCanvas.height) * 0.9;
+      
+      cropSize = Math.max(minSize, Math.min(maxSize, newSize));
+      
+      // Keep crop area within bounds
+      cropX = Math.max(0, Math.min(cropX, cropCanvas.width - cropSize));
+      cropY = Math.max(0, Math.min(cropY, cropCanvas.height - cropSize));
+      
+      drawCrop();
+    }
+  });
+</script>
 </body>
 </html>

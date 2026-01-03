@@ -63,6 +63,7 @@
     }
 
     .header-container {
+      display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
@@ -72,7 +73,8 @@
     }
     
     .header {
-      text-align: center;
+      text-align: left;
+      max-width: 70%;
       margin-bottom: 0;
     }
 
@@ -92,7 +94,7 @@
       font-size: clamp(13px, 3.5vw, 14px);
       color: var(--text-sub);
       line-height: 1.4;
-      text-align: center;
+      text-align: left;
     }
 
     .upload-toggle-btn {
@@ -419,70 +421,6 @@
       }
     }
 
-    /* Bottom Navigation */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-      z-index: 100;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-sub);
-      text-decoration: none;
-      flex: 1;
-      padding: 8px 0;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .nav-item.active {
-      color: var(--primary);
-    }
-
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      top: -12px;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 8px var(--primary-glow);
-    }
-
-    .nav-icon {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-
-    .nav-label {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
-
-    .nav-item:hover {
-      color: var(--text);
-      transform: translateY(-2px);
-    }
-
-    .nav-item.active:hover {
-      color: var(--primary);
-    }
-
     /* Mobile optimizations */
     @media (max-width: 375px) {
       .camera-frame { border-radius: 22px; }
@@ -505,10 +443,10 @@
       <p>Pemindaian wajah real-time</p>
     </div>
     
-    <!--<a href="upload.html" class="upload-toggle-btn">
+    <a href="upload.html" class="upload-toggle-btn">
       <i class="fas fa-upload"></i>
       Upload
-    </a>-->
+    </a>
   </div>
 
   <div class="camera-frame">
@@ -558,12 +496,12 @@
     Mulai Pemindaian
   </button>
 
-  <div class="upload-btn-container">
+  <!--<div class="upload-btn-container">
     <a href="upload.html" class="upload-btn">
       <i class="fas fa-cloud-upload-alt"></i>
       Upload Foto dari Galeri
     </a>
-  </div>
+  </div>-->
 
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
