@@ -706,7 +706,7 @@
     }
     
     if (description && stepNumber <= 4) {
-      const stepText = document.querySelector(`#step${i} .step-text`);
+      const stepText = document.querySelector(`#step${stepNumber} .step-text`);
       if (stepText) stepText.textContent = description;
     }
   }
@@ -800,6 +800,6 @@
       loadingOverlay.style.display = "none";
     }
   });
-  </script>
+</script>
 </body>
 </html>
