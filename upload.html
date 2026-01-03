@@ -43,7 +43,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+      padding: env(safe-area-inset-top) 16px 20px; /* Tambah padding bottom */
       overflow: hidden;
       position: relative;
       -webkit-tap-highlight-color: transparent;
@@ -218,19 +218,6 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      box-shadow:
-        0 4px 16px rgba(16, 185, 129, 0.3),
-        0 0 0 2px rgba(16, 185, 129, 0.2);
-    }
-
-    .btn-success:hover:not(:disabled) {
-      box-shadow:
-        0 6px 20px rgba(16, 185, 129, 0.45),
-        0 0 0 3px rgba(16, 185, 129, 0.3);
-    }
-
     .loading-overlay {
       display: none;
       position: fixed;
@@ -330,6 +317,7 @@
       max-width: 380px;
       line-height: 1.5;
       text-align: center;
+      margin-bottom: 30px; /* Tambah margin bottom */
     }
 
     .requirements {
@@ -369,7 +357,6 @@
       font-size: 14px;
       margin-top: 2px;
     }
-
 
     /* Mobile optimizations */
     @media (max-width: 375px) {
@@ -439,19 +426,37 @@
       background: linear-gradient(135deg, #447DCE, #447DCE);
       color: white;
     }
-/*buton kembali*/
+
+    /* Tombol kembali */
     .back-to-scan {
-        width: 100%;
-        max-width: 380px;
-        margin-top: 12px;
-        margin-bottom: 20px;
+      width: 100%;
+      max-width: 380px;
+      margin-top: 12px;
+      margin-bottom: 30px; /* Tambah margin bottom lebih besar */
+    }
+
+    .back-to-scan a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 12px;
+      gap: 8px;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .back-to-scan a:hover {
-    color: var(--text);
-        transform: translateY(-2px);
+      color: var(--text);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
     }
-    </style>
+  </style>
 </head>
 <body>
   <div class="header">
@@ -470,7 +475,9 @@
   </div>
 
   <div class="upload-area" id="uploadArea">
-    <!--<input type="file" id="fileInput" accept="image/*;capture=camera" hidden>-->
+    <!-- INPUT FILE YANG BENAR: tanpa atribut capture -->
+    <input type="file" id="fileInput" accept="image/*" hidden>
+    
     <div class="upload-icon">
       <i class="fas fa-cloud-upload-alt"></i>
     </div>
@@ -488,22 +495,12 @@
     Analisis dengan AI
   </button>
 
-    <div class="back-to-scan">
-    <a href="scanwajah.html" style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-sub);
-        text-decoration: none;
-        font-size: 14px;
-        padding: 12px;
-        gap: 8px;
-        transition: all 0.3s ease;
-    ">
-        <i class="fas fa-times" style="font-size: 16px;"></i>
-        Kembali ke Scan Kamera
+  <div class="back-to-scan">
+    <a href="scanwajah.html">
+      <i class="fas fa-times" style="font-size: 16px;"></i>
+      Kembali ke Scan Kamera
     </a>
-    </div>
+  </div>
 
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
@@ -540,15 +537,16 @@
     </div>
   </div>
 
-  <div class="note">
+  <!--<div class="note">
     🔒 Data tidak disimpan. Analisis dilakukan lokal & cloud aman. Bukan diagnosis medis.
-  </div>
+  </div>-->
 
   <canvas id="canvas" hidden></canvas>
 
   <script>
   const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
   
+  // Ambil semua elemen yang dibutuhkan
   const uploadArea = document.getElementById('uploadArea');
   const fileInput = document.getElementById('fileInput');
   const previewImage = document.getElementById('previewImage');
@@ -573,7 +571,7 @@
   // Event Listeners
   uploadArea.addEventListener('click', () => {
     if (!selectedFile) {
-      // Pastikan input file tidak punya atribut capture untuk membuka galeri
+      // Pastikan tidak ada atribut capture untuk membuka galeri
       fileInput.removeAttribute('capture');
       fileInput.accept = 'image/*';
       fileInput.click();
@@ -951,6 +949,6 @@
       drawCrop();
     }
   });
-</script>
+  </script>
 </body>
 </html>
