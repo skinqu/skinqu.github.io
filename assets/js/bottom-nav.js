@@ -84,13 +84,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="nav-item" data-page="index.html">
         <a href="${basePath}index.html">
           <img src="${basePath}assets/img/home.png">
-          <span>Home</span>
         </a>
       </div>
       <div class="nav-item" data-page="search.html">
         <a href="${basePath}search.html">
           <img src="${basePath}assets/img/search.png">
-          <span>Search</span>
         </a>
       </div>
       <div class="fab-wrapper">
@@ -101,13 +99,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="nav-item" data-page="favorite.html">
         <a href="${basePath}favorite.html">
           <img src="${basePath}assets/img/heart.png">
-          <span>Favorite</span>
         </a>
       </div>
       <div class="nav-item" data-page="profile.html">
         <a href="${basePath}profile.html">
           <img src="${basePath}assets/img/user.png">
-          <span>Profile</span>
         </a>
       </div>
     </div>`;
