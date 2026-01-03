@@ -83,30 +83,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="bottom-nav">
       <div class="nav-item" data-page="index.html">
         <a href="${basePath}index.html">
-          <img src="${basePath}assets/img/home.png" alt="Home">
+          <img src="${basePath}assets/img/home.png">
           <span>Home</span>
         </a>
       </div>
       <div class="nav-item" data-page="search.html">
         <a href="${basePath}search.html">
-          <img src="${basePath}assets/img/search.png" alt="Search">
+          <img src="${basePath}assets/img/search.png">
           <span>Search</span>
         </a>
       </div>
       <div class="fab-wrapper">
         <a href="${basePath}scanwajah.html" class="fab animate-pulse">
-          <img src="${basePath}assets/img/scanwajah.png" alt="Scan Wajah">
+          <img src="${basePath}assets/img/scanwajah.png">
         </a>
       </div>
       <div class="nav-item" data-page="favorite.html">
         <a href="${basePath}favorite.html">
-          <img src="${basePath}assets/img/heart.png" alt="Favorite">
+          <img src="${basePath}assets/img/heart.png">
           <span>Favorite</span>
         </a>
       </div>
       <div class="nav-item" data-page="profile.html">
         <a href="${basePath}profile.html">
-          <img src="${basePath}assets/img/user.png" alt="Profile">
+          <img src="${basePath}assets/img/user.png">
           <span>Profile</span>
         </a>
       </div>
