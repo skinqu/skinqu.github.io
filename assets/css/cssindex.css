@@ -10,7 +10,6 @@ body {
   padding: 0;
   background: #f6f8fc;
   font-family: 'Poppins', sans-serif;
-  padding-bottom: calc(70px + env(safe-area-inset-bottom)); /* Tambahkan safe area untuk bottom nav */
 }
 
 /* =========================
@@ -20,11 +19,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   height: 64px;
   padding: 0 20px;
+
   background: #265EB3;
   position: relative;
   z-index: 20;
+
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -49,10 +51,13 @@ body {
 .profile-avatar {
   width: 38px;
   height: 38px;
+
   border-radius: 50%;
   object-fit: cover;
+
   background: #ffffff;
   padding: 6px;
+
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
   cursor: pointer;
 }
@@ -76,16 +81,28 @@ body {
   display: flex;
   gap: 18px;
   padding: 0 20px;
+
+  /* Scroll behavior */
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  
+  /* Center alignment with padding */
   scroll-padding: 0 20px;
+
+  /* Overflow handling */
   overflow-x: auto;
   overflow-y: hidden;
+  
+  /* Hide scrollbar */
   scrollbar-width: none;
   -ms-overflow-style: none;
+  
+  /* Prevent text selection during drag */
   user-select: none;
   -webkit-user-select: none;
+  
+  /* Smooth transitions */
   transition: transform 0.3s ease;
 }
 
@@ -104,7 +121,11 @@ body {
   overflow: hidden;
   border-radius: 18px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  
+  /* Snap alignment */
   scroll-snap-align: center;
+  
+  /* Initial state */
   transform: scale(0.88);
   opacity: 0.6;
   transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -196,231 +217,36 @@ body {
 }
 
 /* =========================
-   DOT INDICATOR - PERBAIKAN UNTUK MOBILE
+   DOT INDICATOR
 ========================= */
 .banner-dots {
   display: flex;
   justify-content: center;
-  align-items: center; /* Tambahkan ini */
   gap: 8px;
   margin-top: 20px;
   position: relative;
   z-index: 10;
-  padding: 0 20px; /* Tambahkan padding agar tidak ketutup */
 }
 
 .banner-dots span {
   display: block;
-  width: 10px; /* Perbesar dari 8px */
-  height: 10px; /* Perbesar dari 8px */
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.45);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
-  flex-shrink: 0; /* Tambahkan ini */
 }
 
 .banner-dots span.active {
-  width: 22px; /* Perbesar dari 18px */
+  width: 18px;
   border-radius: 6px;
   background: #ffffff;
   transform: scale(1.1);
 }
 
-/* =========================
-   MOBILE VIEW - PERBAIKAN
-========================= */
-@media (max-width: 480px) {
-  /* ... kode lainnya tetap ... */
-  
-  .banner-track {
-    gap: 14px;
-    padding: 0 20px; /* Ubah dari 44px ke 20px */
-    scroll-padding: 0 20px; /* Ubah dari 44px ke 20px */
-  }
-  
-  .banner {
-    min-width: calc(100vw - 40px); /* Ubah dari 88px ke 40px */
-    height: 160px;
-  }
-  
-  /* PERBAIKAN DOTS UNTUK MOBILE */
-  .banner-dots {
-    margin-top: 18px;
-    gap: 10px; /* Tambah gap sedikit */
-  }
-  
-  .banner-dots span {
-    width: 12px; /* Perbesar untuk mobile */
-    height: 12px; /* Perbesar untuk mobile */
-  }
-  
-  .banner-dots span.active {
-    width: 28px; /* Perbesar untuk mobile */
-    height: 12px; /* Pastikan tinggi tetap */
-  }
-  
-  /* Tambahkan ini untuk touch target yang lebih baik */
-  .banner-dots span {
-    min-width: 24px;
-    min-height: 24px;
-    position: relative;
-  }
-  
-  .banner-dots span::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-  }
-}
-
-/* =========================
-   TABLET VIEW - PENYESUAIAN
-========================= */
-@media (min-width: 481px) and (max-width: 768px) {
-  .banner-track {
-    padding: 0 30px; /* Kurangi dari 50px */
-    scroll-padding: 0 30px; /* Kurangi dari 50px */
-  }
-  
-  .banner {
-    min-width: 320px;
-    height: 180px;
-  }
-  
-  .banner-dots {
-    margin-top: 22px;
-  }
-  
-  .banner-dots span {
-    width: 11px;
-    height: 11px;
-  }
-  
-  .banner-dots span.active {
-    width: 25px;
-  }
-}
-
-/* =========================
-   DESKTOP VIEW - PENYESUAIAN
-========================= */
-@media (min-width: 769px) {
-  .banner-track {
-    padding: 0 40px; /* Kurangi dari 60px */
-    scroll-padding: 0 40px; /* Kurangi dari 60px */
-  }
-  
-  .banner {
-    min-width: 340px;
-    height: 200px;
-  }
-  
-  .banner-dots {
-    margin-top: 24px;
-  }
-  
-  .banner-dots span {
-    width: 12px;
-    height: 12px;
-  }
-  
-  .banner-dots span.active {
-    width: 30px;
-  }
-}
-
-/* =========================
-   LARGE DESKTOP VIEW - PENYESUAIAN
-========================= */
-@media (min-width: 1200px) {
-  .banner-track {
-    padding: 0 60px; /* Kurangi dari 100px */
-    scroll-padding: 0 60px; /* Kurangi dari 100px */
-  }
-  
-  .banner {
-    min-width: 380px;
-    height: 220px;
-  }
-  
-  .banner-dots {
-    margin-top: 28px;
-    gap: 12px;
-  }
-  
-  .banner-dots span {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .banner-dots span.active {
-    width: 35px;
-  }
-}
-
-/* =========================
-   SAFE AREA SUPPORT - UPDATE
-========================= */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .banner-track {
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
-    scroll-padding-left: calc(20px + env(safe-area-inset-left));
-    scroll-padding-right: calc(20px + env(safe-area-inset-right));
-  }
-  
-  .banner-dots {
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
-  }
-}
-
-/* =========================
-   TOUCH FRIENDLY TAP TARGETS - UPDATE
-========================= */
-@media (max-width: 768px) {
-  .banner-dots span {
-    min-width: 32px; /* Perbesar untuk touch */
-    min-height: 32px; /* Perbesar untuk touch */
-  }
-  
-  /* Pastikan area klik lebih besar dari visual dots */
-  .banner-dots span::after {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-/* =========================
-   ANIMASI TAMBAHAN UNTUK DOTS
-========================= */
-.banner-dots span {
-  transform-origin: center;
-}
-
 .banner-dots span:hover {
-  transform: scale(1.3);
-}
-
-.banner-dots span.active:hover {
-  transform: scale(1.15);
-}
-
-/* Animasi saat berpindah dot */
-@keyframes dotPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.banner-dots span.active {
-  animation: dotPulse 0.6s ease-out;
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* =========================
@@ -433,234 +259,6 @@ body {
 
 .banner-track:active {
   cursor: grabbing;
-}
-
-/* =========================
-   SECTION TITLE
-========================= */
-.section-title {
-  padding: 22px 20px 10px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #222;
-}
-
-/* =========================
-   CATEGORY TABS (UNTUK HOMEPAGE)
-========================= */
-.category-tabs {
-  display: flex;
-  gap: 18px;
-  padding: 0 20px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.category-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.category-tabs div {
-  font-size: 14px;
-  font-weight: 500;
-  color: #7A7A7A;
-  cursor: pointer;
-  padding-bottom: 6px;
-  position: relative;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.category-tabs .active {
-  color: #447DCE;
-  font-weight: 600;
-}
-
-.category-tabs .active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 3px;
-  background: #447DCE;
-  border-radius: 3px;
-}
-
-/* =========================
-   CATEGORY GRID (UNTUK HOMEPAGE)
-========================= */
-.category-grid {
-  padding: 22px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-/* =========================
-   CATEGORY CARD (UNTUK HOMEPAGE)
-========================= */
-.category-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 18px 12px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  transition: all 0.25s ease;
-}
-
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(68,125,206,0.22);
-}
-
-.category-card img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 10px;
-  transition: transform 0.25s ease;
-}
-
-.category-card:hover img {
-  transform: scale(1.1);
-}
-
-.category-card p {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: #333;
-}
-
-/* =========================
-   BOTTOM NAVBAR - VERSI FAB (UPDATE TERBARU)
-========================= */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 70px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background: #ffffff;
-  border-top: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 9999;
-}
-
-/* NAV ITEM DASAR */
-.bottom-nav .nav-item {
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 14px;
-  transition: all 0.25s ease;
-  position: relative;
-}
-
-/* ICON NAV */
-.bottom-nav .nav-item img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  opacity: 0.75;
-  transition: all 0.25s ease;
-}
-
-/* HOVER NAV */
-.bottom-nav .nav-item:hover {
-  background: rgba(68,125,206,0.08);
-}
-
-.bottom-nav .nav-item:hover img {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* ACTIVE NAV */
-.bottom-nav .nav-item.active {
-  background: rgba(68,125,206,0.12);
-}
-
-.bottom-nav .nav-item.active img {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* FAB WRAPPER (UNTUK SEARCH DI TENGAH) */
-.fab-wrapper {
-  position: relative;
-  z-index: 1001;
-  margin-top: -30px; /* Untuk menaikkan FAB */
-}
-
-/* FAB STYLE */
-.fab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: #2c83f5;
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(44, 131, 245, 0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-/* FAB ICON */
-.fab img {
-  width: 30px;
-  height: 30px;
-  filter: brightness(0) invert(1);
-  transition: transform 0.3s ease;
-}
-
-/* ANIMASI PULSE UNTUK FAB */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(44, 131, 245, 0.7);
-  }
-  70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(44, 131, 245, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(44, 131, 245, 0);
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* FAB HOVER EFFECT */
-.fab:hover {
-  animation: none;
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(44, 131, 245, 0.5);
-}
-
-.fab:active {
-  transform: scale(0.95);
-}
-
-/* FAB ACTIVE STATE */
-.fab-wrapper.active .fab {
-  background: #1a6fe0;
-  transform: scale(1.05);
 }
 
 /* =========================
@@ -708,31 +306,6 @@ body {
   .banner-dots span.active {
     width: 16px;
   }
-  
-  .category-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 16px;
-  }
-  
-  .category-card {
-    padding: 16px 10px;
-  }
-  
-  .category-card img {
-    width: 48px;
-    height: 48px;
-  }
-  
-  .fab {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .fab img {
-    width: 28px;
-    height: 28px;
-  }
 }
 
 /* Tablet (481px to 768px) */
@@ -745,11 +318,6 @@ body {
   .banner {
     min-width: 320px;
     height: 180px;
-  }
-  
-  .category-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
   }
 }
 
@@ -772,12 +340,6 @@ body {
   .banner-content p {
     font-size: 15px;
   }
-  
-  .category-grid {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 1200px;
-    margin: 0 auto;
-  }
 }
 
 /* Large Desktop (1200px and up) */
@@ -790,10 +352,6 @@ body {
   .banner {
     min-width: 380px;
     height: 220px;
-  }
-  
-  .category-grid {
-    grid-template-columns: repeat(5, 1fr);
   }
 }
 
@@ -810,11 +368,6 @@ body {
     padding-left: calc(20px + env(safe-area-inset-left));
     padding-right: calc(20px + env(safe-area-inset-right));
   }
-  
-  .app-header {
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
-  }
 }
 
 /* =========================
@@ -827,12 +380,6 @@ body {
 
 .banner-dots span:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.8);
-  outline-offset: 2px;
-}
-
-.bottom-nav .nav-item:focus-visible,
-.fab:focus-visible {
-  outline: 2px solid #2c83f5;
   outline-offset: 2px;
 }
 
@@ -866,61 +413,315 @@ body {
   will-change: transform;
 }
 
-.fab {
-  will-change: transform, box-shadow;
+/* ===== SECTION TITLE ===== */
+.section-title {
+  padding: 22px 20px 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* ===== CATEGORY TABS ===== */
+.category-tabs {
+  display: flex;
+  gap: 18px;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.category-tabs div {
+  font-size: 14px;
+  font-weight: 500;
+  color: #7A7A7A;
+  cursor: pointer;
+  padding-bottom: 6px;
+  position: relative;
+}
+
+.category-tabs .active {
+  color: #447DCE;
+  font-weight: 600;
+}
+
+.category-tabs .active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: #447DCE;
+  border-radius: 3px;
+}
+
+/* ===== CATEGORY GRID ===== */
+.category-grid {
+  padding: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
 /* =========================
-   DARK MODE SUPPORT (OPTIONAL)
+   CATEGORY CARD
 ========================= */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #121212;
-    color: #ffffff;
-  }
-  
-  .category-card {
-    background: #1e1e1e;
-  }
-  
-  .category-card p {
-    color: #ffffff;
-  }
-  
-  .section-title {
-    color: #ffffff;
-  }
-  
-  .bottom-nav {
-    background: #1e1e1e;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  
-  .bottom-nav .nav-item:hover {
-    background: rgba(68,125,206,0.2);
-  }
-  
-  .bottom-nav .nav-item.active {
-    background: rgba(68,125,206,0.25);
-  }
+
+.category-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(68,125,206,0.22);
 }
 
 /* =========================
-   SMOOTH SCROLLING FOR ALL PAGES
+   ICON WRAPPER (KUNCI)
 ========================= */
-html {
-  scroll-behavior: smooth;
+
+.category-card img {
+  width: 56px;        /* 🔥 ukuran SERAGAM */
+  height: 56px;       /* 🔥 ukuran SERAGAM */
+
+  object-fit: contain; /* 🔥 biar utuh */
+  display: block;
+  margin: 0 auto 10px;
+
+  transition: transform 0.25s ease;
+}
+
+/* HOVER ICON */
+.category-card:hover img {
+  transform: scale(1.1);
 }
 
 /* =========================
-   TOUCH FRIENDLY TAP TARGETS
+   TEXT
 ========================= */
-@media (max-width: 768px) {
-  .bottom-nav .nav-item,
-  .fab,
-  .category-card,
-  .banner-dots span {
-    min-height: 44px;
-    min-width: 44px;
+
+.category-card p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+
+/* =========================
+   BOTTOM NAVBAR - LAYOUT
+========================= */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  height: 60px;
+}
+
+/* Pastikan konten tidak tertutup navbar */
+body {
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
+
+/* =========================
+   NAV ITEM - BASE STYLE
+========================= */
+
+.bottom-nav .nav-item {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+.bottom-nav .nav-item img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.75;
+  transition: all 0.25s ease;
+}
+
+
+/* =========================
+   INTERAKSI: HOVER & ACTIVE
+========================= */
+
+/* Hover state (semua item) */
+.bottom-nav .nav-item:hover {
+  background: rgba(68, 125, 206, 0.08);
+}
+
+.bottom-nav .nav-item:hover img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Active state (dari JS) */
+.bottom-nav .nav-item.active {
+  background: rgba(68, 125, 206, 0.12);
+}
+
+.bottom-nav .nav-item.active img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Pressed / tap state */
+.bottom-nav .nav-item:active {
+  transform: scale(0.92);
+  background: rgba(68, 125, 206, 0.15);
+}
+
+
+/* =========================
+   SEARCH ICON (Khusus wrapper tengah)
+========================= */
+
+/* Wrapper posisi sedikit naik, tapi tetap dalam safe area */
+.bottom-nav .search-wrapper {
+  position: relative;
+  top: -6px;
+}
+
+/* Search icon tetap mengikuti gaya nav item */
+.bottom-nav .search-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+.bottom-nav .search-icon img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.75;
+  transition: all 0.25s ease;
+}
+
+/* Hover & active untuk search-icon (harus diwariskan dari nav-item parent) */
+.bottom-nav .nav-item:hover .search-icon {
+  background: rgba(68, 125, 206, 0.08);
+}
+
+.bottom-nav .nav-item:hover .search-icon img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.bottom-nav .nav-item:active .search-icon {
+  transform: scale(0.92);
+  background: rgba(68, 125, 206, 0.15);
+}
+
+
+/* =========================
+   FAB: SCAN WAJAH (Floating Action Button)
+========================= */
+
+/* Wrapper agar FAB bisa 'melayang' di atas navbar */
+.bottom-nav .fab-wrapper {
+  position: relative;
+  z-index: 1001;
+}
+
+/* Tombol utama FAB */
+.bottom-nav .fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #2c83f5;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(44, 131, 245, 0.4);
+  position: relative;
+  top: -20px; /* Naik 20px dari baseline navbar */
+  transition: all 0.3s ease;
+}
+
+.bottom-nav .fab img {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1); /* Agar icon tetap putih di latar biru */
+  transition: all 0.25s ease;
+}
+
+/* Interaksi FAB */
+.bottom-nav .fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(44, 131, 245, 0.6);
+}
+
+.bottom-nav .fab:active {
+  transform: scale(0.95);
+}
+
+/* =========================
+   ANIMASI UNTUK FAB SCAN WAJAH
+========================= */
+
+/* Animasi: Bounce + Pulse kombinasi */
+@keyframes fab-pulse {
+  0% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 12px rgba(44, 131, 245, 0.4);
+  }
+  50% {
+    transform: scale(1.08) translateY(-5px);
+    box-shadow: 0 6px 16px rgba(44, 131, 245, 0.6);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 12px rgba(44, 131, 245, 0.4);
   }
 }
+
+.bottom-nav .fab.animate-fab {
+  animation: fab-pulse 2s ease-in-out infinite;
+}
+
+/* Efek tambahan: glow saat hover */
+.bottom-nav .fab:hover {
+  animation: none; /* Hentikan animasi saat hover */
+  transform: scale(1.1) translateY(-3px);
+  box-shadow: 0 8px 20px rgba(44, 131, 245, 0.7);
+  filter: brightness(1.1);
+}
+
+/* Efek tap lebih responsif */
+.bottom-nav .fab:active {
+  transform: scale(0.95) translateY(0);
+  box-shadow: 0 4px 10px rgba(44, 131, 245, 0.5);
+}
+
+
+
+
+
