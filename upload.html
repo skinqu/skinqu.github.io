@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover"/>
+  <title>SkinQu • Upload Foto</title>
+  <script src="assets/js/bottom-nav.js" defer></script>
+  <link rel="stylesheet" href="assets/css/cssindex.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.4);
+      --glass-bg: rgba(15, 23, 42, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text: #f1f5f9;
+      --text-sub: #94a3b8;
+      --success: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow: hidden;
+      height: 100%;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #0b0e1a, #111827, #0d1117);
+      color: var(--text);
+      min-height: 100dvh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+      overflow: hidden;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, transparent 40%, rgba(11, 14, 26, 0.9) 90%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      max-width: 360px;
+      padding-top: 10px;
+    }
+
+    .header h1 {
+      font-weight: 700;
+      font-size: clamp(24px, 5.5vw, 28px);
+      letter-spacing: -0.5px;
+      background: linear-gradient(100deg, #e2e8f0, #cbd5e1);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: clamp(14px, 3.8vw, 15px);
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .upload-area {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 4/5;
+      margin: 0 auto 24px;
+      border-radius: clamp(20px, 5vw, 28px);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.3);
+      border: 2px dashed var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .upload-area:hover {
+      background: rgba(15, 23, 42, 0.5);
+      border-color: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .upload-area.active {
+      background: rgba(15, 23, 42, 0.7);
+      border-style: solid;
+      border-color: var(--primary);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .upload-area:hover .upload-icon {
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+
+    .upload-area.active .upload-icon {
+      color: var(--primary);
+    }
+
+    .upload-text {
+      font-size: clamp(16px, 4.2vw, 18px);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .upload-subtext {
+      font-size: clamp(13px, 3.6vw, 14px);
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    #previewImage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      z-index: 2;
+      display: none;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .upload-area.active .remove-btn {
+      opacity: 1;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 380px;
+      padding: 16px;
+      font-size: clamp(16px, 4.2vw, 17px);
+      font-weight: 600;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #447DCE, #447DCE);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow:
+        0 4px 16px rgba(30, 64, 175, 0.3),
+        0 0 0 2px rgba(59, 130, 246, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow:
+        0 6px 20px rgba(30, 64, 175, 0.45),
+        0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow:
+        0 4px 16px rgba(16, 185, 129, 0.3),
+        0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      box-shadow:
+        0 6px 20px rgba(16, 185, 129, 0.45),
+        0 0 0 3px rgba(16, 185, 129, 0.3);
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100dvh;
+      background: rgba(11, 14, 26, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: clamp(16px, 4.5vw, 18px);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .loading-subtext {
+      color: var(--text-sub);
+      font-size: clamp(13px, 3.6vw, 14px);
+      max-width: 280px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .status-steps {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+
+    .step.active {
+      opacity: 1;
+    }
+
+    .step-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 11px;
+    }
+
+    .step.active .step-icon {
+      background: var(--primary);
+    }
+
+    .step-text {
+      font-size: clamp(13px, 3.5vw, 14px);
+      color: var(--text-sub);
+    }
+
+    .step.active .step-text {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .note {
+      font-size: clamp(10px, 2.8vw, 11px);
+      color: #64748b;
+      margin-top: auto;
+      padding-top: 16px;
+      max-width: 380px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .requirements {
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 0 auto 24px;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .requirements h3 {
+      font-size: clamp(14px, 3.8vw, 15px);
+      margin-bottom: 10px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .requirements ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .requirements li {
+      font-size: clamp(12px, 3.2vw, 13px);
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .requirements li i {
+      color: var(--primary);
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-sub);
+      text-decoration: none;
+      flex: 1;
+      padding: 8px 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-item:hover {
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active:hover {
+      color: var(--primary);
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 375px) {
+      .upload-area { border-radius: 22px; }
+      .header h1 { font-size: 25px; }
+    }
+
+    @media (max-width: 320px) {
+      .header h1 { font-size: 23px; }
+      .header p { font-size: 14px; }
+      .btn { padding: 14px; font-size: 16px; }
+    }
+
+    .crop-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100dvh;
+      background: rgba(11, 14, 26, 0.95);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+      padding: 20px;
+    }
+
+    .crop-container {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 4/5;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    #cropCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .crop-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .crop-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .crop-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .crop-confirm {
+      background: linear-gradient(135deg, #447DCE, #447DCE);
+      color: white;
+    }
+/*buton kembali*/
+    .back-to-scan {
+        width: 100%;
+        max-width: 380px;
+        margin-top: 12px;
+        margin-bottom: 20px;
+    }
+
+    .back-to-scan a:hover {
+    color: var(--text);
+        transform: translateY(-2px);
+    }
+    </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Upload Foto Wajah</h1>
+    <p>Upload foto wajah yang jelas untuk dianalisis oleh AI kami</p>
+  </div>
+
+  <div class="requirements">
+    <h3><i class="fas fa-info-circle"></i> Panduan Foto yang Baik:</h3>
+    <ul>
+      <li><i class="fas fa-check-circle"></i> Wajah menghadap kamera lurus</li>
+      <li><i class="fas fa-check-circle"></i> Pencahayaan yang cukup (tidak gelap)</li>
+      <li><i class="fas fa-check-circle"></i> Tidak menggunakan filter atau edit</li>
+      <li><i class="fas fa-check-circle"></i> Wajah terlihat jelas tanpa rambut menutupi</li>
+    </ul>
+  </div>
+
+  <div class="upload-area" id="uploadArea">
+    <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
+    <div class="upload-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <div class="upload-text">Tap untuk Upload Foto</div>
+    <div class="upload-subtext">Format JPG, PNG, maks 5MB</div>
+    
+    <img id="previewImage" alt="Preview">
+    <button class="remove-btn" id="removeBtn">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <button id="analyzeBtn" class="btn" disabled>
+    <i class="fas fa-magic"></i>
+    Analisis dengan AI
+  </button>
+
+    <div class="back-to-scan">
+    <a href="scanwajah.html" style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-sub);
+        text-decoration: none;
+        font-size: 14px;
+        padding: 12px;
+        gap: 8px;
+        transition: all 0.3s ease;
+    ">
+        <i class="fas fa-times" style="font-size: 16px;"></i>
+        Kembali ke Scan Kamera
+    </a>
+    </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Memproses analisis wajah</div>
+    <div class="loading-subtext">AI kami sedang menganalisis kulit dan mencari produk terbaik untuk Anda</div>
+    
+    <div class="status-steps">
+      <div class="step active" id="step1">
+        <div class="step-icon">1</div>
+        <div class="step-text">Mempersiapkan gambar</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-icon">2</div>
+        <div class="step-text">Mengirim ke server AI</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-icon">3</div>
+        <div class="step-text">Analisis karakteristik kulit</div>
+      </div>
+      <div class="step" id="step4">
+        <div class="step-icon">4</div>
+        <div class="step-text">Menyiapkan rekomendasi</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="crop-overlay" id="cropOverlay">
+    <div class="crop-container">
+      <canvas id="cropCanvas"></canvas>
+    </div>
+    <div class="crop-controls">
+      <button class="crop-btn crop-cancel" id="cancelCrop">Batal</button>
+      <button class="crop-btn crop-confirm" id="confirmCrop">Potong & Simpan</button>
+    </div>
+  </div>
+
+  <div class="note">
+    🔒 Data tidak disimpan. Analisis dilakukan lokal & cloud aman. Bukan diagnosis medis.
+  </div>
+
+  <canvas id="canvas" hidden></canvas>
+
+  <script>
+  const N8N_WEBHOOK = "https://aang34.app.n8n.cloud/webhook/scan-wajah";
+  
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput = document.getElementById('fileInput');
+  const previewImage = document.getElementById('previewImage');
+  const removeBtn = document.getElementById('removeBtn');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const cropOverlay = document.getElementById('cropOverlay');
+  const cropCanvas = document.getElementById('cropCanvas');
+  const cancelCropBtn = document.getElementById('cancelCrop');
+  const confirmCropBtn = document.getElementById('confirmCrop');
+
+  let selectedFile = null;
+  let croppedImageBase64 = null;
+  let isProcessing = false;
+  let cropContext = null;
+  let cropImage = null;
+  let isDragging = false;
+  let startX, startY;
+  let cropX = 0, cropY = 0;
+  let cropSize = 0;
+
+  // Event Listeners
+  uploadArea.addEventListener('click', () => {
+    if (!selectedFile) {
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+      handleImageSelect(e.target.files[0]);
+    }
+  });
+
+  removeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    resetUpload();
+  });
+
+  analyzeBtn.addEventListener('click', analyzeImage);
+
+  cancelCropBtn.addEventListener('click', () => {
+    cropOverlay.style.display = 'none';
+  });
+
+  confirmCropBtn.addEventListener('click', confirmCrop);
+
+  // Touch events for crop
+  cropCanvas.addEventListener('touchstart', handleCropStart);
+  cropCanvas.addEventListener('touchmove', handleCropMove);
+  cropCanvas.addEventListener('touchend', handleCropEnd);
+
+  // Mouse events for crop
+  cropCanvas.addEventListener('mousedown', handleCropStart);
+  cropCanvas.addEventListener('mousemove', handleCropMove);
+  cropCanvas.addEventListener('mouseup', handleCropEnd);
+  cropCanvas.addEventListener('mouseleave', handleCropEnd);
+
+  function handleImageSelect(file) {
+    if (!file.type.match('image.*')) {
+      alert('Hanya file gambar yang diizinkan (JPG, PNG)');
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal 5MB');
+      return;
+    }
+
+    selectedFile = file;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      // Show crop interface
+      initCrop(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function initCrop(imageSrc) {
+    cropOverlay.style.display = 'flex';
+    cropImage = new Image();
+    cropImage.onload = function() {
+      cropContext = cropCanvas.getContext('2d');
+      cropCanvas.width = cropCanvas.offsetWidth * 2;
+      cropCanvas.height = cropCanvas.offsetHeight * 2;
+      
+      // Set initial crop size (80% of smaller dimension)
+      const minDimension = Math.min(cropCanvas.width, cropCanvas.height);
+      cropSize = minDimension * 0.7;
+      
+      // Center the crop area
+      cropX = (cropCanvas.width - cropSize) / 2;
+      cropY = (cropCanvas.height - cropSize) / 2;
+      
+      drawCrop();
+    };
+    cropImage.src = imageSrc;
+  }
+
+  function drawCrop() {
+    if (!cropContext || !cropImage) return;
+    
+    // Clear canvas
+    cropContext.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+    
+    // Draw the image
+    cropContext.drawImage(cropImage, 0, 0, cropCanvas.width, cropCanvas.height);
+    
+    // Draw overlay
+    cropContext.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    cropContext.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+    
+    // Draw cropped area (clear)
+    cropContext.save();
+    cropContext.beginPath();
+    cropContext.arc(cropX + cropSize/2, cropY + cropSize/2, cropSize/2, 0, Math.PI * 2);
+    cropContext.clip();
+    cropContext.drawImage(cropImage, 0, 0, cropCanvas.width, cropCanvas.height);
+    cropContext.restore();
+    
+    // Draw crop circle border
+    cropContext.beginPath();
+    cropContext.arc(cropX + cropSize/2, cropY + cropSize/2, cropSize/2, 0, Math.PI * 2);
+    cropContext.strokeStyle = '#2563eb';
+    cropContext.lineWidth = 4;
+    cropContext.stroke();
+    
+    // Draw guide text
+    cropContext.fillStyle = 'white';
+    cropContext.font = 'bold 16px Arial';
+    cropContext.textAlign = 'center';
+    cropContext.fillText('Atur wajah dalam lingkaran', cropCanvas.width/2, 40);
+    cropContext.font = '14px Arial';
+    cropContext.fillText('Gunakan dua jari untuk memperbesar/mengecil', cropCanvas.width/2, cropCanvas.height - 30);
+  }
+
+  function handleCropStart(e) {
+    e.preventDefault();
+    isDragging = true;
+    
+    const rect = cropCanvas.getBoundingClientRect();
+    const scaleX = cropCanvas.width / rect.width;
+    const scaleY = cropCanvas.height / rect.height;
+    
+    if (e.type === 'touchstart') {
+      startX = (e.touches[0].clientX - rect.left) * scaleX;
+      startY = (e.touches[0].clientY - rect.top) * scaleY;
+    } else {
+      startX = (e.clientX - rect.left) * scaleX;
+      startY = (e.clientY - rect.top) * scaleY;
+    }
+  }
+
+  function handleCropMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    
+    const rect = cropCanvas.getBoundingClientRect();
+    const scaleX = cropCanvas.width / rect.width;
+    const scaleY = cropCanvas.height / rect.height;
+    
+    let currentX, currentY;
+    
+    if (e.type === 'touchmove') {
+      currentX = (e.touches[0].clientX - rect.left) * scaleX;
+      currentY = (e.touches[0].clientY - rect.top) * scaleY;
+    } else {
+      currentX = (e.clientX - rect.left) * scaleX;
+      currentY = (e.clientY - rect.top) * scaleY;
+    }
+    
+    // Move crop area
+    const dx = currentX - startX;
+    const dy = currentY - startY;
+    
+    cropX += dx;
+    cropY += dy;
+    
+    // Keep within bounds
+    cropX = Math.max(0, Math.min(cropX, cropCanvas.width - cropSize));
+    cropY = Math.max(0, Math.min(cropY, cropCanvas.height - cropSize));
+    
+    startX = currentX;
+    startY = currentY;
+    
+    drawCrop();
+  }
+
+  function handleCropEnd() {
+    isDragging = false;
+  }
+
+  function confirmCrop() {
+    // Create a new canvas for the cropped image
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 512;
+    tempCanvas.height = 512;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Draw the cropped area to the temp canvas
+    tempCtx.save();
+    tempCtx.beginPath();
+    tempCtx.arc(256, 256, 256, 0, Math.PI * 2);
+    tempCtx.clip();
+    
+    // Calculate source coordinates
+    const sourceX = cropX;
+    const sourceY = cropY;
+    const sourceSize = cropSize;
+    
+    tempCtx.drawImage(
+      cropImage,
+      sourceX, sourceY, sourceSize, sourceSize,
+      0, 0, 512, 512
+    );
+    
+    tempCtx.restore();
+    
+    // Convert to base64
+    croppedImageBase64 = tempCanvas.toDataURL('image/jpeg', 0.85);
+    
+    // Update preview
+    previewImage.src = croppedImageBase64;
+    previewImage.style.display = 'block';
+    uploadArea.classList.add('active');
+    analyzeBtn.disabled = false;
+    analyzeBtn.innerHTML = '<i class="fas fa-magic"></i> Analisis dengan AI';
+    
+    cropOverlay.style.display = 'none';
+  }
+
+  function resetUpload() {
+    selectedFile = null;
+    croppedImageBase64 = null;
+    previewImage.src = '';
+    previewImage.style.display = 'none';
+    uploadArea.classList.remove('active');
+    analyzeBtn.disabled = true;
+    fileInput.value = '';
+  }
+
+  function updateLoadingStep(stepNumber, description = '') {
+    for (let i = 1; i <= 4; i++) {
+      const step = document.getElementById(`step${i}`);
+      step?.classList.remove('active');
+    }
+    
+    for (let i = 1; i <= stepNumber; i++) {
+      const step = document.getElementById(`step${i}`);
+      step?.classList.add('active');
+    }
+    
+    if (description && stepNumber <= 4) {
+      const stepText = document.querySelector(`#step${stepNumber} .step-text`);
+      if (stepText) stepText.textContent = description;
+    }
+  }
+
+  async function analyzeImage() {
+    if (isProcessing || !croppedImageBase64) return;
+    
+    isProcessing = true;
+    analyzeBtn.disabled = true;
+    loadingOverlay.style.display = "flex";
+    updateLoadingStep(1, "Mempersiapkan gambar...");
+
+    try {
+      // Simulate processing time for step 1
+      await new Promise(r => setTimeout(r, 1000));
+      
+      updateLoadingStep(2, "Mengirim ke server AI...");
+      
+      // Send to n8n webhook
+      const response = await fetch(N8N_WEBHOOK, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ image: croppedImageBase64 })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const products = await response.json();
+      updateLoadingStep(3, "AI menganalisis (25 detik)...");
+
+      // Simulate AI processing time (25 seconds)
+      let seconds = 0;
+      const timerInterval = setInterval(() => {
+        seconds++;
+        document.querySelector('.loading-subtext').textContent = 
+          `AI sedang bekerja: ${seconds} detik…`;
+      }, 1000);
+
+      await new Promise(r => setTimeout(r, 25000));
+      clearInterval(timerInterval);
+
+      updateLoadingStep(4, "Menyiapkan rekomendasi...");
+      await new Promise(r => setTimeout(r, 1500));
+
+      // Save results to session storage
+      sessionStorage.setItem("skinqu_products", JSON.stringify(products || []));
+      sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
+      sessionStorage.setItem("skinqu_source", "upload");
+      
+      // Redirect to product page
+      window.location.href = "product.html";
+
+    } catch (err) {
+      console.error("❌ Error:", err);
+      
+      // Clear all intervals
+      let id = window.setTimeout(() => {}, 0);
+      while (id--) window.clearTimeout(id);
+
+      loadingOverlay.style.display = "none";
+      analyzeBtn.disabled = false;
+      isProcessing = false;
+      
+      alert("Gagal menganalisis: " + (err.message || "Coba lagi nanti."));
+    }
+  }
+
+  // Prevent page from being cached
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      analyzeBtn.disabled = false;
+      isProcessing = false;
+      loadingOverlay.style.display = "none";
+      cropOverlay.style.display = "none";
+    }
+  });
+
+  // Handle zoom with pinch gesture
+  let initialDistance = null;
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2 && cropOverlay.style.display === 'flex') {
+      initialDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  });
+
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2 && cropOverlay.style.display === 'flex' && initialDistance) {
+      e.preventDefault();
+      
+      const currentDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      
+      const scale = currentDistance / initialDistance;
+      const newSize = cropSize * scale;
+      
+      // Limit zoom range
+      const minSize = Math.min(cropCanvas.width, cropCanvas.height) * 0.3;
+      const maxSize = Math.min(cropCanvas.width, cropCanvas.height) * 0.9;
+      
+      cropSize = Math.max(minSize, Math.min(maxSize, newSize));
+      
+      // Keep crop area within bounds
+      cropX = Math.max(0, Math.min(cropX, cropCanvas.width - cropSize));
+      cropY = Math.max(0, Math.min(cropY, cropCanvas.height - cropSize));
+      
+      drawCrop();
+    }
+  });
+
+  document.addEventListener('touchend', function() {
+    initialDistance = null;
+  });
+  </script>
+</body>
+</html>

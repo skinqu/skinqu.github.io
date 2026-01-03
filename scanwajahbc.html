@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --primary: #2563eb;
@@ -62,18 +61,10 @@
       pointer-events: none;
     }
 
-    .header-container {
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 380px;
-      margin-bottom: 24px;
-      padding-top: 10px;
-    }
-    
     .header {
       text-align: center;
-      margin-bottom: 0;
+      margin-bottom: 24px;
+      max-width: 360px;
     }
 
     .header h1 {
@@ -85,42 +76,12 @@
       background-clip: text;
       color: transparent;
       margin-bottom: 6px;
-      line-height: 1.2;
     }
 
     .header p {
-      font-size: clamp(13px, 3.5vw, 14px);
+      font-size: clamp(14px, 3.8vw, 15px);
       color: var(--text-sub);
-      line-height: 1.4;
-      text-align: center;
-    }
-
-    .upload-toggle-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: var(--text);
-      padding: 10px 16px;
-      border-radius: 50px;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      white-space: nowrap;
-      text-decoration: none;
-    }
-    
-    .upload-toggle-btn:hover {
-      background: rgba(37, 99, 235, 0.2);
-      border-color: var(--primary);
-      transform: translateY(-2px);
-    }
-    
-    .upload-toggle-btn i {
-      font-size: 16px;
+      line-height: 1.5;
     }
 
     .camera-frame {
@@ -256,42 +217,6 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .upload-btn-container {
-      margin-top: 16px;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .upload-btn {
-      width: 100%;
-      padding: 16px;
-      font-size: clamp(16px, 4.2vw, 17px);
-      font-weight: 600;
-      border: none;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #7c3aed, #6d28d9);
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow:
-        0 4px 16px rgba(124, 58, 237, 0.3),
-        0 0 0 2px rgba(124, 58, 237, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      display: block;
-      text-align: center;
-    }
-
-    .upload-btn:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 6px 20px rgba(124, 58, 237, 0.45),
-        0 0 0 3px rgba(124, 58, 237, 0.3);
-    }
-
     .loading-overlay {
       display: none;
       position: fixed;
@@ -419,96 +344,23 @@
       }
     }
 
-    /* Bottom Navigation */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-      z-index: 100;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-sub);
-      text-decoration: none;
-      flex: 1;
-      padding: 8px 0;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .nav-item.active {
-      color: var(--primary);
-    }
-
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      top: -12px;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 8px var(--primary-glow);
-    }
-
-    .nav-icon {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-
-    .nav-label {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-    }
-
-    .nav-item:hover {
-      color: var(--text);
-      transform: translateY(-2px);
-    }
-
-    .nav-item.active:hover {
-      color: var(--primary);
-    }
-
     /* Mobile optimizations */
     @media (max-width: 375px) {
       .camera-frame { border-radius: 22px; }
       .header h1 { font-size: 25px; }
-      .upload-toggle-btn { padding: 8px 12px; font-size: 13px; }
     }
 
     @media (max-width: 320px) {
       .header h1 { font-size: 23px; }
-      .header p { font-size: 12px; }
+      .header p { font-size: 14px; }
       .btn { padding: 14px; font-size: 16px; }
-      .upload-toggle-btn { padding: 6px 10px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
-  <div class="header-container">
-    <div class="header">
-      <h1>SkinQu AI Scanner</h1>
-      <p>Pemindaian wajah real-time</p>
-    </div>
-    
-    <!--<a href="upload.html" class="upload-toggle-btn">
-      <i class="fas fa-upload"></i>
-      Upload
-    </a>-->
+  <div class="header">
+    <h1>SkinQu AI Scanner</h1>
+    <p>Lakukan pemindaian wajah real-time untuk rekomendasi perawatan kulit personal.</p>
   </div>
 
   <div class="camera-frame">
@@ -516,7 +368,7 @@
     <video id="video" playsinline muted></video>
     
     <div class="overlay">
-      <div class="guide-text">Letakkan wajah di dalam garis</div><br>
+      <div class="guide-text">Letakkan wajah di dalam garis</div>
       <svg class="face-outline" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
         <path d="M50,15 
                  C30,15 18,28 18,46 
@@ -558,13 +410,6 @@
     Mulai Pemindaian
   </button>
 
-  <div class="upload-btn-container">
-    <a href="upload.html" class="upload-btn">
-      <i class="fas fa-cloud-upload-alt"></i>
-      Upload Foto dari Galeri
-    </a>
-  </div>
-
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
     <div class="loading-text">Memproses analisis wajah</div>
@@ -593,26 +438,6 @@
   <div class="note">
     🔒 Data tidak disimpan. Analisis dilakukan lokal & cloud aman. Bukan diagnosis medis.
   </div>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item active">
-      <div class="nav-icon">📷</div>
-      <div class="nav-label">Scan</div>
-    </a>
-    <a href="upload.html" class="nav-item">
-      <div class="nav-icon">📁</div>
-      <div class="nav-label">Upload</div>
-    </a>
-    <a href="product.html" class="nav-item">
-      <div class="nav-icon">💎</div>
-      <div class="nav-label">Produk</div>
-    </a>
-    <a href="history.html" class="nav-item">
-      <div class="nav-icon">📊</div>
-      <div class="nav-label">Riwayat</div>
-    </a>
-  </nav>
 
   <canvas id="canvas" hidden></canvas>
 
@@ -706,7 +531,7 @@
     }
     
     if (description && stepNumber <= 4) {
-      const stepText = document.querySelector(`#step${i} .step-text`);
+      const stepText = document.querySelector(`#step${stepNumber} .step-text`);
       if (stepText) stepText.textContent = description;
     }
   }
@@ -771,7 +596,6 @@
 
       sessionStorage.setItem("skinqu_products", JSON.stringify(products || []));
       sessionStorage.setItem("skinqu_scan_time", new Date().toISOString());
-      sessionStorage.setItem("skinqu_source", "camera");
       
       window.location.href = "product.html";
 
