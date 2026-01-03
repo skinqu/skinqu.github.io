@@ -1,79 +1,48 @@
 // assets/js/bottom-nav.js
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    console.log("🚀 Starting navbar load...");
-    console.log("Current path:", window.location.pathname);
+    console.log("Loading navbar...");
     
-    // Tentukan path berdasarkan lokasi halaman
     let basePath = "";
     if (window.location.pathname.includes("/antarmuka/")) {
-      basePath = "../"; // Naik satu level dari /antarmuka/
+      basePath = "../";
     }
     
     const navPath = basePath + "components/bottom-nav.html";
-    console.log("Fetching navbar from:", navPath);
-    
     const res = await fetch(navPath);
     
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: Failed to load navbar`);
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     
     const html = await res.text();
-    console.log("✅ Navbar HTML loaded");
-    
-    // Tambahkan navbar ke body
     document.body.insertAdjacentHTML("beforeend", html);
     
-    // Tentukan halaman aktif
     const currentPage = location.pathname.split("/").pop() || "index.html";
-    console.log("Current page for active state:", currentPage);
     
-    // Tunggu DOM selesai render navbar, lalu update semua link
     setTimeout(() => {
-      // 1. Update semua link di navbar
-      const allLinks = document.querySelectorAll(".bottom-nav a");
-      allLinks.forEach(link => {
+      document.querySelectorAll(".bottom-nav a").forEach(link => {
         const href = link.getAttribute("href");
         if (href && !href.startsWith("http") && !href.startsWith("/")) {
-          // Jika halaman di /antarmuka/, tambahkan ../
-          const newHref = basePath + href;
-          link.setAttribute("href", newHref);
+          link.setAttribute("href", basePath + href);
         }
       });
       
-      // 2. Update semua gambar di navbar
-      const allImages = document.querySelectorAll(".bottom-nav img");
-      allImages.forEach(img => {
+      document.querySelectorAll(".bottom-nav img").forEach(img => {
         const src = img.getAttribute("src");
         if (src && !src.startsWith("http") && !src.startsWith("/")) {
-          // Jika halaman di /antarmuka/, tambahkan ../
-          const newSrc = basePath + src;
-          img.setAttribute("src", newSrc);
+          img.setAttribute("src", basePath + src);
         }
       });
       
-      // 3. Set active state
-      const navItems = document.querySelectorAll(".nav-item");
-      console.log("Found nav items:", navItems.length);
-      
-      navItems.forEach(item => {
-        const pageName = item.dataset.page;
-        if (pageName === currentPage) {
+      document.querySelectorAll(".nav-item").forEach(item => {
+        if (item.dataset.page === currentPage) {
           item.classList.add("active");
-          console.log("🌟 Set active for:", pageName);
         }
       });
-      
     }, 100);
     
   } catch (error) {
-    console.error("❌ Error loading navbar:", error);
+    console.error("Navbar error:", error);
     
-    // FALLBACK: Buat navbar manual dengan path yang benar
-    console.log("Creating fallback navbar...");
-    
-    // Tentukan base path untuk fallback
     let basePath = "";
     if (window.location.pathname.includes("/antarmuka/")) {
       basePath = "../";
@@ -109,65 +78,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     </div>`;
     
     document.body.insertAdjacentHTML("beforeend", fallbackNav);
-    
-    // Tambahkan CSS emergency jika CSS tidak terload
-    const emergencyCSS = `
-    <style>
-      .bottom-nav {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 70px !important;
-        display: flex !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-        background: white !important;
-        border-top: 1px solid #eee !important;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
-        z-index: 9999 !important;
-      }
-      .bottom-nav a {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-decoration: none !important;
-        color: #666 !important;
-        font-size: 11px !important;
-      }
-      .bottom-nav img {
-        width: 24px !important;
-        height: 24px !important;
-        margin-bottom: 4px !important;
-      }
-      .bottom-nav .active a {
-        color: #447DCE !important;
-      }
-      .fab-wrapper {
-        margin-top: -20px !important;
-      }
-      .fab {
-        width: 60px !important;
-        height: 60px !important;
-        background: #2c83f5 !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 4px 12px rgba(44,131,245,0.4) !important;
-      }
-      .fab img {
-        width: 30px !important;
-        height: 30px !important;
-        filter: brightness(0) invert(1) !important;
-        margin: 0 !important;
-      }
-      body {
-        padding-bottom: 80px !important;
-      }
-    </style>
-    `;
-    
-    document.head.insertAdjacentHTML("beforeend", emergencyCSS);
   }
 });
