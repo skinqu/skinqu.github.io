@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#447DCE">
-  <title>Form Kulit – Rekomendasi Moisturizer</title>
+  <title>Form Kulit – Rekomendasi moisturizer</title>
   <!-- Google Fonts (Poppins) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- CSS utama -->
-  <link rel="stylesheet" href="/assets/css/cssrecom.css">
+  <script type="module" src="assets/js/auth-guard.js"></script>
+  <script src="../assets/js/bottom-nav.js" defer></script>
+  <script src="../assets/js/jk.js" defer></script>
+  <link rel="stylesheet" href="../assets/css/cssindex.css">
+  <link rel="stylesheet" href="../assets/css/cssrecom.css">
   <style>
-    /* Fallback jika CSS belum load */
     body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
   </style>
 </head>
@@ -47,12 +49,14 @@
         </div>
       </div>
 
+      <div id="hamilWrapper">
       <div class="section-title">Hamil?</div>
-      <div class="option-row">
-        <div>Hamil</div>
-        <div class="yn-buttons">
-          <label><input type="radio" name="hamil" value="ya"> ya</label>
-          <label><input type="radio" name="hamil" value="tidak" checked> tidak</label>
+        <div class="option-row">
+          <div>Hamil</div>
+          <div class="yn-buttons">
+            <label><input type="radio" name="hamil" value="ya"> ya</label>
+            <label><input type="radio" name="hamil" value="tidak" checked> tidak</label>
+          </div>
         </div>
       </div>
 
@@ -141,30 +145,6 @@
 
       <button class="btn-send" type="button" onclick="kirim()">Kirim</button>
     </form>
-  </div>
-
-  <!-- BOTTOM NAV (di luar .page-wrapper agar fixed benar) -->
-  <div class="bottom-nav">
-    <div class="nav-item">
-      <a href="/index.html" aria-label="Beranda">
-        <img src="/assets/img/home.png" alt="Beranda">
-      </a>
-    </div>
-    <div class="nav-item active">
-      <a href="/scanwajah.html" aria-label="Analisis Wajah" class="search-icon">
-        <img src="/assets/img/scanwajah.png" alt="Analisis Wajah">
-      </a>
-    </div>
-    <div class="nav-item">
-      <a href="/favorite.html" aria-label="Favorit">
-        <img src="/assets/img/heart.png" alt="Favorit">
-      </a>
-    </div>
-    <div class="nav-item">
-      <a href="/profile.html" aria-label="Profil">
-        <img src="/assets/img/user.png" alt="Profil">
-      </a>
-    </div>
   </div>
 
   <!-- LOADING OVERLAY — CENTERED & PREMIUM -->
