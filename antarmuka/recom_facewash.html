@@ -182,7 +182,7 @@
       document.getElementById("loadingOverlay").classList.add("active");
 
       // Kirim ke n8n
-      fetch("https://aang34.app.n8n.cloud/webhook/skinqu-input", {
+      fetch("https://skinqu.app.n8n.cloud/webhook/skinqu-input", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
